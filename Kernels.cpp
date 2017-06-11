@@ -20,7 +20,7 @@ float Spiky::W(float r, float h) {
     return 0;
 }
 
-float Spiky:dW(float r, float h) {
+float Spiky::dW(float r, float h) {
     if (r >= 0 && r <= h) {
     return 15/(M_PI * pow(h, 6)) * pow(h - r, 3);
     }
