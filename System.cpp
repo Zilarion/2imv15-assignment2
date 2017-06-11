@@ -131,7 +131,7 @@ float System::getTime() {
 VectorXf System::derivEval() {
     clearForces();
     computeForces();
-    ConstraintSolver::solve(this, 100.0f, 10.0f);
+//    ConstraintSolver::solve(this, 100.0f, 10.0f);
     return computeDerivative();
 }
 
@@ -169,10 +169,10 @@ VectorXf System::computeDerivative() {
     VectorXf dst(this->getDim());
     for (int i = 0; i < particles.size(); i++) {
         Particle *p = particles[i];
-        dst[i * 6 + 0] = p->velocity[0];        /* xdot = v */
+        dst[i * 6 + 0] = p->velocity[0];        /* xdot = u */
         dst[i * 6 + 1] = p->velocity[1];
         dst[i * 6 + 2] = p->velocity[2];
-        dst[i * 6 + 3] = p->force[0] / p->mass; /* vdot = f/m */
+        dst[i * 6 + 3] = p->force[0] / p->mass; /* udot = -dp + density * force + gamma * ddu */
         dst[i * 6 + 4] = p->force[1] / p->mass;
         dst[i * 6 + 5] = p->force[2] / p->mass;
     }
