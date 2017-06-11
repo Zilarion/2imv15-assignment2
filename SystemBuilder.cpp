@@ -20,18 +20,16 @@ System* SystemBuilder::get(AvailableSystems s) {
 
 System* SystemBuilder::initBasic()
 {
-    System* sys = new System(new Euler(Euler::SEMI));
+    System* sys = new System(new RungeKutta());
 
-    const float dist = 0.5f;
-    const Vec3f center(0.0, 0.0, 0.0);
-    const Vec3f offset(dist, 0.0, 0.0);
-
-    sys->addParticle(new Particle(center + offset, 1.0f, 0));
-    sys->addParticle(new Particle(center + offset * 2, 1.0f, 1));
-    sys->addParticle(new Particle(center + offset * 3, 1.0f, 2));
-    sys->addParticle(new Particle(center + offset * 3, 1.0f, 3));
-    sys->addParticle(new Particle(center + offset * 4, 1.0f, 4));
-    sys->addParticle(new Particle(center + offset * 4, 1.0f, 5));
+    int dimensions = 20;
+    int index = 0;
+    for (int i = -dimensions; i < dimensions; i++) {
+        for (int j = -dimensions; j < dimensions; j++) {
+            sys->addParticle(new Particle(Vec3f(i * .1f, .0f, j * .1f), 1.0f, index));
+            index++;
+        }
+    }
 
     return sys;
 }
