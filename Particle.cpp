@@ -23,18 +23,18 @@ void Particle::reset()
 void Particle::draw(bool drawVelocity, bool drawForce)
 {
 	const float h = .025f;
-//	glColor3f(1.f, 1.f, 1.f);
-//    glPointSize(h);
-//	glBegin(GL_POINTS);
-//        glVertex3f(position[0], position[1], position[2]);
-//	glEnd();
+	glColor3f(1.f, 1.f, 1.f);
+    glPointSize(h);
+	glBegin(GL_POINTS);
+        glVertex3f(position[0], position[1], position[2]);
+	glEnd();
 
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, Vec3f(0.88,0.08,0.88));
-    glPushMatrix();
-    glTranslated(position[0], position[1], position[2]);
-    glutSolidSphere(h, 10, 10);
+//    glPushMatrix();
+//    glMaterialfv(GL_FRONT, GL_DIFFUSE, Vec3f(0.88,0.08,0.88));
+//    glTranslated(position[0], position[1], position[2]);
+//    glutSolidSphere(h, 10, 10);
+//    glPopMatrix();
 
-    glPopMatrix();
     if (drawVelocity) {
         glColor3f(0.0, 0.6, 0.0);
         glBegin(GL_LINES);
@@ -47,7 +47,7 @@ void Particle::draw(bool drawVelocity, bool drawForce)
         glColor3f(0.0, 0.6, 0.6);
         glBegin(GL_LINES);
         glVertex3f(position[0], position[1], position[2]);
-        glVertex3f(position[0] + force[0] * 0.2f, position[1] + force[1] * 0.2f, position[2] + force[2] * 0.2f);
+        glVertex3f(position[0] + force[0], position[1] + force[1], position[2] + force[2]);
         glEnd();
     }
 }

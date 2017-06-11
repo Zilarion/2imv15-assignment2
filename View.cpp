@@ -38,7 +38,7 @@ void keypressCallback(unsigned char k, int x, int y) {
 }
 
 View::View(int width, int height, float dt, SystemBuilder::AvailableSystems system, int N)
-        : width(width), height(height), isSimulating(false), dumpFrames(false), drawVelocity(false), drawForces(true),
+        : width(width), height(height), isSimulating(false), dumpFrames(false), drawVelocity(false), drawForces(false),
           drawConstraints(true), adaptive(false), frameNumber(0), dt(dt), N(N) {
     glutInitDisplayMode ( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 

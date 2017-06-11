@@ -23,7 +23,7 @@ System* SystemBuilder::initBasic()
 {
     System* sys = new System(new RungeKutta());
 
-    int dimensions = 10;
+    int dimensions = 8;
     float mass = 1.0f;
     float density = 1.0f;
     int index = 0;
