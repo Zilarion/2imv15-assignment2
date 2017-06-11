@@ -40,7 +40,7 @@ void keypressCallback(unsigned char k, int x, int y) {
 View::View(int width, int height, float dt, SystemBuilder::AvailableSystems system, int N)
         : width(width), height(height), isSimulating(false), dumpFrames(false), drawVelocity(false), drawForces(true),
           drawConstraints(true), adaptive(false), frameNumber(0), dt(dt), N(N) {
-    glutInitDisplayMode ( GLUT_RGBA | GLUT_DOUBLE );
+    glutInitDisplayMode ( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 
     glutInitWindowPosition ( 0, 0 );
     glutInitWindowSize ( width, height );
@@ -49,9 +49,21 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
-    glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
+
+
+    // enable lights
+    GLfloat ambient[] = {0.7,0.7,0.7};
+    GLfloat diffuse[] = {.5,.5,.5};
+    GLfloat specular[] = {0.1, 0.1, 0.1};
+    GLfloat lightPosition[] = { 0.0, 2.0, 2.0 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
     glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
     glEnable(GL_BLEND);
