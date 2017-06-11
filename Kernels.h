@@ -9,7 +9,7 @@
 
 using namespace Eigen;
 
-static float H = 0.2f;
+static float H = 1.5f;
 
 static class Poly6 {
 public:

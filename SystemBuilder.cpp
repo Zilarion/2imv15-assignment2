@@ -7,6 +7,8 @@
 #include "solvers/Midpoint.h"
 #include "solvers/RungeKutta.h"
 #include "forces/PressureForce.h"
+#include "forces/ViscosityForce.h"
+#include "forces/DirectionalForce.h"
 
 System* SystemBuilder::get(AvailableSystems s) {
     System* sys;
@@ -23,18 +25,30 @@ System* SystemBuilder::initBasic()
 {
     System* sys = new System(new RungeKutta());
 
-    int dimensions = 8;
+    int dimensions = 3;
     float mass = 1.0f;
-    float density = 1.0f;
     int index = 0;
+
+    // Movable particles
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * .1f, .0f, j * .1f), density, mass, index));
+            sys->addParticle(new Particle(Vector3f(i * .1f, .0f, j * .1f), mass, index, true));
             index++;
         }
     }
 
+    dimensions += 1;
+    // A small static particle set
+    for (int i = -dimensions; i < dimensions; i++) {
+        for (int j = -dimensions; j < dimensions; j++) {
+            sys->addParticle(new Particle(Vector3f(i * .1f, -2.f, j * .1f), mass, index, false));
+            index++;
+        }
+    }
+
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(0.0f, -0.0981f, 0.0f)));
     sys->addForce(new PressureForce(sys->particles));
+    sys->addForce(new ViscosityForce(sys->particles));
 
     return sys;
 }

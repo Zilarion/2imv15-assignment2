@@ -14,21 +14,6 @@ void PressureForce::setTarget(std::vector<Particle*> particles) {
 }
 
 void PressureForce::apply(System *s) {
-    // Compute all densities
-    float restDensity = 0;
-    for (Particle *p : particles) {
-        p->density = s->densityField->eval(p);
-        restDensity += p->density;
-    }
-
-    float k = 1.5f;
-    restDensity /= particles.size();
-
-    // Compute all pressures at each particle
-    for (Particle* p : particles) {
-        p->pressure = k * (p->density - restDensity);
-    }
-
     // Evaluate pressure force for every particle
     for (Particle* p : particles) {
         p->force += s->pressureField->eval(p);

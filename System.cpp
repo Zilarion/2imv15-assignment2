@@ -53,7 +53,7 @@ void System::addConstraint(Constraint *c) {
  */
 void System::free() {
     particles.clear();
-//    forces.clear();
+    forces.clear();
 }
 
 /**
@@ -71,10 +71,10 @@ void System::reset() {
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
     drawParticles(drawVelocity, drawForce);
     if (drawForce) {
-//        drawForces();
+        drawForces();
     }
     if (drawConstraint){
-//        drawConstraints();
+        drawConstraints();
     }
 }
 
@@ -149,12 +149,14 @@ void System::setState(VectorXf src) {
 
 void System::setState(VectorXf src, float t) {
     for (int i = 0; i < particles.size(); i++) {
-        particles[i]->position[0] = src[i * 6 + 0];
-        particles[i]->position[1] = src[i * 6 + 1];
-        particles[i]->position[2] = src[i * 6 + 2];
-        particles[i]->velocity[0] = src[i * 6 + 3];
-        particles[i]->velocity[1] = src[i * 6 + 4];
-        particles[i]->velocity[2] = src[i * 6 + 5];
+        if (particles[i]->movable) {
+            particles[i]->position[0] = src[i * 6 + 0];
+            particles[i]->position[1] = src[i * 6 + 1];
+            particles[i]->position[2] = src[i * 6 + 2];
+            particles[i]->velocity[0] = src[i * 6 + 3];
+            particles[i]->velocity[1] = src[i * 6 + 4];
+            particles[i]->velocity[2] = src[i * 6 + 5];
+        }
     }
     this->time = t;
 }
@@ -162,6 +164,21 @@ void System::setState(VectorXf src, float t) {
 /// Private ///
 
 void System::computeForces() {
+    // Compute all densities
+    float restDensity = 0;
+    for (Particle *p : particles) {
+        p->density = densityField->eval(p);
+        restDensity += p->density;
+    }
+
+    float k = .1f;
+    restDensity /= particles.size();
+
+    // Compute all pressures at each particle
+    for (Particle* p : particles) {
+        p->pressure = Vector3f(k, k, k) * (p->density - restDensity);
+    }
+
     for (Force *f : forces) {
         f->apply(this);
     }

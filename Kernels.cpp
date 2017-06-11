@@ -2,6 +2,7 @@
 // Created by Ruud Andriessen on 11/06/2017.
 //
 
+#include <iostream>
 #include "Kernels.h"
 
 // Use poly for all computations except for visc. and pressure
@@ -31,7 +32,7 @@ float Spiky::dW(float r, float h) {
 // Use viscosity for viscosity computations
 float Viscosity::W(float r, float h) {
     if (r >= 0 && r <= h) {
-        return 15/(2 * M_PI * pow(h, 3)) * (-pow(r, 3)/(2 * pow(h, 3)) + (r*r)/(h*h) + h/(2 * r));
+        return 15/(2 * M_PI * pow(h, 3)) * (-pow(r, 3)/(2 * pow(h, 3)) + (r*r)/(h*h) + h/(2 * r) - 1);
     }
     return 0;
 }

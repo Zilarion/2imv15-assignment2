@@ -9,18 +9,19 @@ class Particle
 {
 public:
 
-	Particle(const Vector3f & startPosition, float density, float mass, int index);
+	Particle(const Vector3f & startPosition, float mass, int index, bool movable);
 	virtual ~Particle(void);
 
 	void reset();
 	void draw(bool drawVelocity, bool drawForce);
 
     Vector3f startPos;
-	Vector3f position;
     Vector3f force;
     Vector3f velocity;
-    float pressure;
+    Vector3f position;
+    Vector3f pressure;
     float density;
     int index;
     float mass;
+    bool movable;
 };
