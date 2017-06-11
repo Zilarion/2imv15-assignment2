@@ -7,7 +7,7 @@
 #endif
 
 
-CircularWireConstraint::CircularWireConstraint(Particle *p, const Vec3f & center,
+CircularWireConstraint::CircularWireConstraint(Particle *p, const Vector3f & center,
                                                const float radius) :
         Constraint({p}), particle(p), center(center), radius(radius) {}
 
@@ -35,8 +35,8 @@ void CircularWireConstraint::draw()
  * @return x * x - r * r
  */
 float CircularWireConstraint::C() {
-    Vec3f delta = particle->position - center;
-    return delta * delta - radius * radius;
+    Vector3f delta = particle->position - center;
+    return delta.dot(delta) - radius * radius;
 }
 
 /**
@@ -44,18 +44,18 @@ float CircularWireConstraint::C() {
  * @return x * xd
  */
 float CircularWireConstraint::Cd() {
-    Vec3f pVector = (particle->position - center);
-    Vec3f vVector = particle->velocity;
+    Vector3f pVector = (particle->position - center);
+    Vector3f vVector = particle->velocity;
 
-    return 2 * pVector * vVector;
+    return 2 * pVector.dot(vVector);
 }
 
 /**
  * Computes j of this constraint
  * @return
  */
-vector<Vec3f> CircularWireConstraint::j() {
-    vector<Vec3f> j;
+vector<Vector3f> CircularWireConstraint::j() {
+    vector<Vector3f> j;
     j.push_back((particle->position - center) * 2);
     return j;
 }
@@ -64,8 +64,9 @@ vector<Vec3f> CircularWireConstraint::j() {
  * Computes jd of this constraint
  * @return
  */
-vector<Vec3f> CircularWireConstraint::jd() {
-    vector<Vec3f> jd;
-    jd.push_back(particle->velocity * 2);
+vector<Vector3f> CircularWireConstraint::jd() {
+    vector<Vector3f> jd;
+    // TODO fix this? I don't know why it doesn't work
+//    jd.push_back( 2 * (particle->velocity));
     return jd;
 }

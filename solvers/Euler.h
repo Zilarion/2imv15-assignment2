@@ -13,15 +13,11 @@ public:
     void simulateStep(System* system, float h) override;
     enum TYPE {
         EXPLICIT,
-        IMPLICIT,
         SEMI
     };
     TYPE type;
 
     Euler(TYPE type);
-
-private:
-    void implicit(System* sys, float h);
 
 };
 

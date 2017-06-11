@@ -17,7 +17,7 @@ using namespace std;
  */
 void ConstraintSolver::solve(System *s, float Ks, float Kd) {
     vector<Particle*> particles = s->particles;
-    vector<Constraint*> constraints = s->constraints;
+    std::vector<Constraint*> constraints = s->constraints;
 
     if (constraints.empty())
         return;
@@ -60,8 +60,8 @@ void ConstraintSolver::solve(System *s, float Ks, float Kd) {
         // Compute C, Cd, j, jd for this constraint
         C[i] = c->C();
         Cd[i] = c->Cd();
-        vector<Vec3f> j = c->j();
-        vector<Vec3f> jd = c->jd();
+        vector<Vector3f> j = c->j();
+        vector<Vector3f> jd = c->jd();
         vector<Particle*> afParticles = c->affects();
 
         // Fill the matrices at the correct particle positions

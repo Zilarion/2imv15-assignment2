@@ -11,8 +11,8 @@ public:
 
     float C() override;
     float Cd() override;
-    vector<Vec3f> j() override;
-    vector<Vec3f> jd() override;
+    vector<Vector3f> j() override;
+    vector<Vector3f> jd() override;
 
  private:
   Particle * const p1;

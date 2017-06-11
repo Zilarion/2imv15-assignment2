@@ -20,10 +20,21 @@ float Spiky::W(float r, float h) {
     return 0;
 }
 
+float Spiky:dW(float r, float h) {
+    if (r >= 0 && r <= h) {
+    return 15/(M_PI * pow(h, 6)) * pow(h - r, 3);
+    }
+    return 0;
+};
+
 // Use viscosity for viscosity computations
 float Viscosity::W(float r, float h) {
     if (r >= 0 && r <= h) {
-        return 15/(2 * M_PI * pow(h, 3)) * (-pow(r, 3)/(2 * pow(h, 3)) + (r*r)/(h*h) + h/(2r));
+        return 15/(2 * M_PI * pow(h, 3)) * (-pow(r, 3)/(2 * pow(h, 3)) + (r*r)/(h*h) + h/(2 * r));
     }
     return 0;
+}
+
+float Viscosity::ddW(float r, float h) {
+    return 45/(M_PI * pow(h, 6)) * (h - r);
 }

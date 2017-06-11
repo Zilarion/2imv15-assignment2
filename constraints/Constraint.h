@@ -16,8 +16,8 @@ public:
 
     virtual float C() = 0;
     virtual float Cd() = 0;
-    virtual vector<Vec3f> j() = 0;
-    virtual vector<Vec3f> jd() = 0;
+    virtual vector<Vector3f> j() = 0;
+    virtual vector<Vector3f> jd() = 0;
 
     vector<Particle*> affects() { return particles; };
 protected:

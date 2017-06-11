@@ -9,17 +9,17 @@ using namespace std;
 
 class CircularWireConstraint : public Constraint {
 public:
-    CircularWireConstraint(Particle *p, const Vec3f & center, const float radius);
+    CircularWireConstraint(Particle *p, const Vector3f & center, const float radius);
 
     void draw() override;
 
     float C() override;
     float Cd() override;
-    vector<Vec3f> j() override;
-    vector<Vec3f> jd() override;
+    vector<Vector3f> j() override;
+    vector<Vector3f> jd() override;
 
 private:
     Particle * const particle;
-    Vec3f const center;
+    Vector3f const center;
     float const radius;
 };

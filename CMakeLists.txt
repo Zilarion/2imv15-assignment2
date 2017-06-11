@@ -62,7 +62,7 @@ set(SOURCE_FILES
         constraints/CircularWireConstraint.cpp
         constraints/CircularWireConstraint.h
         forces/Force.cpp
-        forces/Force.h fields/Field.cpp fields/Field.h Kernels.cpp Kernels.h)
+        forces/Force.h Kernels.cpp Kernels.h fields/DensityField.cpp fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h)
 
 
 add_executable(Fluids ${SOURCE_FILES})

@@ -11,6 +11,8 @@
 #include "SystemBuilder.h"
 #include "constraints/Constraint.h"
 #include "forces/Force.h"
+#include "fields/DensityField.h"
+#include "fields/PressureField.h"
 
 #include <vector>
 
@@ -29,10 +31,14 @@ private:
     float time;
 public:
     System(Solver* solver);
+    ~System();
 
     std::vector<Particle*> particles;
     std::vector<Force*> forces;
     std::vector<Constraint*> constraints;
+
+    DensityField* densityField;
+    PressureField* pressureField;
 
     bool wallExists;
     bool springsCanBreak = false;

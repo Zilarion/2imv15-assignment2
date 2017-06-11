@@ -6,10 +6,11 @@
 #include "solvers/Euler.h"
 #include "solvers/Midpoint.h"
 #include "solvers/RungeKutta.h"
+#include "forces/PressureForce.h"
 
 System* SystemBuilder::get(AvailableSystems s) {
+    System* sys;
     switch (s) {
-        System* sys;
         case BASIC:
             sys = initBasic();
             sys->type = BASIC;
@@ -22,16 +23,18 @@ System* SystemBuilder::initBasic()
 {
     System* sys = new System(new RungeKutta());
 
-    int dimensions = 20;
+    int dimensions = 10;
     float mass = 1.0f;
     float density = 1.0f;
     int index = 0;
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vec3f(i * .1f, .0f, j * .1f), density, mass, index));
+            sys->addParticle(new Particle(Vector3f(i * .1f, .0f, j * .1f), density, mass, index));
             index++;
         }
     }
+
+    sys->addForce(new PressureForce(sys->particles));
 
     return sys;
 }

@@ -10,20 +10,20 @@ RodConstraint::RodConstraint(Particle *p1, Particle * p2, float dist) :
   Constraint({p1, p2}), p1(p1), p2(p2), dist(dist) {}
 
 float RodConstraint::C() {
-  Vec3f delta = p1->position - p2->position;
+  Vector3f delta = p1->position - p2->position;
 
-  return delta * delta - dist * dist;
+  return delta.dot(delta) - dist * dist;
 }
 
 float RodConstraint::Cd() {
-    Vec3f pDiff = (p1->position - p2->position) * 2;
-    Vec3f vDiff = (p1->velocity - p2->velocity) * 2;
+    Vector3f pDiff = (p1->position - p2->position) * 2;
+    Vector3f vDiff = (p1->velocity - p2->velocity) * 2;
 
-    return pDiff * vDiff;
+    return pDiff.dot(vDiff);
 }
 
-std::vector<Vec3f> RodConstraint::j() {
-    std::vector <Vec3f> j;
+std::vector<Vector3f> RodConstraint::j() {
+    std::vector <Vector3f> j;
 
     j.push_back((p1->position - p2->position) * 2);
     j.push_back((p2->position - p1->position) * 2);
@@ -31,8 +31,8 @@ std::vector<Vec3f> RodConstraint::j() {
     return j;
 }
 
-vector<Vec3f> RodConstraint::jd() {
-    vector <Vec3f> jd;
+vector<Vector3f> RodConstraint::jd() {
+    vector <Vector3f> jd;
 
     jd.push_back((p1->velocity - p2->velocity) * 2);
     jd.push_back((p2->velocity - p1->velocity) * 2);

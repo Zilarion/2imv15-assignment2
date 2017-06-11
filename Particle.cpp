@@ -5,8 +5,8 @@
     #include <GLUT/glut.h>
 #endif
 
-Particle::Particle(const Vec3f & startPosition, float density, float mass, int index) :
-	startPos(startPosition), density(density), position(Vec3f(0.0, 0.0, 0.0)), velocity(Vec3f(0.0, 0.0, 0.0)), force(Vec3f(0.0,0.0,0.0)), mass(mass), index(index)
+Particle::Particle(const Vector3f & startPosition, float density, float mass, int index) :
+	startPos(startPosition), density(density), position(Vector3f(0.0, 0.0, 0.0)), velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0,0.0,0.0)), mass(mass), index(index)
 {
 }
 
@@ -17,8 +17,8 @@ Particle::~Particle(void)
 void Particle::reset()
 {
 	position = startPos;
-    velocity = Vec3f(0.0, 0.0, 0.0);
-    force = Vec3f(0.0, 0.0, 0.0);
+    velocity = Vector3f(0.0, 0.0, 0.0);
+    force = Vector3f(0.0, 0.0, 0.0);
 }
 void Particle::draw(bool drawVelocity, bool drawForce)
 {

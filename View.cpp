@@ -112,10 +112,6 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             printf("Using Semi Explicit Euler\n");
             sys->solver = new Euler(Euler::SEMI);
             break;
-        case '3':
-            printf("Using Implicit Euler\n");
-            sys->solver = new Euler(Euler::IMPLICIT);
-            break;
         case '4':
             printf("Using Midpoint\n");
             sys->solver = new Midpoint();

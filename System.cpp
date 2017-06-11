@@ -5,6 +5,7 @@
 #include "System.h"
 #include "solvers/Solver.h"
 #include "solvers/ConstraintSolver.h"
+#include "fields/PressureField.h"
 
 #if defined(_WIN32) || defined(WIN32)
 
@@ -14,8 +15,15 @@
 #include <GLUT/glut.h>
 #endif
 
-System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005) {}
+System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005) {
+    densityField = new DensityField(this);
+    pressureField = new PressureField(this);
+}
 
+System::~System() {
+    delete densityField;
+    delete pressureField;
+}
 /**
  * Adds a given particle to the system
  * @param p The particle to add
@@ -155,13 +163,13 @@ void System::setState(VectorXf src, float t) {
 
 void System::computeForces() {
     for (Force *f : forces) {
-        f->apply(springsCanBreak);
+        f->apply(this);
     }
 }
 
 void System::clearForces() {
     for (Particle *p : particles) {
-        p->force = Vec3f(0.0f, 0.0f, 0.0f);
+        p->force = Vector3f(0.0f, 0.0f, 0.0f);
     }
 }
 
@@ -172,9 +180,9 @@ VectorXf System::computeDerivative() {
         dst[i * 6 + 0] = p->velocity[0];        /* xdot = u */
         dst[i * 6 + 1] = p->velocity[1];
         dst[i * 6 + 2] = p->velocity[2];
-        dst[i * 6 + 3] = p->force[0] / p->mass; /* udot = -dp + density * force + gamma * ddu */
-        dst[i * 6 + 4] = p->force[1] / p->mass;
-        dst[i * 6 + 5] = p->force[2] / p->mass;
+        dst[i * 6 + 3] = p->force[0]; /* udot = -dp + density * force + gamma * ddu */
+        dst[i * 6 + 4] = p->force[1];
+        dst[i * 6 + 5] = p->force[2];
     }
     return dst;
 }
