@@ -13,6 +13,7 @@
 #include "forces/Force.h"
 #include "fields/DensityField.h"
 #include "fields/PressureField.h"
+#include "fields/ColorField.h"
 
 #include <vector>
 
@@ -39,6 +40,7 @@ public:
 
     DensityField* densityField;
     PressureField* pressureField;
+    ColorField* colorField;
 
     bool wallExists;
     bool springsCanBreak = false;

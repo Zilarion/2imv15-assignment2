@@ -11,20 +11,24 @@ using namespace Eigen;
 
 static float H = 1.5f;
 
-static class Poly6 {
-public:
-    static float W(float r, float h = H);
-};
-
-static class Spiky {
+class Poly6 {
 public:
     static float W(float r, float h = H);
     static float dW(float r, float h = H);
+    static float ddW(float r, float h = H);
 };
 
-static class Viscosity {
+class Spiky {
 public:
     static float W(float r, float h = H);
+
+    static float dW(float r, float h = H);
+};
+
+class Viscosity {
+public:
+    static float W(float r, float h = H);
+
     static float ddW(float r, float h = H);
 };
 

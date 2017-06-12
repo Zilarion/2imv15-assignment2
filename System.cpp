@@ -6,6 +6,7 @@
 #include "solvers/Solver.h"
 #include "solvers/ConstraintSolver.h"
 #include "fields/PressureField.h"
+#include "fields/ColorField.h"
 
 #if defined(_WIN32) || defined(WIN32)
 
@@ -18,11 +19,13 @@
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
+    colorField = new ColorField(this);
 }
 
 System::~System() {
     delete densityField;
     delete pressureField;
+    delete colorField;
 }
 /**
  * Adds a given particle to the system

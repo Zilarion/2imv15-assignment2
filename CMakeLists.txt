@@ -68,7 +68,7 @@ set(SOURCE_FILES
         forces/DirectionalForce.cpp
         forces/DirectionalForce.h
         fields/DensityField.cpp
-        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h)
+        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h)
 
 
 add_executable(Fluids ${SOURCE_FILES})
