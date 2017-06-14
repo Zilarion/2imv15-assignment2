@@ -52,5 +52,8 @@ float Viscosity::W(float r, float h) {
 }
 
 float Viscosity::ddW(float r, float h) {
-    return 45 / (M_PI * pow(h, 6)) * (h - r);
+    if (r >= 0 && r <= h) {
+        return 45 / (M_PI * pow(h, 6)) * (h - r);
+    }
+    return 0;
 }
