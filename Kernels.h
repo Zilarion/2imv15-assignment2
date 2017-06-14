@@ -13,22 +13,22 @@ static float H = .15f;
 
 class Poly6 {
 public:
-    static float W(float r, float h = H);
-    static float dW(float r, float h = H);
-    static float ddW(float r, float h = H);
+    static float W(Vector3f r, float h = H);
+    static Vector3f dW(Vector3f r, float h = H);
+    static float ddW(Vector3f r, float h = H);
 };
 
 class Spiky {
 public:
-    static float W(float r, float h = H);
+    static float W(Vector3f r, float h = H);
     static Vector3f dW(Vector3f r, float h = H);
 };
 
 class Viscosity {
 public:
-    static float W(float r, float h = H);
+    static float W(Vector3f r, float h = H);
 
-    static float ddW(float r, float h = H);
+    static float ddW(Vector3f r, float h = H);
 };
 
 #endif //FLUIDS_KERNEL_H

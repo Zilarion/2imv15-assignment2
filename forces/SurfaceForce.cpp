@@ -21,7 +21,7 @@ void SurfaceForce::apply(System *s) {
     for (Particle *pi : particles) {
         Vector3f n = s->colorField->dEval(pi->position);
         if (n.norm() > certainThreshold) {
-            pi->force += -sigma * s->colorField->ddEval(n / n.norm());
+            pi->force += -sigma * s->colorField->ddEval(pi->position) * n / n.norm();
         }
     }
 }
