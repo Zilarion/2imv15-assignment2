@@ -9,26 +9,23 @@
 
 using namespace Eigen;
 
-static float H = .15f;
-
 class Poly6 {
 public:
-    static float W(Vector3f r, float h = H);
-    static Vector3f dW(Vector3f r, float h = H);
-    static float ddW(Vector3f r, float h = H);
+    static float W(Vector3f r, float h);
+    static Vector3f dW(Vector3f r, float h);
+    static float ddW(Vector3f r, float h);
 };
 
 class Spiky {
 public:
-    static float W(Vector3f r, float h = H);
-    static Vector3f dW(Vector3f r, float h = H);
+    static float W(Vector3f r, float h);
+    static Vector3f dW(Vector3f r, float h);
 };
 
 class Viscosity {
 public:
-    static float W(Vector3f r, float h = H);
-
-    static float ddW(Vector3f r, float h = H);
+    static float W(Vector3f r, float h);
+    static float ddW(Vector3f r, float h);
 };
 
 #endif //FLUIDS_KERNEL_H

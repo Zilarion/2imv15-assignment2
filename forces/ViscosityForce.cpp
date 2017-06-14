@@ -21,7 +21,7 @@ void ViscosityForce::apply(System *s) {
         for (Particle *pj : particles) {
             if (pi->index != pj->index) {
                 viscosityForce = pj->mass * (pj->velocity - pi->velocity) / pj->density
-                                 * Viscosity::ddW(pi->position - pj->position, 200.0f);
+                                 * Viscosity::ddW(pi->position - pj->position, 20.0f);
             }
         }
         pi->force += u * viscosityForce;

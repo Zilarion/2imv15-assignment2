@@ -9,7 +9,7 @@
 Vector3f PressureField::eval(Particle* pi) {
     Vector3f force = Vector3f(0, 0, 0);
     for (Particle* pj : sys->particles) {
-        force -= pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position);
+        force -= pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position, .1f);
     }
     return force;
 }

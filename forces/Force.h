@@ -23,6 +23,9 @@ protected:
 public:
     std::vector<Particle*> particles;
     virtual void setTarget(std::vector<Particle*> particles) = 0;
+    void addAsTarget(Particle* p) {
+        particles.push_back(p);
+    }
     virtual void apply(System* s) = 0;
     virtual void draw() = 0;
 

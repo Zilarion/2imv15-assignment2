@@ -33,6 +33,9 @@ System::~System() {
  */
 void System::addParticle(Particle *p) {
     particles.push_back(p);
+    for (Force* f : forces) {
+        f->addAsTarget(p);
+    }
 }
 
 /**
@@ -171,11 +174,10 @@ void System::computeForces() {
     float restDensity = 0;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
-        if (p->movable)
-            restDensity += p->density;
+        restDensity += p->density;
     }
 
-    float k = 2.0f;
+    float k = .1f;
     restDensity /= particles.size();
 
     // Compute all pressures at each particle

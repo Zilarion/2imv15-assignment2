@@ -28,15 +28,17 @@ System* SystemBuilder::initBasic()
 
     int dimensions = 2;
     float mass = 1.f;
-    float staticMass = 10.f;
+    float staticMass = 100.f;
     int index = 0;
-    float d = 0.2f;
+    float d = 0.1f;
     float ds = 0.1f;
 
     // Movable particles
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * d + 0.01f, .0f, j * d), mass, index++, true));
+            sys->addParticle(new Particle(Vector3f(i * d + 0.01f + (rand() % 10 + 1) * 0.01f
+                    , index * .01f
+                    , j * d + 0.01f + (rand() % 10 + 1) * 0.01f), mass, index++, true));
         }
     }
 
@@ -45,15 +47,15 @@ System* SystemBuilder::initBasic()
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
             sys->addParticle(new Particle(Vector3f(i * ds, -2.f, j * ds), staticMass, index++, false));
-            sys->addParticle(new Particle(Vector3f(-ds * dimensions, -2.f + i * ds, j * ds), staticMass, index++, false));
-            sys->addParticle(new Particle(Vector3f(ds * dimensions, -2.f + i * ds, j * ds), staticMass, index++, false));
+            sys->addParticle(new Particle(Vector3f(-ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
+            sys->addParticle(new Particle(Vector3f( ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
         }
     }
 
-    sys->addForce(new DirectionalForce(sys->particles, Vector3f(0.0f, -.981f, 0.0f)));
-    sys->addForce(new DragForce(sys->particles, 0.5f));
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(0.0f, -9.81f, 0.0f)));
+    sys->addForce(new DragForce(sys->particles, 0.9f));
     sys->addForce(new PressureForce(sys->particles));
-    sys->addForce(new ViscosityForce(sys->particles));
+//    sys->addForce(new ViscosityForce(sys->particles));
 
     return sys;
 }

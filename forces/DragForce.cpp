@@ -17,7 +17,7 @@ void DragForce::setTarget(std::vector<Particle*> particles)
 void DragForce::apply(System* s)
 {
     for (Particle* p : particles) {
-        p->force -= p->velocity * amount * p->density;
+        p->force -= amount * p->density * p->velocity;
     }
 }
 
