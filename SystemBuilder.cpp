@@ -10,6 +10,7 @@
 #include "forces/ViscosityForce.h"
 #include "forces/DirectionalForce.h"
 #include "forces/DragForce.h"
+#include "forces/SurfaceForce.h"
 
 System* SystemBuilder::get(AvailableSystems s) {
     System* sys;
@@ -28,7 +29,7 @@ System* SystemBuilder::initBasic()
 
     int dimensions = 2;
     float mass = 1.f;
-    float staticMass = 100.f;
+    float staticMass = 1000000.f;
     int index = 0;
     float d = 0.1f;
     float ds = 0.1f;
@@ -44,18 +45,19 @@ System* SystemBuilder::initBasic()
 
     dimensions += 1;
     // A small static particle set
-    for (int i = -dimensions; i < dimensions; i++) {
-        for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * ds, -2.f, j * ds), staticMass, index++, false));
-            sys->addParticle(new Particle(Vector3f(-ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
-            sys->addParticle(new Particle(Vector3f( ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
-        }
-    }
+//    for (int i = -dimensions; i < dimensions; i++) {
+//        for (int j = -dimensions; j < dimensions; j++) {
+//            sys->addParticle(new Particle(Vector3f(i * ds, -2.f, j * ds), staticMass, index++, false));
+//            sys->addParticle(new Particle(Vector3f(-ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
+//            sys->addParticle(new Particle(Vector3f( ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
+//        }
+//    }
 
     sys->addForce(new DirectionalForce(sys->particles, Vector3f(0.0f, -9.81f, 0.0f)));
     sys->addForce(new DragForce(sys->particles, 0.9f));
     sys->addForce(new PressureForce(sys->particles));
-//    sys->addForce(new ViscosityForce(sys->particles));
+    sys->addForce(new ViscosityForce(sys->particles));
+//    sys->addForce(new SurfaceForce(sys->particles));
 
     return sys;
 }

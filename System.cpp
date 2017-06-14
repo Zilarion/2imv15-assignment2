@@ -16,7 +16,7 @@
 #include <GLUT/glut.h>
 #endif
 
-System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005) {
+System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.001) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -227,4 +227,51 @@ void System::drawConstraints() {
     for (Constraint *c : constraints) {
         c->draw();
     }
+}
+
+VectorXf System::checkCollisions(VectorXf newState) {
+    //collision from x side
+    for (int i = 0; i < particles.size(); i++) {
+        if (newState[i * 6] < -0.2f) {
+            newState[i * 6] = -0.2f;
+            if(newState[i*6+3]<0){
+                newState[i*6+3]=-newState[i*6+3];
+            }
+        }
+    }
+    for (int i = 0; i < particles.size(); i++) {
+        if (newState[i * 6] > 0.2f) {
+            newState[i * 6] = 0.2f;
+            if(newState[i*6+3]>0){
+                newState[i*6+3]=-newState[i*6+3];
+            }
+        }
+    }
+    //collision from z side
+    for (int i = 0; i < particles.size(); i++) {
+        if (newState[i * 6+2] < -0.2f) {
+            newState[i * 6+2] = -0.2f;
+            if(newState[i*6+5]<0){
+                newState[i*6+5]=-newState[i*6+3];
+            }
+        }
+    }
+    for (int i = 0; i < particles.size(); i++) {
+        if (newState[i * 6+2] > 0.2f) {
+            newState[i * 6+2] = 0.2f;
+            if(newState[i*6+5]>0){
+                newState[i*6+5]=-newState[i*6+3];
+            }
+        }
+    }
+    //Check collision with y side
+    for (int i = 0; i < particles.size(); i++) {
+        if(newState[i * 6 + 1]<-2.0f){
+            newState[i * 6 + 1]=-2.0f;
+            if(newState[i*6+4]<0){
+                newState[i*6+4]=-newState[i*6+4];
+            }
+        }
+    }
+    return newState;
 }

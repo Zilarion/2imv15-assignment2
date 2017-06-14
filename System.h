@@ -60,6 +60,7 @@ public:
     void setState(VectorXf src);
     void setState(VectorXf newState, float time);
     unsigned long getDim();
+    VectorXf checkCollisions(VectorXf newState);
 
     void step(bool adaptive);
     void free();
