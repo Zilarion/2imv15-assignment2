@@ -35,12 +35,12 @@ float Spiky::W(float r, float h) {
     return 0;
 }
 
-float Spiky::dW(float r, float h) {
-    if (r >= 0 && r <= h) {
-//        return 45 * (h - 2 * r) * pow(h-r, 2) /(M_PI * pow(h, 7)); // deriv r
-        return 45 * pow(h - r, 2) * pow(h - r, 2) / (M_PI * pow(h, 6)); // deriv h
+Vector3f Spiky::dW(Vector3f r, float h) {
+    float rd = r.norm();
+    if (rd > 0 && rd <= h) {
+        return - 45 / (M_PI * pow(h, 6) * rd) * pow(h - rd, 2) * r;
     }
-    return 0;
+    return Vector3f(0,0,0);
 };
 
 // Use viscosity for viscosity computations

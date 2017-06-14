@@ -171,17 +171,19 @@ void System::computeForces() {
     float restDensity = 0;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
-        restDensity += p->density;
+        if (p->movable)
+            restDensity += p->density;
     }
 
-    float k = .1f;
+    float k = 2.0f;
     restDensity /= particles.size();
 
     // Compute all pressures at each particle
     for (Particle* p : particles) {
-        p->pressure = Vector3f(k, k, k) * (p->density - restDensity);
+        p->pressure = k * (p->density - restDensity);
     }
 
+    // Apply all forces
     for (Force *f : forces) {
         f->apply(this);
     }
@@ -197,12 +199,12 @@ VectorXf System::computeDerivative() {
     VectorXf dst(this->getDim());
     for (int i = 0; i < particles.size(); i++) {
         Particle *p = particles[i];
-        dst[i * 6 + 0] = p->velocity[0];        /* xdot = u */
+        dst[i * 6 + 0] = p->velocity[0];            /* Velocity */
         dst[i * 6 + 1] = p->velocity[1];
         dst[i * 6 + 2] = p->velocity[2];
-        dst[i * 6 + 3] = p->force[0]; /* udot = -dp + density * force + gamma * ddu */
-        dst[i * 6 + 4] = p->force[1];
-        dst[i * 6 + 5] = p->force[2];
+        dst[i * 6 + 3] = p->force[0] / p->density;  /* new acceleration is F/density */
+        dst[i * 6 + 4] = p->force[1] / p->density;
+        dst[i * 6 + 5] = p->force[2] / p->density;
     }
     return dst;
 }

@@ -19,7 +19,7 @@ public:
     Vector3f force;
     Vector3f velocity;
     Vector3f position;
-    Vector3f pressure;
+    float pressure;
     float density;
     int index;
     float mass;

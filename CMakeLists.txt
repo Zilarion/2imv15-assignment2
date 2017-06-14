@@ -67,6 +67,8 @@ set(SOURCE_FILES
         Kernels.h
         forces/DirectionalForce.cpp
         forces/DirectionalForce.h
+        forces/DragForce.cpp
+        forces/DragForce.h
         fields/DensityField.cpp
         fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h)
 

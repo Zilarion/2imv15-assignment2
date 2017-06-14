@@ -24,22 +24,19 @@ void Particle::reset()
 }
 
 void Particle::draw(bool drawVelocity, bool drawForce) {
-    const float h = .025f;
+    const float h = .05f;
     if (movable) {
         glColor3f(0.f, 1.f, 1.f);
     } else {
         glColor3f(1.f, 1.f, 1.f);
     }
 
-//    glPointSize(h);
-//	glBegin(GL_POINTS);
-//        glVertex3f(position[0], position[1], position[2]);
-//	glEnd();
-
     glPushMatrix();
-//    glMaterialfv(GL_FRONT, GL_DIFFUSE, Vector3f(0.88,0.08,0.88));
     glTranslated(position[0], position[1], position[2]);
     glutSolidSphere(h, 10, 10);
+
+//    glColor4f(1.f, 0.f, 0.f, 0.4f);
+//    glutSolidSphere(.15f, 10, 10);
     glPopMatrix();
 
     if (drawVelocity && movable) {

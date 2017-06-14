@@ -52,10 +52,10 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
 
 
     // enable lights
-    GLfloat ambient[] = {0.7,0.7,0.7};
-    GLfloat diffuse[] = {.5,.5,.5};
+    GLfloat ambient[] = {0.3,0.3,0.3};
+    GLfloat diffuse[] = {.6,.6,.6};
     GLfloat specular[] = {0.1, 0.1, 0.1};
-    GLfloat lightPosition[] = { 0.0, 2.0, 2.0 };
+    GLfloat lightPosition[] = { 0.0, 1.0, 1.0 };
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
@@ -246,7 +246,7 @@ void View::onReshape(int width, int height )
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glTranslatef(0.0f, .5f, -1.5f);
+    glTranslatef(0.0f, .5f, .0f);
 
     gluPerspective(90.0f, aspect, 0.1f, 1000.0f);
 
@@ -279,7 +279,7 @@ void View::preDisplay3D()
     glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity ();
-    glTranslatef(0.0f, 0.0f, -4.0f);
+    glTranslatef(0.0f, 0.0f, -3.0f);
     glRotatef(20, 1.0f, 0.0f, 0.0f);
     glRotatef(camAngle, 0.0f, 1.0f, 0.0f);
 
