@@ -58,5 +58,8 @@ float Viscosity::W(Vector3f r, float h) {
 
 float Viscosity::ddW(Vector3f r, float h) {
     float rd = r.norm();
-    return 45 / (M_PI * pow(h, 6)) * (h - rd);
+    if (rd >= 0 && rd <= h) {
+        return 45 / (M_PI * pow(h, 6)) * (h - rd);
+    }
+    return 0;
 }

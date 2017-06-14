@@ -31,22 +31,22 @@ System* SystemBuilder::initBasic()
     float staticMass = 10.f;
     int index = 0;
     float d = 0.2f;
+    float ds = 0.1f;
 
     // Movable particles
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * d + 0.01f, .0f, j * d), mass, index, true));
-            index++;
+            sys->addParticle(new Particle(Vector3f(i * d + 0.01f, .0f, j * d), mass, index++, true));
         }
     }
 
-    dimensions += 2;
+    dimensions += 1;
     // A small static particle set
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * d, -2.f - 0.01f * index, j * d), staticMass, index, false));
-//            sys->addParticle(new Particle(Vector3f(i * d, -2.f - d - 0.01f * index, j * d), staticMass, index, false));
-            index++;
+            sys->addParticle(new Particle(Vector3f(i * ds, -2.f, j * ds), staticMass, index++, false));
+            sys->addParticle(new Particle(Vector3f(-ds * dimensions, -2.f + i * ds, j * ds), staticMass, index++, false));
+            sys->addParticle(new Particle(Vector3f(ds * dimensions, -2.f + i * ds, j * ds), staticMass, index++, false));
         }
     }
 
