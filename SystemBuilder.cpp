@@ -29,14 +29,16 @@ System* SystemBuilder::initBasic()
 
     int dimensions = 2;
     float mass = 1.f;
-    float staticMass = 1000000.f;
+    float staticMass = 1000.f;
     int index = 0;
     float d = 0.1f;
     float ds = 0.1f;
+    int count = 5;
 
     // Movable particles
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
+            for (int z = 0; z < count; z++)
             sys->addParticle(new Particle(Vector3f(i * d + 0.01f + (rand() % 10 + 1) * 0.01f
                     , index * .01f
                     , j * d + 0.01f + (rand() % 10 + 1) * 0.01f), mass, index++, true));

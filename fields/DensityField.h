@@ -6,13 +6,14 @@
 #define FLUIDS_DENSITYFIELD_H
 
 #include "../Particle.h"
+#include "../data/UniformGrid.h"
 
 class System;
 
 class DensityField {
 public:
     DensityField(System* s) : sys(s) {}
-    float eval(Particle * pi);
+    float eval(Particle * pi, UniformGrid &grid);
 
 private:
     System* sys;

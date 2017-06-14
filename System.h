@@ -14,6 +14,7 @@
 #include "fields/DensityField.h"
 #include "fields/PressureField.h"
 #include "fields/ColorField.h"
+#include "data/UniformGrid.h"
 
 #include <vector>
 
@@ -41,6 +42,7 @@ public:
     DensityField* densityField;
     PressureField* pressureField;
     ColorField* colorField;
+    UniformGrid grid;
 
     bool wallExists;
     bool springsCanBreak = false;

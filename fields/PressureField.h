@@ -6,13 +6,14 @@
 #define FLUIDS_PRESSUREFIELD_H
 
 #include "../Particle.h"
+#include "../data/UniformGrid.h"
 
 class System;
 
 class PressureField {
 public:
     PressureField(System* s) : sys(s) {};
-    Vector3f eval(Particle * pi);
+    Vector3f eval(Particle * pi, UniformGrid &grid);
 
 private:
     System* sys;

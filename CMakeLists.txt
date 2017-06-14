@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.6)
 project(Fluids)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
+#SET(CMAKE_CXX_FLAGS_DISTRIBUTION "-O3")
 #set(CMAKE_EXE_LINKER_FLAGS -static)
 
 FIND_PACKAGE(PNG REQUIRED)
@@ -70,7 +71,7 @@ set(SOURCE_FILES
         forces/DragForce.cpp
         forces/DragForce.h
         fields/DensityField.cpp
-        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h)
+        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h data/UniformGrid.cpp data/UniformGrid.h)
 
 
 add_executable(Fluids ${SOURCE_FILES})

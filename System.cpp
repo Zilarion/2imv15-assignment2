@@ -16,7 +16,7 @@
 #include <GLUT/glut.h>
 #endif
 
-System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.001) {
+System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005), grid(50, 50, 50, 0.1f, Vector3f(2.5f, 2.5f, 2.5f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -170,15 +170,16 @@ void System::setState(VectorXf src, float t) {
 /// Private ///
 
 void System::computeForces() {
+    grid.clear();
+    grid.insert(particles);
+
     // Compute all densities
-    float restDensity = 0;
+    float restDensity = 50;
     for (Particle *p : particles) {
-        p->density = densityField->eval(p);
-        restDensity += p->density;
+        p->density = densityField->eval(p, grid);
     }
 
     float k = .1f;
-    restDensity /= particles.size();
 
     // Compute all pressures at each particle
     for (Particle* p : particles) {
