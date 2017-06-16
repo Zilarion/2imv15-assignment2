@@ -13,17 +13,19 @@ using namespace Eigen;
 class RigidBody {
 public:
 
-    RigidBody(Vector3f startPos, Vector3f size, Vector3f numParticles, float particleMass);
+    RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticles, float particleMass);
     virtual ~RigidBody(void);
     void initializeVariables();
     void reset();
     void draw(bool drawVelocity, bool drawForce);
     void updateForce();
     void updateTorque();
+    VectorXf getState();
+    void setState(VectorXf newState);
 
     std::vector<Particle*> particles;
     Vector3f startPos;
-    Vector3f size;  //lengths of the edges
+    Vector3f dimensions;  //lengths of the edges
 
     //Constants
     double M;                    //totalMass
