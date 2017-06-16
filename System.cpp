@@ -39,6 +39,14 @@ void System::addParticle(Particle *p) {
 }
 
 /**
+ * Adds a given particle to the system
+ * @param p The particle to add
+ */
+void System::addRigidBody(RigidBody *r) {
+    rigidBodies.push_back(r);
+}
+
+/**
  * Adds a force to use in the system when advancing a time step
  * @param f The new force to use in the system
  */
@@ -68,6 +76,9 @@ void System::free() {
 void System::reset() {
     for (Particle *p : particles) {
         p->reset();
+    }
+    for (RigidBody *r : rigidBodies) {
+        r->reset();
     }
 }
 
@@ -216,6 +227,10 @@ void System::drawParticles(bool drawVelocity, bool drawForce) {
     for (Particle *p : particles) {
         p->draw(drawVelocity, drawForce);
     }
+}
+
+void System::drawRigidBodies(bool drawVelocity, bool drawForce) {
+    //TODO
 }
 
 void System::drawForces() {

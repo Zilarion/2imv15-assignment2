@@ -15,6 +15,7 @@
 #include "fields/PressureField.h"
 #include "fields/ColorField.h"
 #include "data/UniformGrid.h"
+#include "RigidBody.h"
 
 #include <vector>
 
@@ -24,6 +25,7 @@ class Solver;
 class System {
 private:
     void drawParticles(bool drawVelocity, bool drawForce);
+    void drawRigidBodies(bool drawVelocity, bool drawForce);
     void drawForces();
     void drawConstraints();
 
@@ -36,6 +38,7 @@ public:
     ~System();
 
     std::vector<Particle*> particles;
+    std::vector<RigidBody*> rigidBodies;
     std::vector<Force*> forces;
     std::vector<Constraint*> constraints;
 
@@ -51,6 +54,7 @@ public:
     Solver* solver;
 
     void addParticle(Particle* p);
+    void addRigidBody(RigidBody* r);
     void addForce(Force* f);
     void addConstraint(Constraint* c);
 

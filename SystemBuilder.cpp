@@ -45,6 +45,9 @@ System* SystemBuilder::initBasic()
         }
     }
 
+    //Add a rigid body
+    sys->addRigidBody(new RigidBody(Vector3f(0,0,0), Vector3f(1,1,1), Vector3f(5,5,5), mass));
+
     dimensions += 1;
     // A small static particle set
 //    for (int i = -dimensions; i < dimensions; i++) {
