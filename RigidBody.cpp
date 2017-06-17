@@ -70,11 +70,48 @@ void RigidBody::initializeVariables() {
 }
 
 void RigidBody::draw(bool drawVelocity, bool drawForce) {
-    glBegin(GL_POINTS);
-    for (Particle *p:particles) {
-        Vector3f ri = R * p->position + x;
-        glVertex3f(ri[0], ri[1], ri[2]);
-    }
+//    glBegin(GL_POINTS);
+//    for (Particle *p:particles) {
+//        Vector3f ri = R * p->position + x;
+//        glVertex3f(ri[0], ri[1], ri[2]);
+//    }
+//    glEnd();
+    Vector3f v1 = R * Vector3f(-dimensions[0] / 2, -dimensions[1] / 2, -dimensions[2] / 2) + x;
+    Vector3f v2 = R * Vector3f(dimensions[0] / 2, -dimensions[1] / 2, -dimensions[2] / 2) + x;
+    Vector3f v3 = R * Vector3f(-dimensions[0] / 2, -dimensions[1] / 2, dimensions[2] / 2) + x;
+    Vector3f v4 = R * Vector3f(dimensions[0] / 2, -dimensions[1] / 2, dimensions[2] / 2) + x;
+    Vector3f v5 = R * Vector3f(-dimensions[0] / 2, dimensions[1] / 2, -dimensions[2] / 2) + x;
+    Vector3f v6 = R * Vector3f(dimensions[0] / 2, dimensions[1] / 2, -dimensions[2] / 2) + x;
+    Vector3f v7 = R * Vector3f(-dimensions[0] / 2, dimensions[1] / 2, dimensions[2] / 2) + x;
+    Vector3f v8 = R * Vector3f(dimensions[0] / 2, dimensions[1] / 2, dimensions[2] / 2) + x;
+    glBegin(GL_LINES);
+    glColor3f(1.f, 1.f, 1.f);
+    glVertex3f(v1[0], v1[1], v1[2]);
+    glVertex3f(v2[0], v2[1], v2[2]);
+    glVertex3f(v1[0], v1[1], v1[2]);
+    glVertex3f(v3[0], v3[1], v3[2]);
+    glVertex3f(v2[0], v2[1], v2[2]);
+    glVertex3f(v4[0], v4[1], v4[2]);
+    glVertex3f(v3[0], v3[1], v3[2]);
+    glVertex3f(v4[0], v4[1], v4[2]);
+
+    glVertex3f(v5[0], v5[1], v5[2]);
+    glVertex3f(v6[0], v6[1], v6[2]);
+    glVertex3f(v5[0], v5[1], v5[2]);
+    glVertex3f(v7[0], v7[1], v7[2]);
+    glVertex3f(v6[0], v6[1], v6[2]);
+    glVertex3f(v8[0], v8[1], v8[2]);
+    glVertex3f(v7[0], v7[1], v7[2]);
+    glVertex3f(v8[0], v8[1], v8[2]);
+
+    glVertex3f(v1[0], v1[1], v1[2]);
+    glVertex3f(v5[0], v5[1], v5[2]);
+    glVertex3f(v2[0], v2[1], v2[2]);
+    glVertex3f(v6[0], v6[1], v6[2]);
+    glVertex3f(v3[0], v3[1], v3[2]);
+    glVertex3f(v7[0], v7[1], v7[2]);
+    glVertex3f(v4[0], v4[1], v4[2]);
+    glVertex3f(v8[0], v8[1], v8[2]);
     glEnd();
 }
 
