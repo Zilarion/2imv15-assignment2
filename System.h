@@ -65,7 +65,7 @@ public:
     float getTime();
     void setState(VectorXf src);
     void setState(VectorXf newState, float time);
-    unsigned long getDim();
+    unsigned long getParticleDim();
     VectorXf checkCollisions(VectorXf newState);
 
     void step(bool adaptive);

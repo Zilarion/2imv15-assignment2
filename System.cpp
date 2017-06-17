@@ -16,7 +16,8 @@
 #include <GLUT/glut.h>
 #endif
 
-System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005), grid(50, 50, 50, 0.1f, Vector3f(2.5f, 2.5f, 2.5f)) {
+System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
+                                 grid(50, 50, 50, 0.1f, Vector3f(2.5f, 2.5f, 2.5f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -27,13 +28,14 @@ System::~System() {
     delete pressureField;
     delete colorField;
 }
+
 /**
  * Adds a given particle to the system
  * @param p The particle to add
  */
 void System::addParticle(Particle *p) {
     particles.push_back(p);
-    for (Force* f : forces) {
+    for (Force *f : forces) {
         f->addAsTarget(p);
     }
 }
@@ -87,10 +89,11 @@ void System::reset() {
  */
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
     drawParticles(drawVelocity, drawForce);
+    drawRigidBodies(drawVelocity, drawForce);
     if (drawForce) {
         drawForces();
     }
-    if (drawConstraint){
+    if (drawConstraint) {
         drawConstraints();
     }
 }
@@ -121,7 +124,7 @@ void System::step(bool adaptive) {
 }
 
 
-unsigned long System::getDim() {
+unsigned long System::getParticleDim() {
     return particles.size() * 3 * 2; // 3 dimensions, velocity and position
 }
 
@@ -130,19 +133,26 @@ unsigned long System::getDim() {
  * @return A copy of the current state of the system
  */
 VectorXf System::getState() {
-    VectorXf r(this->getDim());
+    VectorXf state(this->getParticleDim() + rigidBodies.size() * 18);
 
     for (int i = 0; i < this->particles.size(); i++) {
         Particle *p = particles[i];
-        r[i * 6 + 0] = p->position[0];
-        r[i * 6 + 1] = p->position[1];
-        r[i * 6 + 2] = p->position[2];
-        r[i * 6 + 3] = p->velocity[0];
-        r[i * 6 + 4] = p->velocity[1];
-        r[i * 6 + 5] = p->velocity[2];
+        state[i * 6 + 0] = p->position[0];
+        state[i * 6 + 1] = p->position[1];
+        state[i * 6 + 2] = p->position[2];
+        state[i * 6 + 3] = p->velocity[0];
+        state[i * 6 + 4] = p->velocity[1];
+        state[i * 6 + 5] = p->velocity[2];
     }
 
-    return r;
+    for (int i = 0; i < rigidBodies.size(); i++) {
+        RigidBody *r = rigidBodies[i];
+        VectorXf rState = r->getState();
+        for (int j = 0; j < rState.size(); j++) {
+            state[getParticleDim() + 18 * i + j] = rState[j];
+        }
+    }
+    return state;
 }
 
 float System::getTime() {
@@ -175,6 +185,14 @@ void System::setState(VectorXf src, float t) {
             particles[i]->velocity[2] = src[i * 6 + 5];
         }
     }
+    for (int i = 0; i < rigidBodies.size(); i++) {
+        RigidBody *r = rigidBodies[i];
+        VectorXf rState(18);
+        for (int j = 0; j < rState.size(); j++) {
+            rState[j] = src[getParticleDim() + 18 * i + j];
+        }
+        r->setState(rState);
+    }
     this->time = t;
 }
 
@@ -193,7 +211,7 @@ void System::computeForces() {
     float k = .1f;
 
     // Compute all pressures at each particle
-    for (Particle* p : particles) {
+    for (Particle *p : particles) {
         p->pressure = k * (p->density - restDensity);
     }
 
@@ -207,10 +225,15 @@ void System::clearForces() {
     for (Particle *p : particles) {
         p->force = Vector3f(0.0f, 0.0f, 0.0f);
     }
+    for (RigidBody *r : rigidBodies) {
+        for (Particle *p : r->particles) {
+            p->force = Vector3f(0.0f, 0.0f, 0.0f);
+        }
+    }
 }
 
 VectorXf System::computeDerivative() {
-    VectorXf dst(this->getDim());
+    VectorXf dst(this->getParticleDim() + rigidBodies.size() * 18);
     for (int i = 0; i < particles.size(); i++) {
         Particle *p = particles[i];
         dst[i * 6 + 0] = p->velocity[0];            /* Velocity */
@@ -219,6 +242,13 @@ VectorXf System::computeDerivative() {
         dst[i * 6 + 3] = p->force[0] / p->density;  /* new acceleration is F/density */
         dst[i * 6 + 4] = p->force[1] / p->density;
         dst[i * 6 + 5] = p->force[2] / p->density;
+    }
+    for (int i = 0; i < rigidBodies.size(); i++) {
+        RigidBody *r = rigidBodies[i];
+        VectorXf rDeriv = r->getDerivativeState();
+        for (int j = 0; j < rDeriv.size(); j++) {
+            dst[getParticleDim() + 18 * i + j] = rDeriv[j];
+        }
     }
     return dst;
 }
@@ -230,7 +260,9 @@ void System::drawParticles(bool drawVelocity, bool drawForce) {
 }
 
 void System::drawRigidBodies(bool drawVelocity, bool drawForce) {
-    //TODO
+    for (RigidBody *r:rigidBodies) {
+        r->draw(drawVelocity, drawForce);
+    }
 }
 
 void System::drawForces() {
@@ -250,42 +282,42 @@ VectorXf System::checkCollisions(VectorXf newState) {
     for (int i = 0; i < particles.size(); i++) {
         if (newState[i * 6] < -0.2f) {
             newState[i * 6] = -0.2f;
-            if(newState[i*6+3]<0){
-                newState[i*6+3]=-newState[i*6+3];
+            if (newState[i * 6 + 3] < 0) {
+                newState[i * 6 + 3] = -newState[i * 6 + 3];
             }
         }
     }
     for (int i = 0; i < particles.size(); i++) {
         if (newState[i * 6] > 0.2f) {
             newState[i * 6] = 0.2f;
-            if(newState[i*6+3]>0){
-                newState[i*6+3]=-newState[i*6+3];
+            if (newState[i * 6 + 3] > 0) {
+                newState[i * 6 + 3] = -newState[i * 6 + 3];
             }
         }
     }
     //collision from z side
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6+2] < -0.2f) {
-            newState[i * 6+2] = -0.2f;
-            if(newState[i*6+5]<0){
-                newState[i*6+5]=-newState[i*6+3];
+        if (newState[i * 6 + 2] < -0.2f) {
+            newState[i * 6 + 2] = -0.2f;
+            if (newState[i * 6 + 5] < 0) {
+                newState[i * 6 + 5] = -newState[i * 6 + 3];
             }
         }
     }
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6+2] > 0.2f) {
-            newState[i * 6+2] = 0.2f;
-            if(newState[i*6+5]>0){
-                newState[i*6+5]=-newState[i*6+3];
+        if (newState[i * 6 + 2] > 0.2f) {
+            newState[i * 6 + 2] = 0.2f;
+            if (newState[i * 6 + 5] > 0) {
+                newState[i * 6 + 5] = -newState[i * 6 + 3];
             }
         }
     }
     //Check collision with y side
     for (int i = 0; i < particles.size(); i++) {
-        if(newState[i * 6 + 1]<-2.0f){
-            newState[i * 6 + 1]=-2.0f;
-            if(newState[i*6+4]<0){
-                newState[i*6+4]=-newState[i*6+4];
+        if (newState[i * 6 + 1] < -2.0f) {
+            newState[i * 6 + 1] = -2.0f;
+            if (newState[i * 6 + 4] < 0) {
+                newState[i * 6 + 4] = -newState[i * 6 + 4];
             }
         }
     }

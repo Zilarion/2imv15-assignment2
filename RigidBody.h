@@ -7,6 +7,7 @@
 
 #include <Eigen/Dense>
 #include "Particle.h"
+#include "forces/Force.h"
 
 using namespace Eigen;
 
@@ -15,12 +16,11 @@ public:
 
     RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticles, float particleMass);
     virtual ~RigidBody(void);
-    void initializeVariables();
     void reset();
     void draw(bool drawVelocity, bool drawForce);
-    void updateForce();
-    void updateTorque();
+
     VectorXf getState();
+    VectorXf getDerivativeState();
     void setState(VectorXf newState);
 
     std::vector<Particle*> particles;
@@ -45,11 +45,11 @@ public:
     //Computed quantities
     Vector3f force;
     Vector3f torque;
-
-
-
-
-
+private:
+    Matrix3f star(Vector3f a);
+    void updateForce();
+    void updateTorque();
+    void initializeVariables();
 };
 
 
