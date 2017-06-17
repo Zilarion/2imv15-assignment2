@@ -33,11 +33,12 @@ public:
 
     //State variables
     Vector3f x;                 //position x(t)
-    Matrix3f R;                 //rotation R(t)
+    Quaternionf q;              //quaternion representing R
     Vector3f P;                 //linear momentum P(t)
     Vector3f L;                 //angular momentum L(t)
 
     //Derived quantities
+    Matrix3f R;                   //rotation R(t)
     Matrix3f Iinv;              //I^-1(t)
     Vector3f v;                 //velocity v(t)
     Vector3f omega;             //angular velocity omega(t)
