@@ -305,7 +305,7 @@ unsigned long System::getParticleDim() {
  * @return A copy of the current state of the system
  */
 VectorXf System::getState() {
-    VectorXf state(this->getParticleDim() + rigidBodies.size() * 18);
+    VectorXf state(this->getParticleDim() + rigidBodies.size() * 13);
 
     for (int i = 0; i < this->particles.size(); i++) {
         Particle *p = particles[i];
@@ -321,7 +321,7 @@ VectorXf System::getState() {
         RigidBody *r = rigidBodies[i];
         VectorXf rState = r->getState();
         for (int j = 0; j < rState.size(); j++) {
-            state[getParticleDim() + 18 * i + j] = rState[j];
+            state[getParticleDim() + 13 * i + j] = rState[j];
         }
     }
     return state;
@@ -359,9 +359,9 @@ void System::setState(VectorXf src, float t) {
     }
     for (int i = 0; i < rigidBodies.size(); i++) {
         RigidBody *r = rigidBodies[i];
-        VectorXf rState(18);
+        VectorXf rState(13);
         for (int j = 0; j < rState.size(); j++) {
-            rState[j] = src[getParticleDim() + 18 * i + j];
+            rState[j] = src[getParticleDim() + 13 * i + j];
         }
         r->setState(rState);
     }
@@ -405,7 +405,7 @@ void System::clearForces() {
 }
 
 VectorXf System::computeDerivative() {
-    VectorXf dst(this->getParticleDim() + rigidBodies.size() * 18);
+    VectorXf dst(this->getParticleDim() + rigidBodies.size() * 13);
     for (int i = 0; i < particles.size(); i++) {
         Particle *p = particles[i];
         dst[i * 6 + 0] = p->velocity[0];            /* Velocity */
@@ -419,7 +419,7 @@ VectorXf System::computeDerivative() {
         RigidBody *r = rigidBodies[i];
         VectorXf rDeriv = r->getDerivativeState();
         for (int j = 0; j < rDeriv.size(); j++) {
-            dst[getParticleDim() + 18 * i + j] = rDeriv[j];
+            dst[getParticleDim() + 13 * i + j] = rDeriv[j];
         }
     }
     return dst;
