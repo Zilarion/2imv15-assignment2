@@ -99,13 +99,13 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
     }
 
     // draw marching cubes
-    Vector3f cubeStart = Vector3f(-1.f, -3.f, -1.f);
-    Vector3f cubeEnd = Vector3f(1.f, 1.f, 1.f);
-    Vector3i cubeStartInt = Vector3i(-10, -30, -10);
-    Vector3i cubeEndInt = Vector3i(10, 10, 10);
-    int cubeCornerDimX = 21;
-    int cubeCornerDimY = 41;
-    int cubeCornerDimZ = 21;
+    Vector3f cubeStart = Vector3f(-.5f, -4.f, -.5f);
+    Vector3f cubeEnd = Vector3f(.5f, 1.f, .5f);
+    Vector3i cubeStartInt = Vector3i(-5, -40, -5);
+    Vector3i cubeEndInt = Vector3i(5, 10, 5);
+    int cubeCornerDimX = 11;
+    int cubeCornerDimY = 51;
+    int cubeCornerDimZ = 11;
     float cubeCorners[cubeCornerDimX * cubeCornerDimY * cubeCornerDimZ] = {};
     float cubeStep = .1f; //10^k
     float particleRange = .15f;
@@ -143,8 +143,8 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
     }
 
     double iso = .8;
-    std::vector<TRIANGLE> triangles = {};
-    std::map<string, std::vector> normals = {};
+    vector<TRIANGLE> triangles = {};
+    map<string, Vector3f> normals = {};
 
     for (int x = cubeStartInt[0]; x < cubeEndInt[0]; x++) {
         for (int y = cubeStartInt[1]; y < cubeEndInt[1]; y++) {
@@ -199,7 +199,35 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
                     //cell.p[0][2]);
 
                     for (int i = 0; i < n; i++) {
-                        triangles.push_back(tris[i]);
+                        TRIANGLE tri = tris[i];
+                        triangles.push_back(tri);
+
+                        //add normal to combined normals of each point in triangle.
+                        Vector3f a = tri.p[0];
+                        Vector3f b = tri.p[1];
+                        Vector3f c = tri.p[2];
+                        Vector3f norm = (b - a).cross(c - b);
+                        string aindex = VectorToString(a, 10.f);
+                        auto anorm = normals.find(aindex);
+                        if (anorm == normals.end()) {
+                            normals[aindex] = norm;
+                        } else {
+                            normals[aindex] += norm;
+                        }
+                        string bindex = VectorToString(b, 10.f);
+                        auto bnorm = normals.find(bindex);
+                        if (bnorm == normals.end()) {
+                            normals[bindex] = norm;
+                        } else {
+                            normals[bindex] += norm;
+                        }
+                        string cindex = VectorToString(c, 10.f);
+                        auto cnorm = normals.find(cindex);
+                        if (cnorm == normals.end()) {
+                            normals[cindex] = norm;
+                        } else {
+                            normals[cindex] += norm;
+                        }
                     }
                 }
 
@@ -225,13 +253,18 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
         Vector3f a = triangle.p[0];
         Vector3f b = triangle.p[1];
         Vector3f c = triangle.p[2];
-        //printf("%f,%f,%f;%f,%f,%f;%f,%f,%f\n", a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
-        Vector3f norm = (b - a).cross(c - b);
-        norm.normalize();
 
-        glNormal3f(norm[0], norm[1], norm[2]);
+        Vector3f anorm = normals[VectorToString(a, 10.f)];
+        anorm.normalize();
+        glNormal3f(anorm[0], anorm[1], anorm[2]);
         glVertex3f(a[0], a[1], a[2]);
+        Vector3f bnorm = normals[VectorToString(b, 10.f)];
+        bnorm.normalize();
+        glNormal3f(bnorm[0], bnorm[1], bnorm[2]);
         glVertex3f(b[0], b[1], b[2]);
+        Vector3f cnorm = normals[VectorToString(c, 10.f)];
+        cnorm.normalize();
+        glNormal3f(cnorm[0], cnorm[1], cnorm[2]);
         glVertex3f(c[0], c[1], c[2]);
     }
     glEnd();

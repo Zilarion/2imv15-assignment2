@@ -4,6 +4,8 @@
 // source: http://paulbourke.net/geometry/polygonise/ (with minor changes to work with our codebase)
 //
 
+#include <random>
+#include <string>
 #include "MarchingCubes.h"
 
 const int edgeTable[256]={
@@ -421,4 +423,8 @@ double valp1, double valp2)
     p = p1 + mu * (p2 - p1);
 
     return(p);
+}
+
+string VectorToString(Vector3f vec, float prec) {
+    return to_string((int)(vec[0] * prec)) + "," + to_string((int)(vec[1] * prec)) + "," + to_string((int)(vec[2] * prec));
 }
