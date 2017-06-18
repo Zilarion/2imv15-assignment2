@@ -21,6 +21,8 @@ include_directories(lib/eigen)
 include_directories(${EIGEN_EXTRA_INCS})
 add_definitions(${EIGEN_EXTRA_DEFS})
 
+include_directories(lib/VL)
+
 INCLUDE_DIRECTORIES(include)
 
 set(SOURCE_FILES
@@ -71,7 +73,7 @@ set(SOURCE_FILES
         forces/DragForce.cpp
         forces/DragForce.h
         fields/DensityField.cpp
-        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h data/UniformGrid.cpp data/UniformGrid.h RigidBody.cpp RigidBody.h)
+        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h data/UniformGrid.cpp data/UniformGrid.h RigidBody.cpp RigidBody.h MarchingCubes.cpp MarchingCubes.h)
 
 
 add_executable(Fluids ${SOURCE_FILES})

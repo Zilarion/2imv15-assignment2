@@ -16,6 +16,7 @@
 #include "fields/ColorField.h"
 #include "data/UniformGrid.h"
 #include "RigidBody.h"
+#include "MarchingCubes.h"
 
 #include <vector>
 
