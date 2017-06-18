@@ -39,7 +39,7 @@ void keypressCallback(unsigned char k, int x, int y) {
 
 View::View(int width, int height, float dt, SystemBuilder::AvailableSystems system, int N)
         : width(width), height(height), isSimulating(false), dumpFrames(false), drawVelocity(false), drawForces(false),
-          drawConstraints(true), adaptive(false), frameNumber(0), dt(dt), N(N) {
+          drawConstraints(true), drawMarchingCubes(false), adaptive(false), frameNumber(0), dt(dt), N(N) {
     glutInitDisplayMode ( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 
     glutInitWindowPosition ( 0, 0 );
@@ -54,7 +54,7 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
     // enable lights
     GLfloat ambient[] = {0.3,0.3,0.3};
     GLfloat diffuse[] = {.6,.6,.6};
-    GLfloat specular[] = {0.1, 0.1, 0.1};
+    GLfloat specular[] = {.3, .3, .3};
     GLfloat lightPosition[] = { 0.0, 1.0, 1.0 };
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
@@ -70,6 +70,8 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable(GL_CULL_FACE);
 
     glDepthFunc(GL_LEQUAL);
     glShadeModel(GL_SMOOTH);
@@ -175,6 +177,11 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             if(isSimulating)
                 sys->reset ();
             break;
+        case 'M':
+        case 'm':
+            drawMarchingCubes = !drawMarchingCubes;
+            printf("marching cubes: %s\n", drawMarchingCubes ? "true" : "false");
+            break;
     }
 }
 
@@ -274,7 +281,7 @@ void View::onDisplay()
     preDisplay3D ();
 
     if (sys != NULL)
-        sys->draw(drawVelocity, drawForces, drawConstraints);
+        sys->draw(drawVelocity, drawForces, drawConstraints, drawMarchingCubes);
 
     postDisplay ();
 }
