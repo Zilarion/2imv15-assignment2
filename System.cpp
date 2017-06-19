@@ -88,8 +88,9 @@ void System::reset() {
 /**
  * Draws the forces
  */
-void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
-    drawParticles(drawVelocity, drawForce);
+void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
+    if (!drawMarchingCubes)
+        drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
     if (drawForce) {
         drawForces();
@@ -99,175 +100,187 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint) {
     }
 
     // draw marching cubes
-    Vector3f cubeStart = Vector3f(-.5f, -4.f, -.5f);
-    Vector3f cubeEnd = Vector3f(.5f, 1.f, .5f);
-    Vector3i cubeStartInt = Vector3i(-5, -40, -5);
-    Vector3i cubeEndInt = Vector3i(5, 10, 5);
-    int cubeCornerDimX = 11;
-    int cubeCornerDimY = 51;
-    int cubeCornerDimZ = 11;
-    float cubeCorners[cubeCornerDimX * cubeCornerDimY * cubeCornerDimZ] = {};
-    float cubeStep = .1f; //10^k
-    float particleRange = .15f;
-    for (Particle *p: particles) {
-        Vector3f pos = p->position;
-        // only apply marching cube to particle when it is inside the rendering volume
-        if (pos[0] > cubeStart[0] && pos[1] > cubeStart[1] && pos[2] > cubeStart[2]
-            && pos[0] < cubeEnd[0] && pos[1] < cubeEnd[1] && pos[2] < cubeEnd[2]) {
-            // add the distance between the point and each of the 8 corners of its surrounding gridcube
-            // to the grid values
+    if (drawMarchingCubes) {
+        float cubeStart[] = {-.5f, -4.f, -.5f};
+        float cubeEnd[] = {.5f, 1.f, .5f};
+        int cubeStartInt[] = {-5, -40, -5};
+        int cubeEndInt[] = {5, 10, 5};
+        int cubeCornerDimX = 11;
+        int cubeCornerDimY = 51;
+        int cubeCornerDimZ = 11;
+        float cubeCorners[cubeCornerDimX * cubeCornerDimY * cubeCornerDimZ] = {};
+        float cubeStep = .1f; //10^k
+        float particleRange = .15f;
+        for (Particle *p: particles) {
+            Vector3f pos = p->position;
+            // only apply marching cube to particle when it is inside the rendering volume
+            if (pos[0] > cubeStart[0] && pos[1] > cubeStart[1] && pos[2] > cubeStart[2]
+                && pos[0] < cubeEnd[0] && pos[1] < cubeEnd[1] && pos[2] < cubeEnd[2]) {
+                // add the distance between the point and each of the 8 corners of its surrounding gridcube
+                // to the grid values
 
-            // lower corner [0, 0, 0] of gridcube
-            Vector3f lowerGridPos = Vector3f(floor(pos[0] / cubeStep) * cubeStep, floor(pos[1] / cubeStep) * cubeStep,
-                                             floor(pos[2] / cubeStep) * cubeStep);
-            int lowerCubePos = (int) (floor(pos[0] * 10.f) + -cubeStartInt[0] +
-                                      cubeCornerDimX * (floor(pos[1] * 10.f) + -cubeStartInt[1]
-                                                       + (cubeCornerDimY * (floor(pos[2] * 10.f) + -cubeStartInt[2]))));
+                // lower corner [0, 0, 0] of gridcube
+                Vector3f lowerGridPos = Vector3f(floor(pos[0] / cubeStep) * cubeStep,
+                                                 floor(pos[1] / cubeStep) * cubeStep,
+                                                 floor(pos[2] / cubeStep) * cubeStep);
+                int lowerCubePos = (int) (floor(pos[0] * 10.f) + -cubeStartInt[0] +
+                                          cubeCornerDimX * (floor(pos[1] * 10.f) + -cubeStartInt[1]
+                                                            + (cubeCornerDimY *
+                                                               (floor(pos[2] * 10.f) + -cubeStartInt[2]))));
 
-            //fill in all the gridcube values
-            int steps = (int) ceilf(particleRange / cubeStep);
-            for (int x = -steps; x <= steps + 1; x++) {
-                for (int y = -steps; y <= steps + 1; y++) {
-                    for (int z = -steps; z <= steps + 1; z++) {
-                        Vector3f gridPos = lowerGridPos + Vector3f(x * cubeStep, y * cubeStep, z * cubeStep);
-                        int cubePos = lowerCubePos + x + (cubeCornerDimX * (y + cubeCornerDimY * z));
-                        if (cubePos < cubeCornerDimX * cubeCornerDimY * cubeCornerDimX && cubePos >= 0) {
-                            cubeCorners[cubePos] = min(
-                                    cubeCorners[cubePos] +
-                                    max(particleRange - (pos - gridPos).norm(), 0.f) / particleRange, 1.f);
+                //fill in all the gridcube values
+                int steps = (int) ceilf(particleRange / cubeStep);
+                for (int x = -steps; x <= steps + 1; x++) {
+                    for (int y = -steps; y <= steps + 1; y++) {
+                        for (int z = -steps; z <= steps + 1; z++) {
+                            Vector3f gridPos = lowerGridPos + Vector3f(x * cubeStep, y * cubeStep, z * cubeStep);
+                            int cubePos = lowerCubePos + x + (cubeCornerDimX * (y + cubeCornerDimY * z));
+                            if (cubePos < cubeCornerDimX * cubeCornerDimY * cubeCornerDimX && cubePos >= 0) {
+                                cubeCorners[cubePos] = min(
+                                        cubeCorners[cubePos] +
+                                        max(particleRange - (pos - gridPos).norm(), 0.f) / particleRange, 1.f);
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    double iso = .8;
-    vector<TRIANGLE> triangles = {};
-    map<string, Vector3f> normals = {};
+        double iso = .8;
+        vector<TRIANGLE> triangles = {};
+        unordered_map<string, Vector3f> normals = {};
 
-    for (int x = cubeStartInt[0]; x < cubeEndInt[0]; x++) {
-        for (int y = cubeStartInt[1]; y < cubeEndInt[1]; y++) {
-            for (int z = cubeStartInt[2]; z < cubeEndInt[2]; z++) {
-                int cubePos0 = x + -cubeStartInt[0] + cubeCornerDimX * (y + -cubeStartInt[1] + (cubeCornerDimY * (z +
-                                                                                                                -cubeStartInt[2]))); // [0,0,0]
-                int cubePos1 = cubePos0 + 1; // [1,0,0]
-                int cubePos2 = cubePos0 + 1 + cubeCornerDimX; // [1,1,0]
-                int cubePos3 = cubePos0 + cubeCornerDimX; // [0,1,0]
-                int cubePos4 = cubePos0 + cubeCornerDimX * cubeCornerDimY; // [0,0,1]
-                int cubePos5 = cubePos0 + 1 + cubeCornerDimX * cubeCornerDimY; // [1,0,1]
-                int cubePos6 = cubePos0 + 1 + cubeCornerDimX + cubeCornerDimX * cubeCornerDimY; // [1,1,1]
-                int cubePos7 = cubePos0 + cubeCornerDimX + cubeCornerDimX * cubeCornerDimY; // [0,1,1]
+        for (int x = cubeStartInt[0]; x < cubeEndInt[0]; x++) {
+            for (int y = cubeStartInt[1]; y < cubeEndInt[1]; y++) {
+                for (int z = cubeStartInt[2]; z < cubeEndInt[2]; z++) {
+                    int cubePos0 =
+                            x + -cubeStartInt[0] + cubeCornerDimX * (y + -cubeStartInt[1] + (cubeCornerDimY * (z +
+                                                                                                               -cubeStartInt[2]))); // [0,0,0]
+                    int cubePos[8] = {
+                            cubePos0, //[0,0,0]
+                            cubePos0 + 1, // [1,0,0]
+                            cubePos0 + 1 + cubeCornerDimX, // [1,1,0]
+                            cubePos0 + cubeCornerDimX, // [0,1,0]
+                            cubePos0 + cubeCornerDimX * cubeCornerDimY, // [0,0,1]
+                            cubePos0 + 1 + cubeCornerDimX * cubeCornerDimY, // [1,0,1]
+                            cubePos0 + 1 + cubeCornerDimX + cubeCornerDimX * cubeCornerDimY, // [1,1,1]
+                            cubePos0 + cubeCornerDimX + cubeCornerDimX * cubeCornerDimY // [0,1,1]
+                    };
 
-                GRIDCELL cell = {
-                        {
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(0 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[0,0,0]
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(1 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[1,0,0]
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(1 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[1,1,0]
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(0 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[0,1,0]
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(0 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[0,0,1]
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(1 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[1,0,1]
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(1 * cubeStep, 1 * cubeStep, 1 * cubeStep), //[1,1,1]
-                                Vector3f(x / 10.f, y / 10.f, z / 10.f) +
-                                Vector3f(0 * cubeStep, 1 * cubeStep, 1 * cubeStep)  //[0,1,1]
-                        },
-                        {
-                                cubeCorners[cubePos0],
-                                cubeCorners[cubePos1],
-                                cubeCorners[cubePos2],
-                                cubeCorners[cubePos3],
-                                cubeCorners[cubePos4],
-                                cubeCorners[cubePos5],
-                                cubeCorners[cubePos6],
-                                cubeCorners[cubePos7]
-                        }
-                };
+                    GRIDCELL cell = {
+                            {
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(0 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[0,0,0]
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(1 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[1,0,0]
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(1 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[1,1,0]
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(0 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[0,1,0]
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(0 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[0,0,1]
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(1 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[1,0,1]
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(1 * cubeStep, 1 * cubeStep, 1 * cubeStep), //[1,1,1]
+                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(0 * cubeStep, 1 * cubeStep, 1 * cubeStep)  //[0,1,1]
+                            },
+                            {
+                                    cubeCorners[cubePos[0]],
+                                    cubeCorners[cubePos[1]],
+                                    cubeCorners[cubePos[2]],
+                                    cubeCorners[cubePos[3]],
+                                    cubeCorners[cubePos[4]],
+                                    cubeCorners[cubePos[5]],
+                                    cubeCorners[cubePos[6]],
+                                    cubeCorners[cubePos[7]]
+                            }
+                    };
 
-                TRIANGLE tris[5] = {};
+                    double cellsum = 0;
+                    for (int i = 0; i < 8; i++) {
+                        cellsum += cubeCorners[cubePos[i]];
+                    }
 
-                int n = Polygonise(cell, iso, tris);
+                    if (cellsum > 0) {
+                        TRIANGLE tris[5] = {};
+                        int n = Polygonise(cell, iso, tris);
 
-                if (n > 0) {
-                    //printf("%i triangles for gridcell centered around %f,%f,%f:\n", n, cell.p[0][0], cell.p[0][1],
-                    //cell.p[0][2]);
+                        if (n > 0) {
+                            for (int i = 0; i < n; i++) {
+                                TRIANGLE tri = tris[i];
+                                triangles.push_back(tri);
 
-                    for (int i = 0; i < n; i++) {
-                        TRIANGLE tri = tris[i];
-                        triangles.push_back(tri);
-
-                        //add normal to combined normals of each point in triangle.
-                        Vector3f a = tri.p[0];
-                        Vector3f b = tri.p[1];
-                        Vector3f c = tri.p[2];
-                        Vector3f norm = (b - a).cross(c - b);
-                        string aindex = VectorToString(a, 10.f);
-                        auto anorm = normals.find(aindex);
-                        if (anorm == normals.end()) {
-                            normals[aindex] = norm;
-                        } else {
-                            normals[aindex] += norm;
-                        }
-                        string bindex = VectorToString(b, 10.f);
-                        auto bnorm = normals.find(bindex);
-                        if (bnorm == normals.end()) {
-                            normals[bindex] = norm;
-                        } else {
-                            normals[bindex] += norm;
-                        }
-                        string cindex = VectorToString(c, 10.f);
-                        auto cnorm = normals.find(cindex);
-                        if (cnorm == normals.end()) {
-                            normals[cindex] = norm;
-                        } else {
-                            normals[cindex] += norm;
+                                //*add normal to combined normals of each point in triangle. (per-vertex normals)
+                                Vector3f a = tri.p[0];
+                                Vector3f b = tri.p[1];
+                                Vector3f c = tri.p[2];
+                                Vector3f norm = (b - a).cross(c - b);
+                                string aindex = VectorToString(a, 10.f);
+                                if (!normals.emplace(aindex, norm).second) {
+                                    normals[aindex] += norm;
+                                }
+                                string bindex = VectorToString(b, 10.f);
+                                if (!normals.emplace(bindex, norm).second) {
+                                    normals[bindex] += norm;
+                                }
+                                string cindex = VectorToString(c, 10.f);
+                                if (!normals.emplace(cindex, norm).second) {
+                                    normals[cindex] += norm;
+                                }
+                                //*/
+                            }
                         }
                     }
-                }
 
-                /* draw each grid cell
-                if (cubeCorners[cubePos0] > 0.f) {
-                    glColor3f(cubeCorners[cubePos0], 0.f, 0.f);
-                    glPushMatrix();
-                    glTranslated(x*cubeStep, y*cubeStep, z*cubeStep);
-                    glBegin(GL_POINTS);
-                        glVertex3f(0.f, 0.f, 0.f);
-                    glEnd();
-                    glPopMatrix();
+                    /* draw each grid cell
+                    if (cubeCorners[cubePos0] > 0.f) {
+                        glColor3f(cubeCorners[cubePos0], 0.f, 0.f);
+                        glPushMatrix();
+                        glTranslated(x*cubeStep, y*cubeStep, z*cubeStep);
+                        glBegin(GL_POINTS);
+                            glVertex3f(0.f, 0.f, 0.f);
+                        glEnd();
+                        glPopMatrix();
+                    }
+                    //*/
                 }
-                //*/
             }
         }
-    }
 
-    //* draw triangles
-    glBegin(GL_TRIANGLES);
-    for (int i = 0; i < triangles.size(); i++) {
-        TRIANGLE triangle = triangles[i];
-        Vector3f a = triangle.p[0];
-        Vector3f b = triangle.p[1];
-        Vector3f c = triangle.p[2];
+        //* draw triangles
+        glColor4f(.4f, .5f, .6f, .7f);
+        GLfloat specular[] = {1.f, 1.f, 1.f, 1.f};
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+        glBegin(GL_TRIANGLES);
+        for (int i = 0; i < triangles.size(); i++) {
+            TRIANGLE triangle = triangles[i];
+            Vector3f a = triangle.p[0];
+            Vector3f b = triangle.p[1];
+            Vector3f c = triangle.p[2];
+            /* per-face normals
+            Vector3f norm = (b - a).cross(c - b);
+            glNormal3f(norm[0], norm[1], norm[2]);
+            /*/// per vertex normals
+            Vector3f anorm = normals[VectorToString(a, 10.f)];
+            Vector3f bnorm = normals[VectorToString(b, 10.f)];
+            Vector3f cnorm = normals[VectorToString(c, 10.f)];
+            anorm.normalize();
+            bnorm.normalize();
+            cnorm.normalize();
+            //*/
 
-        Vector3f anorm = normals[VectorToString(a, 10.f)];
-        anorm.normalize();
-        glNormal3f(anorm[0], anorm[1], anorm[2]);
-        glVertex3f(a[0], a[1], a[2]);
-        Vector3f bnorm = normals[VectorToString(b, 10.f)];
-        bnorm.normalize();
-        glNormal3f(bnorm[0], bnorm[1], bnorm[2]);
-        glVertex3f(b[0], b[1], b[2]);
-        Vector3f cnorm = normals[VectorToString(c, 10.f)];
-        cnorm.normalize();
-        glNormal3f(cnorm[0], cnorm[1], cnorm[2]);
-        glVertex3f(c[0], c[1], c[2]);
+            glNormal3f(anorm[0], anorm[1], anorm[2]);
+            glVertex3f(a[0], a[1], a[2]);
+            glNormal3f(bnorm[0], bnorm[1], bnorm[2]);
+            glVertex3f(b[0], b[1], b[2]);
+            glNormal3f(cnorm[0], cnorm[1], cnorm[2]);
+            glVertex3f(c[0], c[1], c[2]);
+        }
+        glEnd();
+        glNormal3f(0.f, 0.f, 0.f);
     }
-    glEnd();
 }
 
 /**

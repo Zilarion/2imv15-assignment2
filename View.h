@@ -29,7 +29,7 @@ private:
     int initialMx, initialMy;
     int width, height;
     bool dumpFrames;
-    bool drawVelocity, drawConstraints, drawForces;
+    bool drawVelocity, drawConstraints, drawForces, drawMarchingCubes;
     bool isSimulating, adaptive;
     int rotate = 0;
     int N;

@@ -426,5 +426,7 @@ double valp1, double valp2)
 }
 
 string VectorToString(Vector3f vec, float prec) {
-    return to_string((int)(vec[0] * prec)) + "," + to_string((int)(vec[1] * prec)) + "," + to_string((int)(vec[2] * prec));
+    stringstream out;
+    out << (int)(vec[0] * prec) << "," << (int)(vec[1] * prec) << "," << (int)(vec[2] * prec);
+    return out.str();
 }

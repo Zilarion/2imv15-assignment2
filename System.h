@@ -19,6 +19,7 @@
 #include "MarchingCubes.h"
 
 #include <vector>
+#include <unordered_map>
 
 using namespace Eigen;
 
@@ -72,7 +73,7 @@ public:
     void step(bool adaptive);
     void free();
     void reset();
-    void draw(bool drawVelocity, bool drawForces = false, bool drawConstraints = false);
+    void draw(bool drawVelocity, bool drawForces = false, bool drawConstraints = false, bool drawMarchingCubes = false);
 };
 
 
