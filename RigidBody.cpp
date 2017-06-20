@@ -182,7 +182,7 @@ VectorXf RigidBody::getState() {
 VectorXf RigidBody::getDerivativeState() {
     updateForce();
     updateTorque();
-    VectorXf y(18);
+    VectorXf y(13);
     //xdot
     y[0] = v[0];
     y[1] = v[1];
