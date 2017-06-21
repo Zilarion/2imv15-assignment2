@@ -13,6 +13,7 @@ using namespace Eigen;
 
 class RigidBody {
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticles, float particleMass);
     virtual ~RigidBody(void);

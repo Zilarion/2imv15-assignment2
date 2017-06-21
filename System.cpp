@@ -101,15 +101,15 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 
     // draw marching cubes
     if (drawMarchingCubes) {
-        Vector3f cubeStart = Vector3f(-.5f, -4.f, -.5f);
+        Vector3f cubeStart = Vector3f(-.5f, -2.1f, -.5f);
         Vector3f cubeEnd = Vector3f(.5f, 1.f, .5f);
-        Vector3i cubeStartInt = Vector3i(-5, -40, -5);
-        Vector3i cubeEndInt = Vector3i(5, 10, 5);
-        int cubeCornerDim[3] = {11, 51, 11};
+        float cubeStep = .1f; // a whole number of steps should fit into interval
+        Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
+        Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
+        int cubeCornerDim[3] = {cubeEndInt[0] - cubeStartInt[0] + 1, cubeEndInt[1] - cubeStartInt[1] + 1, cubeEndInt[2] - cubeStartInt[2] + 1};
         float cubeCorners[cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2]] = {};
         Vector3f gradientCorners[cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2]] = {};
-        float cubeStep = -1.f;
-        cubeStep = powf(10, cubeStep); //step should be 10^k for algorithm to work as it is now
+
         float particleRange = .15f;
         for (Particle *p: particles) {
             Vector3f pos = p->position;
@@ -123,10 +123,10 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
                 Vector3f lowerGridPos = Vector3f(floor(pos[0] / cubeStep) * cubeStep,
                                                  floor(pos[1] / cubeStep) * cubeStep,
                                                  floor(pos[2] / cubeStep) * cubeStep);
-                int lowerCubePos = (int) (floor(pos[0] * 10.f) + -cubeStartInt[0] +
-                                          cubeCornerDim[0] * (floor(pos[1] * 10.f) + -cubeStartInt[1]
+                int lowerCubePos = (int) (floor(pos[0] / cubeStep) + -cubeStartInt[0] +
+                                          cubeCornerDim[0] * (floor(pos[1] / cubeStep) + -cubeStartInt[1]
                                                             + (cubeCornerDim[1] *
-                                                               (floor(pos[2] * 10.f) + -cubeStartInt[2]))));
+                                                               (floor(pos[2] / cubeStep) + -cubeStartInt[2]))));
 
                 //fill in all the gridcube values
                 int steps = (int) ceilf(particleRange / cubeStep);
@@ -171,21 +171,21 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 
                     GRIDCELL cell = {
                             {
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[0,0,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[1,0,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[1,1,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[0,1,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[0,0,1]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[1,0,1]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 1 * cubeStep, 1 * cubeStep), //[1,1,1]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 1 * cubeStep, 1 * cubeStep)  //[0,1,1]
                             },
                             {
@@ -274,14 +274,17 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             //*/
             //* per vertex normals 2
             Vector3f anorm = getEdgeNormal(a, cubeStart, cubeEnd, cubeCornerDim, cubeStep, gradientCorners);
+            anorm.normalize();
             glNormal3f(anorm[0], anorm[1], anorm[2]);
             glVertex3f(a[0], a[1], a[2]);
 
             Vector3f bnorm = getEdgeNormal(b, cubeStart, cubeEnd, cubeCornerDim, cubeStep, gradientCorners);
+            bnorm.normalize();
             glNormal3f(bnorm[0], bnorm[1], bnorm[2]);
             glVertex3f(b[0], b[1], b[2]);
 
             Vector3f cnorm = getEdgeNormal(c, cubeStart, cubeEnd, cubeCornerDim, cubeStep, gradientCorners);
+            cnorm.normalize();
             glNormal3f(cnorm[0], cnorm[1], cnorm[2]);
             glVertex3f(c[0], c[1], c[2]);
         }
