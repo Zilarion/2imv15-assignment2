@@ -111,6 +111,11 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         float cubeCorners[size];
         Vector3f gradientCorners[size];
 
+        for (int i = 0; i < size; i++) {
+            cubeCorners[i] = 0;
+            gradientCorners[i] = Vector3f(0.f,0.f,0.f);
+        }
+
         float particleRange = .15f;
         for (Particle *p: particles) {
             Vector3f pos = p->position;
