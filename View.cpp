@@ -93,6 +93,8 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
 
 void View::initialize(SystemBuilder::AvailableSystems type) {
     sys = SystemBuilder::get(type);
+    wind = new DirectionalForce(sys->particles, Vector3f(0.f, 0.f, 0.f));
+    sys->addForce(wind);
 }
 
 void View::onKeyPress ( unsigned char key, int x, int y )
@@ -144,6 +146,18 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'f':
             drawForces = !drawForces;
+            break;
+        case 'i':
+            wind->direction = Vector3f(0.0f, 0.0f, -10.0f);
+            break;
+        case 'j':
+            wind->direction = Vector3f(-10.0f, 0.0f, 0.0f);
+            break;
+        case 'k':
+            wind->direction = Vector3f(0.0f, 0.0f, 10.0f);
+            break;
+        case 'l':
+            wind->direction = Vector3f(10.0f, 0.0f, 0.0f);
             break;
         case ',':
             rotate = 1;

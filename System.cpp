@@ -18,7 +18,7 @@
 #endif
 
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(50, 50, 50, 0.1f, Vector3f(2.5f, 2.5f, 2.5f)) {
+                                 grid(40, 40, 40, 0.1f, Vector3f(2.5f, 2.5f, 2.5f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -477,18 +477,19 @@ void System::drawConstraints() {
 }
 
 VectorXf System::checkCollisions(VectorXf newState) {
+    float dist = 2.0f;
     //collision from x side
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] < -0.2f) {
-            newState[i * 6] = -0.2f;
+        if (newState[i * 6] < -dist) {
+            newState[i * 6] = -dist;
             if (newState[i * 6 + 3] < 0) {
                 newState[i * 6 + 3] = -newState[i * 6 + 3];
             }
         }
     }
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] > 0.2f) {
-            newState[i * 6] = 0.2f;
+        if (newState[i * 6] > dist) {
+            newState[i * 6] = dist;
             if (newState[i * 6 + 3] > 0) {
                 newState[i * 6 + 3] = -newState[i * 6 + 3];
             }
@@ -496,16 +497,16 @@ VectorXf System::checkCollisions(VectorXf newState) {
     }
     //collision from z side
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] < -0.2f) {
-            newState[i * 6 + 2] = -0.2f;
+        if (newState[i * 6 + 2] < -dist) {
+            newState[i * 6 + 2] = -dist;
             if (newState[i * 6 + 5] < 0) {
                 newState[i * 6 + 5] = -newState[i * 6 + 3];
             }
         }
     }
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] > 0.2f) {
-            newState[i * 6 + 2] = 0.2f;
+        if (newState[i * 6 + 2] > dist) {
+            newState[i * 6 + 2] = dist;
             if (newState[i * 6 + 5] > 0) {
                 newState[i * 6 + 5] = -newState[i * 6 + 3];
             }
@@ -513,8 +514,8 @@ VectorXf System::checkCollisions(VectorXf newState) {
     }
     //Check collision with y side
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 1] < -2.0f) {
-            newState[i * 6 + 1] = -2.0f;
+        if (newState[i * 6 + 1] < -dist) {
+            newState[i * 6 + 1] = -dist;
             if (newState[i * 6 + 4] < 0) {
                 newState[i * 6 + 4] = -newState[i * 6 + 4];
             }

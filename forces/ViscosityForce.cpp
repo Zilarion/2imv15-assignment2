@@ -4,6 +4,7 @@
 
 #include "ViscosityForce.h"
 #include "../Kernels.h"
+#include "../System.h"
 
 ViscosityForce::ViscosityForce(vector<Particle *> particles) {
     this->setTarget(particles);
@@ -14,14 +15,14 @@ void ViscosityForce::setTarget(std::vector<Particle *> particles) {
 }
 
 void ViscosityForce::apply(System *s) {
-    float u = 10.0f;
+    float u = 0.001f;
     // Evaluate viscosity force for every particle
     for (Particle *pi : particles) {
         Vector3f viscosityForce = Vector3f(0, 0, 0);
-        for (Particle *pj : particles) {
+        for (Particle *pj : s->grid.query(pi->position)) {
             if (pi->index != pj->index) {
                 viscosityForce = pj->mass * (pj->velocity - pi->velocity) / pj->density
-                                 * Viscosity::ddW(pi->position - pj->position, 20.0f);
+                                 * Viscosity::ddW(pi->position - pj->position, .5f);
             }
         }
         pi->force += u * viscosityForce;
