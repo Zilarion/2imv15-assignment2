@@ -21,8 +21,6 @@ include_directories(lib/eigen)
 include_directories(${EIGEN_EXTRA_INCS})
 add_definitions(${EIGEN_EXTRA_DEFS})
 
-include_directories(lib/VL)
-
 INCLUDE_DIRECTORIES(include)
 
 set(SOURCE_FILES

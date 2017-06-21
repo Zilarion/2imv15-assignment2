@@ -106,8 +106,15 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         Vector3i cubeStartInt = Vector3i(-5, -40, -5);
         Vector3i cubeEndInt = Vector3i(5, 10, 5);
         int cubeCornerDim[3] = {11, 51, 11};
-        float cubeCorners[cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2]] = {};
-        Vector3f gradientCorners[cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2]] = {};
+        int size = cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2];
+        float cubeCorners[size];
+        Vector3f gradientCorners[size];
+
+        for (int i = 0; i < size; i++) {
+            cubeCorners[i] = 0;
+            gradientCorners[i] = Vector3f(0.f,0.f,0.f);
+        }
+
         float cubeStep = -1.f;
         cubeStep = powf(10, cubeStep); //step should be 10^k for algorithm to work as it is now
         float particleRange = .15f;
