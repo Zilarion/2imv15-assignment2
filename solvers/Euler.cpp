@@ -54,6 +54,21 @@ void Euler::simulateStep(System *system, float h) {
         semiImpl = system->checkBoundingBox(semiImpl);
         // Set the new state, using semi implicit computation
         system->setState(semiImpl, system->getTime() + h);
+
+//        vector<Contact *> contacts = system->findContacts(semiImpl);
+//        float epsilon = 0.01f;
+//        if (contacts.size() > 0) {
+//            for (Contact *contact:contacts) {
+//                if (contact->isPenetrating(epsilon)) {
+//                    hasCollisions = true;
+//                }
+//            }
+//            if (hasCollisions) {
+//                simulateStep(system, h / 2);
+//            }
+//        } else if (hasCollisions) {
+//            simulateStep(system, 1.5f * h);
+//        }
     } else {
         system->setState(newState, system->getTime() + h);
     }

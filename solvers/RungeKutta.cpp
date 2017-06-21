@@ -38,5 +38,4 @@ void RungeKutta::simulateStep(System *system, float h) {
     // Set the final state
     newState = system->checkBoundingBox(newState);
     system->setState(newState, oldTime + h);
-    system->findContacts(newState);
 }

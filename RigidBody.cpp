@@ -194,7 +194,7 @@ VectorXf RigidBody::getBoundingBox() {
 }
 
 Vector3f RigidBody::getBodyCoordinates(Vector3f world) {
-    return R.inverse() * (world - x);
+    return R.transpose() * (world - x);
 }
 
 void RigidBody::updateForce() {

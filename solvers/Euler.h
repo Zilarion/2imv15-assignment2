@@ -18,6 +18,8 @@ public:
     TYPE type;
 
     Euler(TYPE type);
+private:
+    bool hasCollisions = false;
 
 };
 
