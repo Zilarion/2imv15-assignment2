@@ -102,8 +102,8 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 
     // draw marching cubes
     if (drawMarchingCubes) {
-        Vector3f cubeStart = Vector3f(-1.f, -1.f, -1.f);
-        Vector3f cubeEnd = Vector3f(1.f, 1.f, 1.f);
+        Vector3f cubeStart = Vector3f(-1.05f, -1.05f, -1.05f);
+        Vector3f cubeEnd = Vector3f(1.05f, 1.05f, 1.05f);
         float cubeStep = .05f; // a whole number of steps should fit into interval
         Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
         Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
@@ -406,7 +406,7 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 100;
+    float restDensity = 1000;
     for (Particle *p : particles) {
         p->density = densityField->eval(p, grid);
         meanDensity += p->density;
@@ -484,7 +484,7 @@ void System::drawConstraints() {
 
 VectorXf System::checkCollisions(VectorXf newState) {
     float dist = .95f;
-    float dec = .9f;
+    float dec = .8f;
     //collision from x side
     for (int i = 0; i < particles.size(); i++) {
         if (newState[i * 6] < -dist) {

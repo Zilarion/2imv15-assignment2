@@ -27,17 +27,17 @@ System* SystemBuilder::initBasic()
 {
     System* sys = new System(new RungeKutta());
 
-    int dimensions = 8;
+    int dimensions = 12;
     float mass = 1.f;
     float staticMass = 1000.f;
     int index = 0;
-    float d = 0.1f;
+    float d = 0.05f;
     float ds = 0.1f;
 
     // Movable particles
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * d, 0.f, j * d), mass, index++, true));
+            sys->addParticle(new Particle(Vector3f(i * d + (rand() % 10 + 1) * 0.001f, 0.f, j * d + (rand() % 10 + 1) * 0.001f), mass, index++, true));
         }
     }
 
