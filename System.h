@@ -32,6 +32,7 @@ private:
     void drawForces();
     void drawConstraints();
     void drawBorder();
+    void drawMarching();
 
     void computeForces();
     void clearForces();
@@ -55,8 +56,6 @@ public:
     bool wallExists;
     bool springsCanBreak = false;
     float dt;
-    int frame;
-    float currenttime, timebase;
     SystemBuilder::AvailableSystems type;
     Solver* solver;
 

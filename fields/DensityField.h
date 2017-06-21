@@ -13,7 +13,7 @@ class System;
 class DensityField {
 public:
     DensityField(System* s) : sys(s) {}
-    float eval(Particle * pi, UniformGrid &grid);
+    float eval(Particle * pi);
 
 private:
     System* sys;

@@ -8,9 +8,9 @@ class System;
 class ColorField {
 public:
     ColorField(System* s) : sys(s) {}
-    float eval(Vector3f position);
-    Vector3f dEval(Vector3f position);
-    float ddEval(Vector3f position);
+    float eval(const Vector3f &position);
+    Vector3f dEval(const Vector3f &position);
+    float ddEval(const Vector3f &position);
 
 private:
     System* sys;

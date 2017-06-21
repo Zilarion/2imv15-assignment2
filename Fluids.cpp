@@ -50,7 +50,7 @@ int main ( int argc, char ** argv )
 	printf ( "\t 4: Midpoint\n" );
 	printf ( "\t 5: 4th order Runge-Kutta\n" );
 
-	View v(768, 512, dt, SystemBuilder::BASIC, N);
+	View v(768, 512, dt, SystemBuilder::WATER, N);
 
 	exit ( 0 );
 }

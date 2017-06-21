@@ -14,7 +14,7 @@ UniformGrid::UniformGrid(int x, int y, int z, float delta, Vector3f offset): xMa
             );
 }
 
-void UniformGrid::insert(vector<Particle *> &particles) {
+void UniformGrid::insert(const vector<Particle *> &particles) {
     for (Particle * p : particles) {
         this->insert(p);
     }
@@ -27,10 +27,10 @@ void UniformGrid::insert(Particle *p) {
 
     if (xC >= 0 && yC >= 0 && zC >= 0 && xC < xMax && yC < yMax && zC < zMax)
         grid[xC][yC][zC].insert(p);
-    else {
-        std::cout << p->position << std::endl;
-        std::cout << xC << " " << yC << " " << zC << std::endl;
-    }
+//    else {
+//        std::cout << p->position << std::endl;
+//        std::cout << xC << " " << yC << " " << zC << std::endl;
+//    }
 }
 
 void appendVect(vector<Particle*> &target, vector<Particle*> &from) {
@@ -38,7 +38,7 @@ void appendVect(vector<Particle*> &target, vector<Particle*> &from) {
                   make_move_iterator(from.end()));
 }
 
-vector<Particle *> UniformGrid::query(const Vector3f pos) {
+vector<Particle *> UniformGrid::query(const Vector3f &pos) {
     int xC = floorf((pos[0] + offset[0]) / delta);
     int yC = floorf((pos[1] + offset[1]) / delta);
     int zC = floorf((pos[2] + offset[2]) / delta);

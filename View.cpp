@@ -52,10 +52,10 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
 
 
     // enable lights
-    GLfloat ambient[] = {0.3,0.3,0.3};
-    GLfloat diffuse[] = {.6,.6,.6};
-    GLfloat specular[] = {.3, .3, .3};
-    GLfloat lightPosition[] = { 0.0, 1.0, 1.0 };
+    GLfloat ambient[] = {.2f ,.2f ,.2f };
+    GLfloat diffuse[] = {.5f ,.5f ,.5f, 1.0f};
+    GLfloat specular[] = {0.5f, 0.5f, 0.5f, 1.0f};
+    GLfloat lightPosition[] = { 0.f, 2.f, 2.f };
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
@@ -65,8 +65,6 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-
-    glPointSize(3.f);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -97,6 +95,7 @@ void View::initialize(SystemBuilder::AvailableSystems type) {
 
 void View::onKeyPress ( unsigned char key, int x, int y )
 {
+    float rx, rz;
     switch ( key )
     {
         case 'd':
@@ -184,7 +183,8 @@ void View::onKeyPress ( unsigned char key, int x, int y )
                 printf("Springs can no longer break\n");
             break;
         case 'p':
-            sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.1f, 1.f, (rand() % 10 + 1) * 0.1f),
+            for (int i = 0; i < 10; i++)
+                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, -.9f, (rand() % 10 + 1) * 0.01f),
                                           1.f, sys->particles.size() + 1, true));
             break;
         case ' ':
@@ -299,6 +299,21 @@ void View::onIdle()
 
 void View::onDisplay()
 {
+    frame++;
+
+    //get the current time
+    currenttime = glutGet(GLUT_ELAPSED_TIME);
+    char title[20];
+
+    //check if a second has passed
+    if (currenttime - timebase > 1000)
+    {
+        sprintf(title, "Fluids! (FPS: %4.2f)", frame*1000.0/(currenttime-timebase));
+        glutSetWindowTitle(title);
+        timebase = currenttime;
+        frame = 0;
+    }
+
     preDisplay3D ();
 
     if (sys != NULL)

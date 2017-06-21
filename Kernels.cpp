@@ -6,7 +6,7 @@
 #include "Kernels.h"
 
 // Use poly for all computations except for visc. and pressure
-float Poly6::W(Vector3f r, float h) {
+float Poly6::W(const Vector3f &r, float h) {
     float rd = r.norm();
     if (rd >= 0 && rd <= h) {
         return 315 / (64 * M_PI * pow(h, 9)) * pow(h * h - rd * rd, 3);
@@ -14,7 +14,7 @@ float Poly6::W(Vector3f r, float h) {
     return 0;
 }
 
-Vector3f Poly6::dW(Vector3f r, float h) {
+Vector3f Poly6::dW(const Vector3f &r, float h) {
     float rd = r.norm();
     if (rd >= 0 && rd <= h) {
         return 315 / (64 * M_PI * pow(h, 9)) * -6  * pow(h * h - rd * rd, 2) * r;
@@ -22,7 +22,7 @@ Vector3f Poly6::dW(Vector3f r, float h) {
     return Vector3f(0,0,0);
 }
 
-float Poly6::ddW(Vector3f r, float h) {
+float Poly6::ddW(const Vector3f &r, float h) {
     float rd = r.norm();
     if (rd >= 0 && rd <= h) {
         return 315 / (64 * M_PI * pow(h, 9)) * (24 * rd * rd * (h * h - rd * rd) - 6 * pow(h * h - rd * rd, 2));
@@ -31,7 +31,7 @@ float Poly6::ddW(Vector3f r, float h) {
 }
 
 // Use spiky for pressure computations
-float Spiky::W(Vector3f r, float h) {
+float Spiky::W(const Vector3f &r, float h) {
     float rd = r.norm();
     if (rd >= 0 && rd <= h) {
         return 15 / (M_PI * pow(h, 6)) * pow(h - rd, 3);
@@ -39,7 +39,7 @@ float Spiky::W(Vector3f r, float h) {
     return 0;
 }
 
-Vector3f Spiky::dW(Vector3f r, float h) {
+Vector3f Spiky::dW(const Vector3f &r, float h) {
     float rd = r.norm();
     if (rd > 0 && rd <= h) {
         return - 45 / (M_PI * pow(h, 6) * rd) * pow(h - rd, 2) * r;
@@ -48,7 +48,7 @@ Vector3f Spiky::dW(Vector3f r, float h) {
 };
 
 // Use viscosity for viscosity computations
-float Viscosity::W(Vector3f r, float h) {
+float Viscosity::W(const Vector3f &r, float h) {
     float rd = r.norm();
     if (rd >= 0 && rd <= h) {
         return 15 / (2 * M_PI * pow(h, 3)) * (-pow(rd, 3) / (2 * pow(h, 3)) + (rd * rd) / (h * h) + h / (2 * rd) - 1);
@@ -56,7 +56,7 @@ float Viscosity::W(Vector3f r, float h) {
     return 0;
 }
 
-float Viscosity::ddW(Vector3f r, float h) {
+float Viscosity::ddW(const Vector3f &r, float h) {
     float rd = r.norm();
     if (rd >= 0 && rd <= h) {
         return 45 / (M_PI * pow(h, 6)) * (h - rd);
