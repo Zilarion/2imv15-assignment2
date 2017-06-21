@@ -15,7 +15,7 @@ void ViscosityForce::setTarget(std::vector<Particle *> particles) {
 }
 
 void ViscosityForce::apply(System *s) {
-    float u = 0.0001f;
+    float u = 0.01f;
     // Evaluate viscosity force for every particle
     for (Particle *pi : particles) {
         Vector3f viscosityForce = Vector3f(0, 0, 0);

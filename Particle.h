@@ -2,18 +2,27 @@
 
 #include <gfx/vec3.h>
 #include <Eigen/Dense>
+#include "Object.h"
+
+class RigidBody;
 
 using namespace Eigen;
+using namespace std;
 
-class Particle
+class Particle:public Object
 {
 public:
 
 	Particle(const Vector3f & startPosition, float mass, int index, bool movable);
 	virtual ~Particle(void);
 
+
 	void reset();
 	void draw(bool drawVelocity, bool drawForce, float meanDensity);
+
+	//from object
+
+	void handleSweep(bool start, vector<RigidBody *>* activeRigidBodies, vector<pair<RigidBody *, Particle *>> *range) override;
 
     Vector3f startPos;
     Vector3f force;
@@ -24,4 +33,5 @@ public:
     int index;
     float mass;
     bool movable;
+
 };

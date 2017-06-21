@@ -1,4 +1,5 @@
 #include "Particle.h"
+
 #if defined(_WIN32) || defined(WIN32)
     #include <GL/glut.h>
 #else
@@ -24,23 +25,19 @@ void Particle::reset()
 }
 
 void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
-    const float h = .3f;
     if (movable) {
-        glColor3f(0.f, density/meanDensity - 0.5f, density/meanDensity - 0.5f);
+        glColor4f(0.f, density, density, 0.2f);
     } else {
         glColor3f(1.f, 1.f, 1.f);
     }
 
-    glBegin(GL_POINTS);
-        glVertex3f(position[0], position[1], position[2]);
-    glEnd();
-//    glPushMatrix();
-//    glTranslated(position[0], position[1], position[2]);
-//    glutSolidSphere(h, 10, 10);
-
-//    glColor4f(1.f, 0.f, 0.f, 0.4f);
-//    glutSolidSphere(.15f, 10, 10);
-//    glPopMatrix();
+//    glBegin(GL_POINTS);
+//        glVertex3f(position[0], position[1], position[2]);
+//    glEnd();
+    glPushMatrix();
+    glTranslated(position[0], position[1], position[2]);
+    glutSolidSphere(.015f, 10, 10);
+    glPopMatrix();
 
     if (drawVelocity && movable) {
         glColor3f(0.0, 0.6, 0.0);
@@ -57,5 +54,12 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
         glVertex3f(position[0] + force[0] * 0.2f, position[1] + force[1] * 0.2f,
                    position[2] + force[2] * 0.2f);
         glEnd();
+    }
+}
+
+void Particle::handleSweep(bool isStart, vector<RigidBody *> *activeRigidBodies,
+                           vector<pair<RigidBody *, Particle *>> *range) {
+    for (RigidBody *r:(*activeRigidBodies)) {
+        (*range).push_back(make_pair(r, this));
     }
 }

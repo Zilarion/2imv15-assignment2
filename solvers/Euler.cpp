@@ -32,7 +32,7 @@ void Euler::simulateStep(System *system, float h) {
             semiImpl[i + 5] = newState[i + 5];
         }
 
-        semiImpl = system->checkCollisions(semiImpl);
+        semiImpl = system->checkBoundingBox(semiImpl);
         // Set the new state, using semi implicit computation
         system->setState(semiImpl, system->getTime() + h);
     } else {

@@ -158,6 +158,9 @@ void View::onKeyPress ( unsigned char key, int x, int y )
         case 'l':
             wind->direction = Vector3f(5.0f, 0.0f, 0.0f);
             break;
+        case 'u':
+            wind->direction = Vector3f(0.0f, 0.0f, 0.0f);
+            break;
         case ',':
             rotate = 1;
             break;

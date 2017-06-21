@@ -18,7 +18,7 @@
 #endif
 
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(20, 20, 20, 0.1f, Vector3f(1.f, 1.f, 1.f)) {
+                                 grid(80, 80, 80, 0.025f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -89,6 +89,22 @@ void System::reset() {
  * Draws the forces
  */
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
+    frame++;
+
+    //get the current time
+    currenttime = glutGet(GLUT_ELAPSED_TIME);
+    char title[20];
+
+    //check if a second has passed
+    if (currenttime - timebase > 1000)
+    {
+        sprintf(title, "Fluids! (FPS: %4.2f)", frame*1000.0/(currenttime-timebase));
+        glutSetWindowTitle(title);
+        timebase = currenttime;
+        frame = 0;
+    }
+
+
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
@@ -105,6 +121,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         Vector3f cubeStart = Vector3f(-1.1f, -1.1f, -1.1f);
         Vector3f cubeEnd = Vector3f(1.1f, 1.1f, 1.1f);
         float cubeStep = .05f; // a whole number of steps should fit into interval
+
         Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
         Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
         int cubeCornerDim[3] = {cubeEndInt[0] - cubeStartInt[0] + 1, cubeEndInt[1] - cubeStartInt[1] + 1, cubeEndInt[2] - cubeStartInt[2] + 1};
@@ -404,7 +421,7 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 100;
+    float restDensity = 1000;
     for (Particle *p : particles) {
         p->density = densityField->eval(p, grid);
         meanDensity += p->density;
@@ -480,9 +497,9 @@ void System::drawConstraints() {
     }
 }
 
-VectorXf System::checkCollisions(VectorXf newState) {
+VectorXf System::checkBoundingBox(VectorXf newState) {
     float dist = .95f;
-    float dec = .9f;
+    float dec = .8f;
     //collision from x side
     for (int i = 0; i < particles.size(); i++) {
         if (newState[i * 6] < -dist) {
@@ -539,6 +556,52 @@ VectorXf System::checkCollisions(VectorXf newState) {
     return newState;
 }
 
+vector<Contact *> System::findContacts(VectorXf newState) {
+    vector<Contact *> contacts;
+    //sweep sort
+    //bool indicates start or end, start=true
+    map<float, pair<Object *, bool>> xMap;
+    map<float, pair<Object *, bool>> yMap;
+    map<float, pair<Object *, bool>> zMap;
+    for (RigidBody *r:rigidBodies) {
+        VectorXf boundingBox = r->getBoundingBox();
+        xMap[boundingBox[0]] = make_pair(r, true);
+        xMap[boundingBox[3]] = make_pair(r, false);
+        yMap[boundingBox[1]] = make_pair(r, true);
+        yMap[boundingBox[4]] = make_pair(r, false);
+        zMap[boundingBox[2]] = make_pair(r, true);
+        zMap[boundingBox[5]] = make_pair(r, false);
+//        printf("minY: %f\n",boundingBox[1]);
+    }
+    for (Particle *p:particles) {
+        xMap[p->position[0]] = make_pair(p, true);
+        yMap[p->position[1]] = make_pair(p, true);
+        zMap[p->position[2]] = make_pair(p, true);
+    }
+    vector<RigidBody *> activeRigidBodies;
+    //keep track of particles that are in x/y/z range of a rigid body
+    //there is a collision if a  particle is present in all 3 ranges
+    vector<pair<RigidBody *, Particle *>> xRange;
+    vector<pair<RigidBody *, Particle *>> yRange;
+    vector<pair<RigidBody *, Particle *>> zRange;
+    for (pair<int, pair<Object *, bool>> xPair:xMap) {
+        xPair.second.first->handleSweep(xPair.second.second, &activeRigidBodies, &xRange);
+    }
+    for (pair<int, pair<Object *, bool>> yPair:yMap) {
+        yPair.second.first->handleSweep(yPair.second.second, &activeRigidBodies, &yRange);
+    }
+    for (pair<int, pair<Object *, bool>> zPair:zMap) {
+        zPair.second.first->handleSweep(zPair.second.second, &activeRigidBodies, &zRange);
+    }
+    for (pair<RigidBody *, Particle *> xPair:xRange) {
+        //check if there is a collision in all three directions x,y,z
+        if (find(yRange.begin(), yRange.end(), xPair) != yRange.end() &&
+            find(zRange.begin(), zRange.end(), xPair) != zRange.end()) {
+            contacts.push_back(new Contact(xPair.first, xPair.second, xPair.first->getNormal(xPair.second->position)));
+        }
+    }
+    return contacts;
+}
 void System::drawBorder() {
     glBegin(GL_LINES);
         glColor3f(.8f, .8f, .8f);
