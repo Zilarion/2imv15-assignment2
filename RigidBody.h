@@ -37,7 +37,9 @@ public:
     VectorXf getDerivativeState();
 
     void setState(VectorXf newState);
-
+    void recomputeAuxiliaryVars();
+    bool isPenetrating(float epsilon, Particle *p);
+    bool isContact(float epsilon, Particle *p);
     std::vector<Particle *> particles;
     Vector3f startPos;
     Vector3f dimensions;  //lengths of the edges

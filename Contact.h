@@ -11,8 +11,6 @@
 class Contact {
 public:
     Contact(RigidBody *r, Particle *p, Vector3f n);
-    bool isPenetrating(float epsilon);
-    bool isContact(float epsilon);
 
     RigidBody *r;
     Particle *p;

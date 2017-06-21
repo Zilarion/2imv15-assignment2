@@ -145,7 +145,7 @@ Vector3f RigidBody::getNormal(Vector3f p) {
         n = Vector3f(0, 0, 1);
         minDistance = abs(bodyPos[2] + 0.5f * dimensions[2]);
     }
-    Vector3f result = R * n;
+    Vector3f result = R * -n;
     //rotate back to obtain world n
     return result.normalized();
 }
@@ -231,6 +231,10 @@ void RigidBody::setState(VectorXf newState) {
     L[2] = newState[12];
 
     //Compute auxiliary variables
+    recomputeAuxiliaryVars();
+}
+
+void RigidBody::recomputeAuxiliaryVars() {
     R = q.normalized().toRotationMatrix();
     v = P / M;
     Iinv = R * IbodyInv * R.transpose();
@@ -298,8 +302,8 @@ Matrix3f RigidBody::star(Vector3f a) {
     return m;
 }
 
-void RigidBody::handleSweep(bool isStart, vector<RigidBody *>* activeRigidBodies,
-                            vector<pair<RigidBody *, Particle *>>* range) {
+void RigidBody::handleSweep(bool isStart, vector<RigidBody *> *activeRigidBodies,
+                            vector<pair<RigidBody *, Particle *>> *range) {
     if (isStart) {
         (*activeRigidBodies).push_back(this);
     } else {
@@ -311,5 +315,24 @@ void RigidBody::handleSweep(bool isStart, vector<RigidBody *>* activeRigidBodies
 
 }
 
+bool RigidBody::isPenetrating(float epsilon, Particle *p) {
+    Vector3f bodyCoords = getBodyCoordinates(p->position);
+    return bodyCoords[0] < 0.5f * dimensions[0] - epsilon && bodyCoords[0] > -0.5f * dimensions[0] + epsilon &&
+           bodyCoords[1] < 0.5f * dimensions[1] - epsilon && bodyCoords[1] > -0.5f * dimensions[1] + epsilon &&
+           bodyCoords[2] < 0.5f * dimensions[2] - epsilon && bodyCoords[2] > -0.5f * dimensions[2] + epsilon;
+}
 
+bool RigidBody::isContact(float epsilon, Particle *p) {
+    Vector3f bodyCoords = getBodyCoordinates(p->position);
+    VectorXf boundingBox = getBoundingBox();
+    return (((abs(bodyCoords[0] - boundingBox[0]) < epsilon) || (abs(bodyCoords[0] - boundingBox[3]) < epsilon)) &&
+            bodyCoords[1] - boundingBox[1] > epsilon && boundingBox[4] - bodyCoords[1] > epsilon &&
+            bodyCoords[2] - boundingBox[2] > epsilon && boundingBox[5] - bodyCoords[2] > epsilon) ||
+           (((abs(bodyCoords[1] - boundingBox[1]) < epsilon) || (abs(bodyCoords[1] - boundingBox[4]) < epsilon)) &&
+            bodyCoords[0] - boundingBox[0] > epsilon && boundingBox[3] - bodyCoords[0] > epsilon &&
+            bodyCoords[2] - boundingBox[2] > epsilon && boundingBox[5] - bodyCoords[2] > epsilon) ||
+           (((abs(bodyCoords[2] - boundingBox[2]) < epsilon) || (abs(bodyCoords[2] - boundingBox[5]) < epsilon)) &&
+            bodyCoords[1] - boundingBox[1] > epsilon && boundingBox[4] - bodyCoords[1] > epsilon &&
+            bodyCoords[0] - boundingBox[0] > epsilon && boundingBox[3] - bodyCoords[0] > epsilon);
+}
 

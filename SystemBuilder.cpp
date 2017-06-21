@@ -42,9 +42,8 @@ System* SystemBuilder::initBasic()
     }
 
     //Add a rigid body
-    RigidBody* r = new RigidBody(Vector3f(-1,-1,-1), Vector3f(1,1,1), Vector3f(5,5,5), staticMass);
+    RigidBody* r = new RigidBody(Vector3f(0,-1,0), Vector3f(1,1,1), Vector3f(5,5,5), staticMass);
     sys->addRigidBody(r);
-    sys->addForce(new PressureForce(r->particles));
 //    sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -9.81f, 0.0f)));
 //    sys->addForce(new DragForce(r->particles, 0.9f));
 

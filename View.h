@@ -26,6 +26,8 @@ public:
 private:
     System* sys = NULL;
     DirectionalForce* wind;
+    DirectionalForce* mouseDragForce;
+    Particle* mouseDragParticle;
     int id;
     int mx, my, omx, omy, hmx, hmy;
     int initialMx, initialMy;
