@@ -102,8 +102,8 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 
     // draw marching cubes
     if (drawMarchingCubes) {
-        Vector3f cubeStart = Vector3f(-1.f, -1.f, -1.f);
-        Vector3f cubeEnd = Vector3f(1.f, 1.f, 1.f);
+        Vector3f cubeStart = Vector3f(-1.1f, -1.1f, -1.1f);
+        Vector3f cubeEnd = Vector3f(1.1f, 1.1f, 1.1f);
         float cubeStep = .05f; // a whole number of steps should fit into interval
         Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
         Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
@@ -259,9 +259,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         }
 
         //* draw triangles
-        glColor4f(.4f, .5f, .6f, 1.f);
-        GLfloat specular[] = {1.f, 1.f, 1.f, 1.f};
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+        glColor4f(.8f, .7f, .9f, 1.f);
         glBegin(GL_TRIANGLES);
         for (int i = 0; i < triangles.size(); i++) {
             TRIANGLE triangle = triangles[i];

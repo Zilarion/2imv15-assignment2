@@ -52,10 +52,10 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
 
 
     // enable lights
-    GLfloat ambient[] = {0.3,0.3,0.3};
-    GLfloat diffuse[] = {.6,.6,.6};
-    GLfloat specular[] = {.3, .3, .3};
-    GLfloat lightPosition[] = { 0.0, 1.0, 1.0 };
+    GLfloat ambient[] = {.3, .3, .3};
+    GLfloat diffuse[] = {.6, .6, .6};
+    GLfloat specular[] = {.1, .1, .1};
+    GLfloat lightPosition[] = { 1.0, 1.0, 0.0 };
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
@@ -97,6 +97,7 @@ void View::initialize(SystemBuilder::AvailableSystems type) {
 
 void View::onKeyPress ( unsigned char key, int x, int y )
 {
+    float rx, rz;
     switch ( key )
     {
         case 'd':
@@ -181,8 +182,10 @@ void View::onKeyPress ( unsigned char key, int x, int y )
                 printf("Springs can no longer break\n");
             break;
         case 'p':
-            sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.1f, 1.f, (rand() % 10 + 1) * 0.1f),
-                                          1.f, sys->particles.size() + 1, true));
+            rx = (rand() % 100 - 50) * .01f;
+            rz = (rand() % 100 - 50) * .01f;
+            printf("Particle added: %f, %f\n", rx, rz);
+            sys->addParticle(new Particle(Vector3f(rx, 0.f, rz), 1.f, sys->particles.size() + 1, true));
             break;
         case ' ':
             isSimulating = !isSimulating;

@@ -6,7 +6,7 @@
 #endif
 
 Particle::Particle(const Vector3f & startPosition, float mass, int index, bool movable) :
-	startPos(startPosition), density(0), position(Vector3f(0.0, 0.0, 0.0)),
+	startPos(startPosition), density(0), position(startPosition),
     velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0,0.0,0.0)), mass(mass), index(index),
     movable(movable)
 {
