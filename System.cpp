@@ -134,7 +134,8 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             gradientCorners[i] = Vector3f(0.f,0.f,0.f);
         }
 
-        float particleRange = .12f;
+        float particleRange = 1.f; //percentage of step size for speed increase
+        particleRange = particleRange * cubeStep;
         for (Particle *p: particles) {
             Vector3f pos = p->position;
             // only apply marching cube to particle when it is inside the rendering volume
@@ -153,16 +154,16 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
                                                                (floor(pos[2] / cubeStep) + -cubeStartInt[2]))));
 
                 //fill in all the gridcube values
-                int steps = (int) ceilf(particleRange / cubeStep);
-                for (int x = -steps; x <= steps + 1; x++) {
-                    for (int y = -steps; y <= steps + 1; y++) {
-                        for (int z = -steps; z <= steps + 1; z++) {
+//                int steps = (int) ceilf(particleRange / cubeStep);
+                for (int x = 0; x <= 1; x++) {
+                    for (int y = 0; y <= 1; y++) {
+                        for (int z = 0; z <= 1; z++) {
                             Vector3f gridPos = lowerGridPos + Vector3f(x * cubeStep, y * cubeStep, z * cubeStep);
                             int cubePos = lowerCubePos + x + (cubeCornerDim[0] * (y + cubeCornerDim[1] * z));
                             if (cubePos < cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[0] && cubePos >= 0) {
-                                cubeCorners[cubePos] = min(
+                                cubeCorners[cubePos] =
                                         cubeCorners[cubePos] +
-                                        max(particleRange - (pos - gridPos).norm(), 0.f) / particleRange, 1.f);
+                                        max(particleRange - (pos - gridPos).norm(), 0.f) / particleRange;
                                 // update gradients based on change in grid
                                 updateGradient(cubeCorners, cubeCornerDim, cubePos, gradientCorners);
                             }
@@ -172,7 +173,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             }
         }
 
-        double iso = .5;
+        double iso = 0.1;
         vector<TRIANGLE> triangles = {};
         //unordered_map<string, Vector3f> normals = {};
 
@@ -180,8 +181,8 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             for (int y = cubeStartInt[1]; y < cubeEndInt[1] - 1; y++) {
                 for (int z = cubeStartInt[2]; z < cubeEndInt[2] - 1; z++) {
                     int cubePos0 =
-                            x + -cubeStartInt[0] + cubeCornerDim[0] * (y + -cubeStartInt[1] + (cubeCornerDim[1] * (z +
-                                                                                                               -cubeStartInt[2]))); // [0,0,0]
+                            x + -cubeStartInt[0] + cubeCornerDim[0] * (y + -cubeStartInt[1] +
+                                    (cubeCornerDim[1] * (z + -cubeStartInt[2])));
                     int cubePos[8] = {
                             cubePos0, //[0,0,0]
                             cubePos0 + 1, // [1,0,0]
@@ -195,32 +196,32 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 
                     GRIDCELL cell = {
                             {
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(0 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[0,0,0]
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(1 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[1,0,0]
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(1 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[1,1,0]
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(0 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[0,1,0]
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(0 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[0,0,1]
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(1 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[1,0,1]
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(1 * cubeStep, 1 * cubeStep, 1 * cubeStep), //[1,1,1]
-                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
-                                    Vector3f(0 * cubeStep, 1 * cubeStep, 1 * cubeStep)  //[0,1,1]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(0 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[0,0,0]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(1 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[1,0,0]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(1 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[1,1,0]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(0 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[0,1,0]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(0 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[0,0,1]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(1 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[1,0,1]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(1 * cubeStep, 1 * cubeStep, 1 * cubeStep), //[1,1,1]
+                                Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
+                                Vector3f(0 * cubeStep, 1 * cubeStep, 1 * cubeStep)  //[0,1,1]
                             },
                             {
-                                    cubeCorners[cubePos[0]],
-                                    cubeCorners[cubePos[1]],
-                                    cubeCorners[cubePos[2]],
-                                    cubeCorners[cubePos[3]],
-                                    cubeCorners[cubePos[4]],
-                                    cubeCorners[cubePos[5]],
-                                    cubeCorners[cubePos[6]],
-                                    cubeCorners[cubePos[7]]
+                                cubeCorners[cubePos[0]],
+                                cubeCorners[cubePos[1]],
+                                cubeCorners[cubePos[2]],
+                                cubeCorners[cubePos[3]],
+                                cubeCorners[cubePos[4]],
+                                cubeCorners[cubePos[5]],
+                                cubeCorners[cubePos[6]],
+                                cubeCorners[cubePos[7]]
                             }
                     };
 

@@ -25,7 +25,7 @@ System* SystemBuilder::get(AvailableSystems s) {
 
 System* SystemBuilder::initBasic()
 {
-    System* sys = new System(new RungeKutta());
+    System* sys = new System(new Euler(Euler::SEMI));
 
     int dimensions = 20;
     float mass = 1.f;
@@ -41,12 +41,12 @@ System* SystemBuilder::initBasic()
         }
     }
 
-    //Add a rigid body
+    /*/Add a rigid body
     RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(1,1,1), Vector3f(5,5,5), mass);
     sys->addRigidBody(r);
     sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -9.81f, 0.0f)));
 //    sys->addForce(new DragForce(r->particles, 0.9f));
-
+    //*/
 
     dimensions += 1;
     // A small static particle set
