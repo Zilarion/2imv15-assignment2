@@ -117,7 +117,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             gradientCorners[i] = Vector3f(0.f,0.f,0.f);
         }
 
-        float particleRange = .15f;
+        float particleRange = .12f;
         for (Particle *p: particles) {
             Vector3f pos = p->position;
             // only apply marching cube to particle when it is inside the rendering volume
@@ -155,13 +155,13 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             }
         }
 
-        double iso = .8;
+        double iso = .5;
         vector<TRIANGLE> triangles = {};
-        unordered_map<string, Vector3f> normals = {};
+        //unordered_map<string, Vector3f> normals = {};
 
-        for (int x = cubeStartInt[0]; x < cubeEndInt[0]; x++) {
-            for (int y = cubeStartInt[1]; y < cubeEndInt[1]; y++) {
-                for (int z = cubeStartInt[2]; z < cubeEndInt[2]; z++) {
+        for (int x = cubeStartInt[0]; x < cubeEndInt[0] - 1; x++) {
+            for (int y = cubeStartInt[1]; y < cubeEndInt[1] - 1; y++) {
+                for (int z = cubeStartInt[2]; z < cubeEndInt[2] - 1; z++) {
                     int cubePos0 =
                             x + -cubeStartInt[0] + cubeCornerDim[0] * (y + -cubeStartInt[1] + (cubeCornerDim[1] * (z +
                                                                                                                -cubeStartInt[2]))); // [0,0,0]
@@ -259,7 +259,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         }
 
         //* draw triangles
-        glColor4f(.4f, .5f, .6f, .7f);
+        glColor4f(.4f, .5f, .6f, 1.f);
         GLfloat specular[] = {1.f, 1.f, 1.f, 1.f};
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
         glBegin(GL_TRIANGLES);
@@ -296,8 +296,9 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             glVertex3f(c[0], c[1], c[2]);
         }
         glEnd();
-        glNormal3f(0.f, 0.f, 0.f);
     }
+    glNormal3f(1.f, 0.f, 0.f);
+    glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 
 /**
