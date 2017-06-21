@@ -65,7 +65,7 @@ System* SystemBuilder::initBasic()
     sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -9.81f, .0f)));
     sys->addForce(new DragForce(sys->particles, 0.9f));
     sys->addForce(new PressureForce(sys->particles));
-    sys->addForce(new ViscosityForce(sys->particles));
+//    sys->addForce(new ViscosityForce(sys->particles));
 //    sys->addForce(new SurfaceForce(sys->particles));
 
     return sys;

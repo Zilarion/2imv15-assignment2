@@ -404,12 +404,12 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 50;
+    float restDensity = 100;
     for (Particle *p : particles) {
         p->density = densityField->eval(p, grid);
     }
 
-    float k = .1f;
+    float k = .000000001f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
