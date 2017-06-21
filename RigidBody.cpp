@@ -69,6 +69,7 @@ void RigidBody::initializeVariables() {
     torque = Vector3f(0, 0, 0);
 }
 
+
 void RigidBody::draw(bool drawVelocity, bool drawForce) {
 //    glBegin(GL_POINTS);
 //    for (Particle *p:particles) {
@@ -113,6 +114,90 @@ void RigidBody::draw(bool drawVelocity, bool drawForce) {
     glVertex3f(v4[0], v4[1], v4[2]);
     glVertex3f(v8[0], v8[1], v8[2]);
     glEnd();
+}
+
+Vector3f RigidBody::pt_velocity(Vector3f p) {
+    return v + omega.cross(p - x);
+}
+
+Vector3f RigidBody::getNormal(Vector3f p) {
+    Vector3f bodyPos = getBodyCoordinates(p);
+    float minDistance = 100000000;
+    Vector3f n;
+    if (abs(bodyPos[0] - 0.5f * dimensions[0]) < minDistance) {
+        n = Vector3f(-1, 0, 0);
+        minDistance = abs(bodyPos[0] - 0.5f * dimensions[0]);
+    }
+    if (abs(bodyPos[0] + 0.5f * dimensions[0]) < minDistance) {
+        n = Vector3f(1, 0, 0);
+        minDistance = abs(bodyPos[0] + 0.5f * dimensions[0]);
+    }
+    if (abs(bodyPos[1] - 0.5f * dimensions[1]) < minDistance) {
+        n = Vector3f(0, -1, 0);
+        minDistance = abs(bodyPos[1] - 0.5f * dimensions[1]);
+    }
+    if (abs(bodyPos[1] + 0.5f * dimensions[1]) < minDistance) {
+        n = Vector3f(0, 1, 0);
+        minDistance = abs(bodyPos[1] + 0.5f * dimensions[1]);
+    }
+    if (abs(bodyPos[2] - 0.5f * dimensions[2]) < minDistance) {
+        n = Vector3f(0, 0, -1);
+        minDistance = abs(bodyPos[2] - 0.5f * dimensions[2]);
+    }
+    if (abs(bodyPos[2] + 0.5f * dimensions[2]) < minDistance) {
+        n = Vector3f(0, 0, 1);
+        minDistance = abs(bodyPos[2] + 0.5f * dimensions[2]);
+    }
+    Vector3f result = R * n;
+    //rotate back to obtain world n
+    return result.normalized();
+}
+
+VectorXf RigidBody::getBoundingBox() {
+    float minX = 100000000;
+    float maxX = -10000000;
+    float minY = 100000000;
+    float maxY = -10000000;
+    float minZ = 100000000;
+    float maxZ = -10000000;
+    for (float i = -0.5f; i < 1; i++) {
+        for (float j = -0.5f; j < 1; j++) {
+            for (float k = -0.5f; k < 1; k++) {
+                Vector3f world = R * Vector3f(i * dimensions[0], j * dimensions[1], k * dimensions[2]) + x;
+                if (world[0] < minX) {
+                    minX = world[0];
+                }
+                if (world[0] > maxX) {
+                    maxX = world[0];
+                }
+                if (world[1] < minY) {
+                    minY = world[1];
+                }
+                if (world[1] > maxY) {
+                    maxY = world[1];
+                }
+                if (world[2] < minZ) {
+                    minZ = world[2];
+                }
+                if (world[2] > maxZ) {
+                    maxZ = world[2];
+                }
+            }
+        }
+    }
+    VectorXf boundingBox(6);
+    boundingBox[0] = minX;
+    boundingBox[1] = minY;
+    boundingBox[2] = minZ;
+    boundingBox[3] = maxX;
+    boundingBox[4] = maxY;
+    boundingBox[5] = maxZ;
+    return boundingBox;
+
+}
+
+Vector3f RigidBody::getBodyCoordinates(Vector3f world) {
+    return R.inverse() * (world - x);
 }
 
 void RigidBody::updateForce() {
@@ -214,6 +299,19 @@ Matrix3f RigidBody::star(Vector3f a) {
             a[2], 0, -a[0],
             -a[1], a[0], 0;
     return m;
+}
+
+void RigidBody::handleSweep(bool isStart, vector<RigidBody *>* activeRigidBodies,
+                            vector<pair<RigidBody *, Particle *>>* range) {
+    if (isStart) {
+        (*activeRigidBodies).push_back(this);
+    } else {
+        //remove
+        auto it = std::find((*activeRigidBodies).begin(), (*activeRigidBodies).end(), this);
+        if (it != (*activeRigidBodies).end())
+            (*activeRigidBodies).erase(it);
+    }
+
 }
 
 

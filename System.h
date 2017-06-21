@@ -17,6 +17,7 @@
 #include "data/UniformGrid.h"
 #include "RigidBody.h"
 #include "MarchingCubes.h"
+#include "Contact.h"
 
 #include <vector>
 #include <unordered_map>
@@ -68,7 +69,8 @@ public:
     void setState(VectorXf src);
     void setState(VectorXf newState, float time);
     unsigned long getParticleDim();
-    VectorXf checkCollisions(VectorXf newState);
+    VectorXf checkBoundingBox(VectorXf newState);
+    vector<Contact*> findContacts(VectorXf newState);   //bool indicates if there are any
 
     void step(bool adaptive);
     void free();

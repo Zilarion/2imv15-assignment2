@@ -1,23 +1,23 @@
 #include "Particle.h"
+
 #if defined(_WIN32) || defined(WIN32)
-    #include <GL/glut.h>
+
+#include <GL/glut.h>
+
 #else
-    #include <GLUT/glut.h>
+#include <GLUT/glut.h>
 #endif
 
-Particle::Particle(const Vector3f & startPosition, float mass, int index, bool movable) :
-	startPos(startPosition), density(0), position(Vector3f(0.0, 0.0, 0.0)),
-    velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0,0.0,0.0)), mass(mass), index(index),
-    movable(movable)
-{
+Particle::Particle(const Vector3f &startPosition, float mass, int index, bool movable) :
+        startPos(startPosition), density(0), position(Vector3f(0.0, 0.0, 0.0)),
+        velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0, 0.0, 0.0)), mass(mass), index(index),
+        movable(movable) {
 }
 
-Particle::~Particle(void)
-{
+Particle::~Particle(void) {
 }
 
-void Particle::reset()
-{
+void Particle::reset() {
     position = startPos;
     velocity = Vector3f(0.0, 0.0, 0.0);
     force = Vector3f(0.0, 0.0, 0.0);
@@ -32,7 +32,7 @@ void Particle::draw(bool drawVelocity, bool drawForce) {
     }
 
     glBegin(GL_POINTS);
-        glVertex3f(position[0], position[1], position[2]);
+    glVertex3f(position[0], position[1], position[2]);
     glEnd();
 //    glPushMatrix();
 //    glTranslated(position[0], position[1], position[2]);
@@ -58,4 +58,13 @@ void Particle::draw(bool drawVelocity, bool drawForce) {
                    position[2] + force[2] * 0.2f);
         glEnd();
     }
+}
+
+void Particle::handleSweep(bool isStart, vector<RigidBody *> *activeRigidBodies,
+                           vector<pair<RigidBody *, Particle *>> *range) {
+
+    for (RigidBody *r:(*activeRigidBodies)) {
+        (*range).push_back(make_pair(r, this));
+    }
+
 }
