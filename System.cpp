@@ -107,8 +107,9 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
         Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
         int cubeCornerDim[3] = {cubeEndInt[0] - cubeStartInt[0] + 1, cubeEndInt[1] - cubeStartInt[1] + 1, cubeEndInt[2] - cubeStartInt[2] + 1};
-        float cubeCorners[cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2]] = {};
-        Vector3f gradientCorners[cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2]] = {};
+        int size = cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2];
+        float cubeCorners[size];
+        Vector3f gradientCorners[size];
 
         float particleRange = .15f;
         for (Particle *p: particles) {
