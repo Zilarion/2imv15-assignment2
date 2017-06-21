@@ -54,6 +54,8 @@ public:
     bool wallExists;
     bool springsCanBreak = false;
     float dt;
+    int frame;
+    float currenttime, timebase;
     SystemBuilder::AvailableSystems type;
     Solver* solver;
 

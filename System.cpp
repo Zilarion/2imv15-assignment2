@@ -17,8 +17,9 @@
 #include <GLUT/glut.h>
 #endif
 
+
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(20, 20, 20, 0.1f, Vector3f(1.f, 1.f, 1.f)) {
+                                 grid(80, 80, 80, 0.025f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -89,6 +90,22 @@ void System::reset() {
  * Draws the forces
  */
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
+    frame++;
+
+    //get the current time
+    currenttime = glutGet(GLUT_ELAPSED_TIME);
+    char title[20];
+
+    //check if a second has passed
+    if (currenttime - timebase > 1000)
+    {
+        sprintf(title, "Fluids! (FPS: %4.2f)", frame*1000.0/(currenttime-timebase));
+        glutSetWindowTitle(title);
+        timebase = currenttime;
+        frame = 0;
+    }
+
+
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
@@ -105,6 +122,8 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         Vector3f cubeStart = Vector3f(-1.05f, -1.05f, -1.05f);
         Vector3f cubeEnd = Vector3f(1.05f, 1.05f, 1.05f);
         float cubeStep = .05f; // a whole number of steps should fit into interval
+
+
         Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
         Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
         int cubeCornerDim[3] = {cubeEndInt[0] - cubeStartInt[0] + 1, cubeEndInt[1] - cubeStartInt[1] + 1, cubeEndInt[2] - cubeStartInt[2] + 1};

@@ -27,11 +27,11 @@ System* SystemBuilder::initBasic()
 {
     System* sys = new System(new RungeKutta());
 
-    int dimensions = 12;
+    int dimensions = 20;
     float mass = 1.f;
     float staticMass = 1000.f;
     int index = 0;
-    float d = 0.05f;
+    float d = 0.03f;
     float ds = 0.1f;
 
     // Movable particles
