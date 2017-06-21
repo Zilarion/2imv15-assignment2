@@ -25,7 +25,7 @@ System* SystemBuilder::get(AvailableSystems s) {
 
 System* SystemBuilder::initBasic()
 {
-    System* sys = new System(new RungeKutta());
+    System* sys = new System(new Euler(Euler::SEMI));
 
     int dimensions = 20;
     float mass = 1.f;
