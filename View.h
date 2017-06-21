@@ -7,6 +7,7 @@
 
 #include "System.h"
 #include "SystemBuilder.h"
+#include "forces/DirectionalForce.h"
 
 class View {
 public:
@@ -24,6 +25,7 @@ public:
 
 private:
     System* sys = NULL;
+    DirectionalForce* wind;
     int id;
     int mx, my, omx, omy, hmx, hmy;
     int initialMx, initialMy;
