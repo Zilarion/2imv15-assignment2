@@ -18,7 +18,7 @@
 #endif
 
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(40, 40, 40, 0.1f, Vector3f(2.5f, 2.5f, 2.5f)) {
+                                 grid(20, 20, 20, 0.1f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -101,8 +101,8 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 
     // draw marching cubes
     if (drawMarchingCubes) {
-        Vector3f cubeStart = Vector3f(-.5f, -2.1f, -.5f);
-        Vector3f cubeEnd = Vector3f(.5f, 1.f, .5f);
+        Vector3f cubeStart = Vector3f(-1.f, -1.f, -1.f);
+        Vector3f cubeEnd = Vector3f(1.f, 1.f, 1.f);
         float cubeStep = .1f; // a whole number of steps should fit into interval
         Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
         Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
@@ -409,7 +409,7 @@ void System::computeForces() {
         p->density = densityField->eval(p, grid);
     }
 
-    float k = .000000001f;
+    float k = .1f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -479,7 +479,7 @@ void System::drawConstraints() {
 }
 
 VectorXf System::checkCollisions(VectorXf newState) {
-    float dist = 2.0f;
+    float dist = .95f;
     //collision from x side
     for (int i = 0; i < particles.size(); i++) {
         if (newState[i * 6] < -dist) {
@@ -523,5 +523,15 @@ VectorXf System::checkCollisions(VectorXf newState) {
             }
         }
     }
+
+    for (int i = 0; i < particles.size(); i++) {
+        if (newState[i * 6 + 1] > dist) {
+            newState[i * 6 + 1] = dist;
+            if (newState[i * 6 + 4] > 0) {
+                newState[i * 6 + 4] = -newState[i * 6 + 4];
+            }
+        }
+    }
+
     return newState;
 }
