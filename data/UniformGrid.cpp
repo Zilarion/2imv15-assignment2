@@ -27,6 +27,10 @@ void UniformGrid::insert(Particle *p) {
 
     if (xC >= 0 && yC >= 0 && zC >= 0 && xC < xMax && yC < yMax && zC < zMax)
         grid[xC][yC][zC].insert(p);
+    else {
+        std::cout << p->position << std::endl;
+        std::cout << xC << " " << yC << " " << zC << std::endl;
+    }
 }
 
 void appendVect(vector<Particle*> &target, vector<Particle*> &from) {

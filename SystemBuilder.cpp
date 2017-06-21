@@ -27,21 +27,17 @@ System* SystemBuilder::initBasic()
 {
     System* sys = new System(new RungeKutta());
 
-    int dimensions = 2;
+    int dimensions = 20;
     float mass = 1.f;
     float staticMass = 1000.f;
     int index = 0;
-    float d = 0.1f;
+    float d = 0.03f;
     float ds = 0.1f;
-    int count = 5;
 
     // Movable particles
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            for (int z = 0; z < count; z++)
-            sys->addParticle(new Particle(Vector3f(i * d + 0.01f + (rand() % 10 + 1) * 0.01f
-                    , index * .01f
-                    , j * d + 0.01f + (rand() % 10 + 1) * 0.01f), mass, index++, true));
+            sys->addParticle(new Particle(Vector3f(i * d + (rand() % 10 + 1) * 0.001f, 0.f, j * d + (rand() % 10 + 1) * 0.001f), mass, index++, true));
         }
     }
 
@@ -62,11 +58,11 @@ System* SystemBuilder::initBasic()
 //        }
 //    }
 
-    sys->addForce(new DirectionalForce(sys->particles, Vector3f(0.0f, -9.81f, 0.0f)));
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -2.81f, .0f)));
     sys->addForce(new DragForce(sys->particles, 0.9f));
     sys->addForce(new PressureForce(sys->particles));
     sys->addForce(new ViscosityForce(sys->particles));
-//    sys->addForce(new SurfaceForce(sys->particles));
+    sys->addForce(new SurfaceForce(sys->particles));
 
     return sys;
 }

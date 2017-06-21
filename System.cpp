@@ -17,8 +17,9 @@
 #include <GLUT/glut.h>
 #endif
 
+
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(50, 50, 50, 0.1f, Vector3f(2.5f, 2.5f, 2.5f)) {
+                                 grid(80, 80, 80, 0.025f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -89,9 +90,26 @@ void System::reset() {
  * Draws the forces
  */
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
+    frame++;
+
+    //get the current time
+    currenttime = glutGet(GLUT_ELAPSED_TIME);
+    char title[20];
+
+    //check if a second has passed
+    if (currenttime - timebase > 1000)
+    {
+        sprintf(title, "Fluids! (FPS: %4.2f)", frame*1000.0/(currenttime-timebase));
+        glutSetWindowTitle(title);
+        timebase = currenttime;
+        frame = 0;
+    }
+
+
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
+    drawBorder();
     if (drawForce) {
         drawForces();
     }
@@ -101,16 +119,24 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 
     // draw marching cubes
     if (drawMarchingCubes) {
-        float cubeStart[] = {-.5f, -4.f, -.5f};
-        float cubeEnd[] = {.5f, 1.f, .5f};
-        int cubeStartInt[] = {-5, -40, -5};
-        int cubeEndInt[] = {5, 10, 5};
-        int cubeCornerDimX = 11;
-        int cubeCornerDimY = 51;
-        int cubeCornerDimZ = 11;
-        float cubeCorners[cubeCornerDimX * cubeCornerDimY * cubeCornerDimZ] = {};
-        float cubeStep = .1f; //10^k
-        float particleRange = .15f;
+        Vector3f cubeStart = Vector3f(-1.05f, -1.05f, -1.05f);
+        Vector3f cubeEnd = Vector3f(1.05f, 1.05f, 1.05f);
+        float cubeStep = .05f; // a whole number of steps should fit into interval
+
+
+        Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
+        Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
+        int cubeCornerDim[3] = {cubeEndInt[0] - cubeStartInt[0] + 1, cubeEndInt[1] - cubeStartInt[1] + 1, cubeEndInt[2] - cubeStartInt[2] + 1};
+        int size = cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2];
+        float cubeCorners[size];
+        Vector3f gradientCorners[size];
+
+        for (int i = 0; i < size; i++) {
+            cubeCorners[i] = 0;
+            gradientCorners[i] = Vector3f(0.f,0.f,0.f);
+        }
+
+        float particleRange = .12f;
         for (Particle *p: particles) {
             Vector3f pos = p->position;
             // only apply marching cube to particle when it is inside the rendering volume
@@ -123,10 +149,10 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
                 Vector3f lowerGridPos = Vector3f(floor(pos[0] / cubeStep) * cubeStep,
                                                  floor(pos[1] / cubeStep) * cubeStep,
                                                  floor(pos[2] / cubeStep) * cubeStep);
-                int lowerCubePos = (int) (floor(pos[0] * 10.f) + -cubeStartInt[0] +
-                                          cubeCornerDimX * (floor(pos[1] * 10.f) + -cubeStartInt[1]
-                                                            + (cubeCornerDimY *
-                                                               (floor(pos[2] * 10.f) + -cubeStartInt[2]))));
+                int lowerCubePos = (int) (floor(pos[0] / cubeStep) + -cubeStartInt[0] +
+                                          cubeCornerDim[0] * (floor(pos[1] / cubeStep) + -cubeStartInt[1]
+                                                            + (cubeCornerDim[1] *
+                                                               (floor(pos[2] / cubeStep) + -cubeStartInt[2]))));
 
                 //fill in all the gridcube values
                 int steps = (int) ceilf(particleRange / cubeStep);
@@ -134,11 +160,13 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
                     for (int y = -steps; y <= steps + 1; y++) {
                         for (int z = -steps; z <= steps + 1; z++) {
                             Vector3f gridPos = lowerGridPos + Vector3f(x * cubeStep, y * cubeStep, z * cubeStep);
-                            int cubePos = lowerCubePos + x + (cubeCornerDimX * (y + cubeCornerDimY * z));
-                            if (cubePos < cubeCornerDimX * cubeCornerDimY * cubeCornerDimX && cubePos >= 0) {
+                            int cubePos = lowerCubePos + x + (cubeCornerDim[0] * (y + cubeCornerDim[1] * z));
+                            if (cubePos < cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[0] && cubePos >= 0) {
                                 cubeCorners[cubePos] = min(
                                         cubeCorners[cubePos] +
                                         max(particleRange - (pos - gridPos).norm(), 0.f) / particleRange, 1.f);
+                                // update gradients based on change in grid
+                                updateGradient(cubeCorners, cubeCornerDim, cubePos, gradientCorners);
                             }
                         }
                     }
@@ -146,44 +174,44 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             }
         }
 
-        double iso = .8;
+        double iso = .5;
         vector<TRIANGLE> triangles = {};
-        unordered_map<string, Vector3f> normals = {};
+        //unordered_map<string, Vector3f> normals = {};
 
-        for (int x = cubeStartInt[0]; x < cubeEndInt[0]; x++) {
-            for (int y = cubeStartInt[1]; y < cubeEndInt[1]; y++) {
-                for (int z = cubeStartInt[2]; z < cubeEndInt[2]; z++) {
+        for (int x = cubeStartInt[0]; x < cubeEndInt[0] - 1; x++) {
+            for (int y = cubeStartInt[1]; y < cubeEndInt[1] - 1; y++) {
+                for (int z = cubeStartInt[2]; z < cubeEndInt[2] - 1; z++) {
                     int cubePos0 =
-                            x + -cubeStartInt[0] + cubeCornerDimX * (y + -cubeStartInt[1] + (cubeCornerDimY * (z +
+                            x + -cubeStartInt[0] + cubeCornerDim[0] * (y + -cubeStartInt[1] + (cubeCornerDim[1] * (z +
                                                                                                                -cubeStartInt[2]))); // [0,0,0]
                     int cubePos[8] = {
                             cubePos0, //[0,0,0]
                             cubePos0 + 1, // [1,0,0]
-                            cubePos0 + 1 + cubeCornerDimX, // [1,1,0]
-                            cubePos0 + cubeCornerDimX, // [0,1,0]
-                            cubePos0 + cubeCornerDimX * cubeCornerDimY, // [0,0,1]
-                            cubePos0 + 1 + cubeCornerDimX * cubeCornerDimY, // [1,0,1]
-                            cubePos0 + 1 + cubeCornerDimX + cubeCornerDimX * cubeCornerDimY, // [1,1,1]
-                            cubePos0 + cubeCornerDimX + cubeCornerDimX * cubeCornerDimY // [0,1,1]
+                            cubePos0 + 1 + cubeCornerDim[0], // [1,1,0]
+                            cubePos0 + cubeCornerDim[0], // [0,1,0]
+                            cubePos0 + cubeCornerDim[0] * cubeCornerDim[1], // [0,0,1]
+                            cubePos0 + 1 + cubeCornerDim[0] * cubeCornerDim[1], // [1,0,1]
+                            cubePos0 + 1 + cubeCornerDim[0] + cubeCornerDim[0] * cubeCornerDim[1], // [1,1,1]
+                            cubePos0 + cubeCornerDim[0] + cubeCornerDim[0] * cubeCornerDim[1] // [0,1,1]
                     };
 
                     GRIDCELL cell = {
                             {
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[0,0,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 0 * cubeStep, 0 * cubeStep), //[1,0,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[1,1,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 1 * cubeStep, 0 * cubeStep), //[0,1,0]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[0,0,1]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 0 * cubeStep, 1 * cubeStep), //[1,0,1]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(1 * cubeStep, 1 * cubeStep, 1 * cubeStep), //[1,1,1]
-                                    Vector3f(x / 10.f, y / 10.f, z / 10.f) +
+                                    Vector3f(x * cubeStep, y * cubeStep, z * cubeStep) +
                                     Vector3f(0 * cubeStep, 1 * cubeStep, 1 * cubeStep)  //[0,1,1]
                             },
                             {
@@ -212,7 +240,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
                                 TRIANGLE tri = tris[i];
                                 triangles.push_back(tri);
 
-                                //*add normal to combined normals of each point in triangle. (per-vertex normals)
+                                /*add normal to combined normals of each point in triangle. (per-vertex normals) DEPRECATED
                                 Vector3f a = tri.p[0];
                                 Vector3f b = tri.p[1];
                                 Vector3f c = tri.p[2];
@@ -234,7 +262,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
                         }
                     }
 
-                    /* draw each grid cell
+                    /* draw each grid cell DEBUG
                     if (cubeCorners[cubePos0] > 0.f) {
                         glColor3f(cubeCorners[cubePos0], 0.f, 0.f);
                         glPushMatrix();
@@ -250,7 +278,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         }
 
         //* draw triangles
-        glColor4f(.4f, .5f, .6f, .7f);
+        glColor4f(.4f, .5f, .6f, 1.f);
         GLfloat specular[] = {1.f, 1.f, 1.f, 1.f};
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
         glBegin(GL_TRIANGLES);
@@ -262,7 +290,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             /* per-face normals
             Vector3f norm = (b - a).cross(c - b);
             glNormal3f(norm[0], norm[1], norm[2]);
-            /*/// per vertex normals
+            //// per vertex normals
             Vector3f anorm = normals[VectorToString(a, 10.f)];
             Vector3f bnorm = normals[VectorToString(b, 10.f)];
             Vector3f cnorm = normals[VectorToString(c, 10.f)];
@@ -270,17 +298,26 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
             bnorm.normalize();
             cnorm.normalize();
             //*/
-
+            //* per vertex normals 2
+            Vector3f anorm = getEdgeNormal(a, cubeStart, cubeEnd, cubeCornerDim, cubeStep, gradientCorners);
+            anorm.normalize();
             glNormal3f(anorm[0], anorm[1], anorm[2]);
             glVertex3f(a[0], a[1], a[2]);
+
+            Vector3f bnorm = getEdgeNormal(b, cubeStart, cubeEnd, cubeCornerDim, cubeStep, gradientCorners);
+            bnorm.normalize();
             glNormal3f(bnorm[0], bnorm[1], bnorm[2]);
             glVertex3f(b[0], b[1], b[2]);
+
+            Vector3f cnorm = getEdgeNormal(c, cubeStart, cubeEnd, cubeCornerDim, cubeStep, gradientCorners);
+            cnorm.normalize();
             glNormal3f(cnorm[0], cnorm[1], cnorm[2]);
             glVertex3f(c[0], c[1], c[2]);
         }
         glEnd();
-        glNormal3f(0.f, 0.f, 0.f);
     }
+    glNormal3f(1.f, 0.f, 0.f);
+    glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 
 /**
@@ -388,12 +425,14 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 50;
+    float restDensity = 1000;
     for (Particle *p : particles) {
         p->density = densityField->eval(p, grid);
+        meanDensity += p->density;
     }
+    meanDensity /= particles.size();
 
-    float k = .1f;
+    float k = 2.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -440,7 +479,7 @@ VectorXf System::computeDerivative() {
 
 void System::drawParticles(bool drawVelocity, bool drawForce) {
     for (Particle *p : particles) {
-        p->draw(drawVelocity, drawForce);
+        p->draw(drawVelocity, drawForce, meanDensity);
     }
 }
 
@@ -463,49 +502,61 @@ void System::drawConstraints() {
 }
 
 VectorXf System::checkBoundingBox(VectorXf newState) {
+    float dist = .95f;
+    float dec = .8f;
     //collision from x side
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] < -0.2f) {
-            newState[i * 6] = -0.2f;
+        if (newState[i * 6] < -dist) {
+            newState[i * 6] = -dist;
             if (newState[i * 6 + 3] < 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3];
+                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
             }
         }
     }
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] > 0.2f) {
-            newState[i * 6] = 0.2f;
+        if (newState[i * 6] > dist) {
+            newState[i * 6] = dist;
             if (newState[i * 6 + 3] > 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3];
+                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
             }
         }
     }
     //collision from z side
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] < -0.2f) {
-            newState[i * 6 + 2] = -0.2f;
+        if (newState[i * 6 + 2] < -dist) {
+            newState[i * 6 + 2] = -dist;
             if (newState[i * 6 + 5] < 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3];
+                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
             }
         }
     }
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] > 0.2f) {
-            newState[i * 6 + 2] = 0.2f;
+        if (newState[i * 6 + 2] > dist) {
+            newState[i * 6 + 2] = dist;
             if (newState[i * 6 + 5] > 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3];
+                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
             }
         }
     }
     //Check collision with y side
     for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 1] < -2.0f) {
-            newState[i * 6 + 1] = -2.0f;
+        if (newState[i * 6 + 1] < -dist) {
+            newState[i * 6 + 1] = -dist;
             if (newState[i * 6 + 4] < 0) {
-                newState[i * 6 + 4] = -newState[i * 6 + 4];
+                newState[i * 6 + 4] = -newState[i * 6 + 4] * dec;
             }
         }
     }
+
+    for (int i = 0; i < particles.size(); i++) {
+        if (newState[i * 6 + 1] > dist) {
+            newState[i * 6 + 1] = dist;
+            if (newState[i * 6 + 4] > 0) {
+                newState[i * 6 + 4] = -newState[i * 6 + 4] * dec;
+            }
+        }
+    }
+
     return newState;
 }
 
@@ -554,4 +605,13 @@ vector<Contact *> System::findContacts(VectorXf newState) {
         }
     }
     return contacts;
+}
+void System::drawBorder() {
+    glBegin(GL_LINES);
+        glColor3f(.8f, .8f, .8f);
+        glVertex3f(-0.95f, -0.95f, -0.95f);
+        glVertex3f(0.95f, -0.95f, -0.95f);
+        glVertex3f(0.95f, -0.95f, 0.95f);
+        glVertex3f(-0.95f, -0.95f, 0.95f);
+    glEnd();
 }

@@ -307,7 +307,7 @@ const int triTable[256][16] =
 	0 will be returned if the grid cell is either totally above
    of totally below the isolevel.
 */
-int Polygonise(GRIDCELL grid,double isolevel,TRIANGLE *triangles)
+int Polygonise(GRIDCELL &grid,double isolevel,TRIANGLE *triangles)
 {
     int i,ntriang;
     int cubeindex;
@@ -406,7 +406,7 @@ bool operator<(const Vector3f &left, const Vector3f &right)
    an edge between two vertices, each with their own scalar value
 */
 Vector3f VertexInterp(double isolevel,
-Vector3f p1, Vector3f p2,
+Vector3f &p1, Vector3f &p2,
 double valp1, double valp2)
 {
     double mu;
@@ -425,8 +425,80 @@ double valp1, double valp2)
     return(p);
 }
 
-string VectorToString(Vector3f vec, float prec) {
-    stringstream out;
-    out << (int)(vec[0] * prec) << "," << (int)(vec[1] * prec) << "," << (int)(vec[2] * prec);
-    return out.str();
+void updateGradient(float grid[], int dim[3], int index, Vector3f gradients[]) {
+    int gridSize = dim[0] * dim[1] * dim[2];
+    //only update normals if center index is within cube grid
+    if (0 <= index && index < gridSize) {
+        //for each neighbouring grid cell
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    // only neighbouring cells though, not the cell itself
+                    if (abs(x) + abs(y) + abs(z) == 1) {
+                        //calculate grid cell index
+                        int centerIndex = index + x + dim[0] * (y + dim[1] * z);
+                        //only update normals if grid cell is within cube grid
+                        if (0 <= centerIndex && centerIndex < gridSize) {
+                            //get all the indices of grid cell-neighbouring cells, setting them to the cell
+                            // itself when they are outside the cube grid
+                            int plusXIndex = index + 1;
+                            plusXIndex = plusXIndex < gridSize ? plusXIndex : index;
+                            int minusXIndex = index - 1;
+                            minusXIndex = minusXIndex >= 0 ? minusXIndex : index;
+                            int plusYIndex = index + dim[0];
+                            plusYIndex = plusYIndex < gridSize ? plusYIndex : index;
+                            int minusYIndex = index - dim[0];
+                            minusYIndex = minusYIndex >= 0 ? minusYIndex : index;
+                            int plusZIndex = index + dim[0] * dim[1];
+                            plusZIndex = plusZIndex < gridSize ? plusZIndex : index;
+                            int minusZIndex = index - dim[0] * dim[1];
+                            minusZIndex = minusZIndex >= 0 ? minusZIndex : index;
+
+                            //calculate gradient from neighbouring cell difference
+                            float dx = grid[plusXIndex] - grid[minusXIndex];
+                            float dy = grid[plusYIndex] - grid[minusYIndex];
+                            float dz = grid[plusZIndex] - grid[minusZIndex];
+                            //save gradient
+                            gradients[index] = Vector3f(-dx, -dy, -dz);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+Vector3f getEdgeNormal(Vector3f &edgePoint, Vector3f &gridStart, Vector3f &gridEnd, int gridDim[3], float gridStep, Vector3f gradients[]) {
+    Vector3f edgeStart = Vector3f(floorf(edgePoint[0] / gridStep) * gridStep,
+                                  floorf(edgePoint[1] / gridStep) * gridStep,
+                                  floorf(edgePoint[2] / gridStep) * gridStep);
+
+    Vector3f edgeEnd = Vector3f(ceilf(edgePoint[0] / gridStep) * gridStep,
+                                ceilf(edgePoint[1] / gridStep) * gridStep,
+                                ceilf(edgePoint[2] / gridStep) * gridStep);
+
+    //edge should fall inside of grid
+    if (gridStart < edgeStart && edgeStart < gridEnd
+        && gridStart < edgeEnd && edgeEnd < gridEnd) {
+        // get normal at edge start
+        Vector3f relEdgeStart = edgeStart - gridStart;
+        int edgeStartGridPos[3] = {(int) lroundf(relEdgeStart[0] / gridStep),
+                                   (int) lroundf(relEdgeStart[1] / gridStep),
+                                   (int) lroundf(relEdgeStart[2] / gridStep)};
+        int edgeStartIndex = edgeStartGridPos[0] + gridDim[0] * (edgeStartGridPos[1] + (gridDim[1] * edgeStartGridPos[2]));
+        Vector3f startNormal = gradients[edgeStartIndex];
+
+        // get normal at edge end
+        Vector3f relEdgeEnd = edgeEnd - gridStart;
+        int edgeEndGridPos[3] = {(int) lroundf(relEdgeEnd[0] / gridStep),
+                                 (int) lroundf(relEdgeEnd[1] / gridStep),
+                                 (int) lroundf(relEdgeEnd[2] / gridStep)};
+        int edgeEndIndex = edgeEndGridPos[0] + gridDim[0] * (edgeEndGridPos[1] + (gridDim[1] * edgeEndGridPos[2]));
+        Vector3f endNormal = gradients[edgeEndIndex];
+
+        // return average of start end end normal
+        return (startNormal + endNormal) / 2.f;
+    } else {
+        return Vector3f(0.f, 0.f, 0.f);
+    }
 }

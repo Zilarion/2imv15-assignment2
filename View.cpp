@@ -71,8 +71,6 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glEnable(GL_CULL_FACE);
-
     glDepthFunc(GL_LEQUAL);
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -93,6 +91,8 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
 
 void View::initialize(SystemBuilder::AvailableSystems type) {
     sys = SystemBuilder::get(type);
+    wind = new DirectionalForce(sys->particles, Vector3f(0.f, 0.f, 0.f));
+    sys->addForce(wind);
 }
 
 void View::onKeyPress ( unsigned char key, int x, int y )
@@ -144,6 +144,21 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'f':
             drawForces = !drawForces;
+            break;
+        case 'i':
+            wind->direction = Vector3f(0.0f, 0.0f, -5.0f);
+            break;
+        case 'j':
+            wind->direction = Vector3f(-5.0f, 0.0f, 0.0f);
+            break;
+        case 'k':
+            wind->direction = Vector3f(0.0f, 0.0f, 5.0f);
+            break;
+        case 'l':
+            wind->direction = Vector3f(5.0f, 0.0f, 0.0f);
+            break;
+        case 'u':
+            wind->direction = Vector3f(0.0f, 0.0f, 0.0f);
             break;
         case ',':
             rotate = 1;
@@ -293,7 +308,7 @@ void View::preDisplay3D()
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity ();
     glTranslatef(0.0f, 0.0f, -3.0f);
-    glRotatef(20, 1.0f, 0.0f, 0.0f);
+//    glRotatef(20, 1.0f, 0.0f, 0.0f);
     glRotatef(camAngle, 0.0f, 1.0f, 0.0f);
 
     if (rotate != 0) {

@@ -1,6 +1,3 @@
-
-
-#include <GL/gl.h>
 #include "RigidBody.h"
 
 #if defined(_WIN32) || defined(WIN32)

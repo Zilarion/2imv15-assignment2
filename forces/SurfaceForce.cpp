@@ -13,11 +13,10 @@ void SurfaceForce::setTarget(std::vector<Particle *> particles) {
 
 void SurfaceForce::apply(System *s) {
     //Tension coefficient water-air
-    float sigma = 72.75f;
-    //TODO: what is certainThreshold
-    float certainThreshold = 1.0f;
+    float sigma = 72.75f/100.f;
+    float certainThreshold = .05f;
 
-    // Evaluate viscosity force for every particle
+    // Evaluate surface force for every particle
     for (Particle *pi : particles) {
         Vector3f n = s->colorField->dEval(pi->position);
         if (n.norm() > certainThreshold) {

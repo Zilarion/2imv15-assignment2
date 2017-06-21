@@ -14,6 +14,7 @@ using namespace Eigen;
 
 class RigidBody : public Object {
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     RigidBody(Eigen::Vector3f startPos, Vector3f dimensions, Vector3f numParticles, float particleMass);
 

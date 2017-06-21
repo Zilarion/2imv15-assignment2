@@ -23,24 +23,20 @@ void Particle::reset() {
     force = Vector3f(0.0, 0.0, 0.0);
 }
 
-void Particle::draw(bool drawVelocity, bool drawForce) {
-    const float h = .3f;
+void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
     if (movable) {
-        glColor3f(0.f, 1.f, 1.f);
+        glColor4f(0.f, density, density, 0.2f);
     } else {
         glColor3f(1.f, 1.f, 1.f);
     }
 
-    glBegin(GL_POINTS);
-    glVertex3f(position[0], position[1], position[2]);
-    glEnd();
-//    glPushMatrix();
-//    glTranslated(position[0], position[1], position[2]);
-//    glutSolidSphere(h, 10, 10);
-
-//    glColor4f(1.f, 0.f, 0.f, 0.4f);
-//    glutSolidSphere(.15f, 10, 10);
-//    glPopMatrix();
+//    glBegin(GL_POINTS);
+//        glVertex3f(position[0], position[1], position[2]);
+//    glEnd();
+    glPushMatrix();
+    glTranslated(position[0], position[1], position[2]);
+    glutSolidSphere(.015f, 10, 10);
+    glPopMatrix();
 
     if (drawVelocity && movable) {
         glColor3f(0.0, 0.6, 0.0);
@@ -62,9 +58,7 @@ void Particle::draw(bool drawVelocity, bool drawForce) {
 
 void Particle::handleSweep(bool isStart, vector<RigidBody *> *activeRigidBodies,
                            vector<pair<RigidBody *, Particle *>> *range) {
-
     for (RigidBody *r:(*activeRigidBodies)) {
         (*range).push_back(make_pair(r, this));
     }
-
 }
