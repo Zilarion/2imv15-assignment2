@@ -26,17 +26,19 @@ void Particle::reset()
 
 void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
     if (movable) {
-        glColor4f(0.f, density, density, 0.2f);
+        if (meanDensity == 0)
+            meanDensity = 0.0001f;
+        float perc = density / meanDensity;
+        if (perc > 1.f)
+            perc = 1.f;
+        glColor3f(1.f - perc, 1.f, 1.f);
     } else {
         glColor3f(1.f, 1.f, 1.f);
     }
 
-//    glBegin(GL_POINTS);
-//        glVertex3f(position[0], position[1], position[2]);
-//    glEnd();
     glPushMatrix();
     glTranslated(position[0], position[1], position[2]);
-    glutSolidSphere(.015f, 10, 10);
+    glutSolidSphere(.025f, 10, 10);
     glPopMatrix();
 
     if (drawVelocity && movable) {

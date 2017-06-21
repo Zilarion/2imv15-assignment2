@@ -38,6 +38,8 @@ private:
     int frameNumber;
     float dt;
     float camAngle = 0;
+    int frame;
+    float currenttime, timebase;
     int mouse_down[3];
     int mouse_release[3];
     int mouse_shiftclick[3];

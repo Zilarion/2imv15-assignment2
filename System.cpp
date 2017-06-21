@@ -89,22 +89,6 @@ void System::reset() {
  * Draws the forces
  */
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
-    frame++;
-
-    //get the current time
-    currenttime = glutGet(GLUT_ELAPSED_TIME);
-    char title[20];
-
-    //check if a second has passed
-    if (currenttime - timebase > 1000)
-    {
-        sprintf(title, "Fluids! (FPS: %4.2f)", frame*1000.0/(currenttime-timebase));
-        glutSetWindowTitle(title);
-        timebase = currenttime;
-        frame = 0;
-    }
-
-
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
