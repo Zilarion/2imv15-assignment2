@@ -13,7 +13,7 @@ public:
 	virtual ~Particle(void);
 
 	void reset();
-	void draw(bool drawVelocity, bool drawForce);
+	void draw(bool drawVelocity, bool drawForce, float meanDensity);
 
     Vector3f startPos;
     Vector3f force;

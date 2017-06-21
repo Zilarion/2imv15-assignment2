@@ -23,10 +23,10 @@ void Particle::reset()
     force = Vector3f(0.0, 0.0, 0.0);
 }
 
-void Particle::draw(bool drawVelocity, bool drawForce) {
+void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
     const float h = .3f;
     if (movable) {
-        glColor3f(0.f, 1.f, 1.f);
+        glColor3f(0.f, density/meanDensity - 0.5f, density/meanDensity - 0.5f);
     } else {
         glColor3f(1.f, 1.f, 1.f);
     }

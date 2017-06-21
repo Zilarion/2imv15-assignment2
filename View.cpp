@@ -148,16 +148,16 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             drawForces = !drawForces;
             break;
         case 'i':
-            wind->direction = Vector3f(0.0f, 0.0f, -10.0f);
+            wind->direction = Vector3f(0.0f, 0.0f, -5.0f);
             break;
         case 'j':
-            wind->direction = Vector3f(-10.0f, 0.0f, 0.0f);
+            wind->direction = Vector3f(-5.0f, 0.0f, 0.0f);
             break;
         case 'k':
-            wind->direction = Vector3f(0.0f, 0.0f, 10.0f);
+            wind->direction = Vector3f(0.0f, 0.0f, 5.0f);
             break;
         case 'l':
-            wind->direction = Vector3f(10.0f, 0.0f, 0.0f);
+            wind->direction = Vector3f(5.0f, 0.0f, 0.0f);
             break;
         case ',':
             rotate = 1;
@@ -307,7 +307,7 @@ void View::preDisplay3D()
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity ();
     glTranslatef(0.0f, 0.0f, -3.0f);
-    glRotatef(20, 1.0f, 0.0f, 0.0f);
+//    glRotatef(20, 1.0f, 0.0f, 0.0f);
     glRotatef(camAngle, 0.0f, 1.0f, 0.0f);
 
     if (rotate != 0) {

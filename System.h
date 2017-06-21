@@ -30,6 +30,7 @@ private:
     void drawRigidBodies(bool drawVelocity, bool drawForce);
     void drawForces();
     void drawConstraints();
+    void drawBorder();
 
     void computeForces();
     void clearForces();
@@ -49,6 +50,7 @@ public:
     ColorField* colorField;
     UniformGrid grid;
 
+    float meanDensity = 0;
     bool wallExists;
     bool springsCanBreak = false;
     float dt;

@@ -9,7 +9,7 @@
 Vector3f PressureField::eval(Particle* pi, UniformGrid &grid) {
     Vector3f force = Vector3f(0, 0, 0);
     for (Particle* pj : grid.query(pi->position)) {
-        force -= pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position, .05f);
+        force -= pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position, .1f);
     }
     return force;
 }

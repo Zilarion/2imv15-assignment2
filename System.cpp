@@ -92,6 +92,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
+    drawBorder();
     if (drawForce) {
         drawForces();
     }
@@ -103,7 +104,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     if (drawMarchingCubes) {
         Vector3f cubeStart = Vector3f(-1.f, -1.f, -1.f);
         Vector3f cubeEnd = Vector3f(1.f, 1.f, 1.f);
-        float cubeStep = .1f; // a whole number of steps should fit into interval
+        float cubeStep = .05f; // a whole number of steps should fit into interval
         Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
         Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
         int cubeCornerDim[3] = {cubeEndInt[0] - cubeStartInt[0] + 1, cubeEndInt[1] - cubeStartInt[1] + 1, cubeEndInt[2] - cubeStartInt[2] + 1};
@@ -407,9 +408,11 @@ void System::computeForces() {
     float restDensity = 100;
     for (Particle *p : particles) {
         p->density = densityField->eval(p, grid);
+        meanDensity += p->density;
     }
+    meanDensity /= particles.size();
 
-    float k = .1f;
+    float k = 2.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -456,7 +459,7 @@ VectorXf System::computeDerivative() {
 
 void System::drawParticles(bool drawVelocity, bool drawForce) {
     for (Particle *p : particles) {
-        p->draw(drawVelocity, drawForce);
+        p->draw(drawVelocity, drawForce, meanDensity);
     }
 }
 
@@ -480,12 +483,13 @@ void System::drawConstraints() {
 
 VectorXf System::checkCollisions(VectorXf newState) {
     float dist = .95f;
+    float dec = .9f;
     //collision from x side
     for (int i = 0; i < particles.size(); i++) {
         if (newState[i * 6] < -dist) {
             newState[i * 6] = -dist;
             if (newState[i * 6 + 3] < 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3];
+                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
             }
         }
     }
@@ -493,7 +497,7 @@ VectorXf System::checkCollisions(VectorXf newState) {
         if (newState[i * 6] > dist) {
             newState[i * 6] = dist;
             if (newState[i * 6 + 3] > 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3];
+                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
             }
         }
     }
@@ -502,7 +506,7 @@ VectorXf System::checkCollisions(VectorXf newState) {
         if (newState[i * 6 + 2] < -dist) {
             newState[i * 6 + 2] = -dist;
             if (newState[i * 6 + 5] < 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3];
+                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
             }
         }
     }
@@ -510,7 +514,7 @@ VectorXf System::checkCollisions(VectorXf newState) {
         if (newState[i * 6 + 2] > dist) {
             newState[i * 6 + 2] = dist;
             if (newState[i * 6 + 5] > 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3];
+                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
             }
         }
     }
@@ -519,7 +523,7 @@ VectorXf System::checkCollisions(VectorXf newState) {
         if (newState[i * 6 + 1] < -dist) {
             newState[i * 6 + 1] = -dist;
             if (newState[i * 6 + 4] < 0) {
-                newState[i * 6 + 4] = -newState[i * 6 + 4];
+                newState[i * 6 + 4] = -newState[i * 6 + 4] * dec;
             }
         }
     }
@@ -528,10 +532,20 @@ VectorXf System::checkCollisions(VectorXf newState) {
         if (newState[i * 6 + 1] > dist) {
             newState[i * 6 + 1] = dist;
             if (newState[i * 6 + 4] > 0) {
-                newState[i * 6 + 4] = -newState[i * 6 + 4];
+                newState[i * 6 + 4] = -newState[i * 6 + 4] * dec;
             }
         }
     }
 
     return newState;
+}
+
+void System::drawBorder() {
+    glBegin(GL_LINES);
+        glColor3f(.8f, .8f, .8f);
+        glVertex3f(-0.95f, -0.95f, -0.95f);
+        glVertex3f(0.95f, -0.95f, -0.95f);
+        glVertex3f(0.95f, -0.95f, 0.95f);
+        glVertex3f(-0.95f, -0.95f, 0.95f);
+    glEnd();
 }

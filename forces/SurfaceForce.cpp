@@ -13,7 +13,7 @@ void SurfaceForce::setTarget(std::vector<Particle *> particles) {
 
 void SurfaceForce::apply(System *s) {
     //Tension coefficient water-air
-    float sigma = 72.75f/1000000000.f;
+    float sigma = 72.75f;
     //TODO: what is certainThreshold
     float certainThreshold = .01f;
 
