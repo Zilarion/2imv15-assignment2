@@ -16,10 +16,6 @@ Particle::Particle(const Vector3f &startPosition, float mass, int index, bool mo
 Particle::~Particle(void) {
 }
 
-Particle::~Particle(void)
-{
-}
-
 void Particle::reset()
 {
     position = startPos;

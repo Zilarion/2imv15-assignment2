@@ -32,6 +32,7 @@ private:
     void drawForces();
     void drawConstraints();
     void drawBorder();
+    void drawMarching();
 
     void computeForces();
     void clearForces();
