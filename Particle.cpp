@@ -1,16 +1,19 @@
 #include "Particle.h"
 
 #if defined(_WIN32) || defined(WIN32)
-    #include <GL/glut.h>
+#include <GL/glut.h>
 #else
     #include <GLUT/glut.h>
 #endif
 
-Particle::Particle(const Vector3f & startPosition, float mass, int index, bool movable) :
-	startPos(startPosition), density(0), position(startPosition),
-    velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0,0.0,0.0)), mass(mass), index(index),
-    movable(movable)
-{
+Particle::Particle(const Vector3f &startPosition, float mass, int index, bool movable) :
+        startPos(startPosition), density(0), position(Vector3f(0.0, 0.0, 0.0)),
+        velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0, 0.0, 0.0)), mass(mass), index(index),
+        movable(movable) {
+    position = startPos;
+}
+
+Particle::~Particle(void) {
 }
 
 Particle::~Particle(void)
@@ -35,10 +38,13 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
     } else {
         glColor3f(1.f, 1.f, 1.f);
     }
+//    glBegin(GL_POINTS);
+//        glVertex3f(position[0], position[1], position[2]);
+//    glEnd();
 
     glPushMatrix();
     glTranslated(position[0], position[1], position[2]);
-    glutSolidSphere(.025f, 10, 10);
+    glutSolidSphere(.01f, 8, 8);
     glPopMatrix();
 
     if (drawVelocity && movable) {

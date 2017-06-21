@@ -15,9 +15,13 @@
 System* SystemBuilder::get(AvailableSystems s) {
     System* sys;
     switch (s) {
-        case BASIC:
+        case WATER:
             sys = initBasic();
-            sys->type = BASIC;
+            sys->type = WATER;
+            return sys;
+        case SMOKE:
+            sys = initSmoke();
+            sys->type = SMOKE;
             return sys;
     }
     return NULL;
@@ -26,6 +30,7 @@ System* SystemBuilder::get(AvailableSystems s) {
 System* SystemBuilder::initBasic()
 {
     System* sys = new System(new Euler(Euler::SEMI));
+//    System* sys = new System(new RungeKutta());
 
     int dimensions = 20;
     float mass = 1.f;
@@ -60,6 +65,33 @@ System* SystemBuilder::initBasic()
 
     sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -2.81f, .0f)));
     sys->addForce(new DragForce(sys->particles, 0.6f));
+    sys->addForce(new PressureForce(sys->particles));
+    sys->addForce(new ViscosityForce(sys->particles));
+    sys->addForce(new SurfaceForce(sys->particles));
+
+    return sys;
+}
+
+
+System* SystemBuilder::initSmoke()
+{
+    System* sys = new System(new Euler(Euler::SEMI));
+//    System* sys = new System(new RungeKutta());
+
+    int dimensions = 2;
+    float mass = 1.f;
+    int index = 0;
+    float d = 0.03f;
+
+    // Movable particles
+    for (int i = -dimensions; i < dimensions; i++) {
+        for (int j = -dimensions; j < dimensions; j++) {
+            sys->addParticle(new Particle(Vector3f(i * d, -1.f, j * d), mass, index++, true));
+        }
+    }
+
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, .81f, .0f)));
+    sys->addForce(new DragForce(sys->particles, 0.2f));
     sys->addForce(new PressureForce(sys->particles));
     sys->addForce(new ViscosityForce(sys->particles));
     sys->addForce(new SurfaceForce(sys->particles));

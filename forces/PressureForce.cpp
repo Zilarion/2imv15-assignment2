@@ -16,7 +16,7 @@ void PressureForce::setTarget(std::vector<Particle*> particles) {
 void PressureForce::apply(System *s) {
     // Evaluate pressure force for every particle
     for (Particle* p : particles) {
-        p->force += s->pressureField->eval(p, s->grid);
+        p->force += s->pressureField->eval(p);
     }
 }
 void PressureForce::draw() {

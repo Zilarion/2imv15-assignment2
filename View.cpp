@@ -183,10 +183,9 @@ void View::onKeyPress ( unsigned char key, int x, int y )
                 printf("Springs can no longer break\n");
             break;
         case 'p':
-            rx = (rand() % 100 - 50) * .01f;
-            rz = (rand() % 100 - 50) * .01f;
-            printf("Particle added: %f, %f\n", rx, rz);
-            sys->addParticle(new Particle(Vector3f(rx, 0.f, rz), 1.f, sys->particles.size() + 1, true));
+            for (int i = 0; i < 10; i++)
+                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, -.9f, (rand() % 10 + 1) * 0.01f),
+                                          1.f, sys->particles.size() + 1, true));
             break;
         case ' ':
             isSimulating = !isSimulating;

@@ -13,7 +13,7 @@ class System;
 class PressureField {
 public:
     PressureField(System* s) : sys(s) {};
-    Vector3f eval(Particle * pi, UniformGrid &grid);
+    Vector3f eval(Particle * pi);
 
 private:
     System* sys;

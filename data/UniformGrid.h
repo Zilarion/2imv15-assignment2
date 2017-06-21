@@ -24,8 +24,8 @@ class UniformGrid {
 public:
     UniformGrid(int x, int y, int z, float delta, Vector3f offset = Vector3f(0,0,0));
 
-    void insert(vector<Particle*> &particles);
-    vector<Particle*> query(const Vector3f pos);
+    void insert(const vector<Particle*> &particles);
+    vector<Particle*> query(const Vector3f &pos);
     void clear();
 
 private:

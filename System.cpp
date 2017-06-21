@@ -18,7 +18,7 @@
 #endif
 
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(80, 80, 80, 0.025f, Vector3f(1.f, 1.f, 1.f)) {
+                                 grid(40, 40, 40, 0.05f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -261,7 +261,9 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         }
 
         //* draw triangles
-        glColor4f(.8f, .7f, .9f, 1.f);
+        glColor4f(1.f, 1.f, 1.f, .2f);
+        GLfloat specular[] = {.5f, .5f, .5f, 1.f};
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
         glBegin(GL_TRIANGLES);
         for (int i = 0; i < triangles.size(); i++) {
             TRIANGLE triangle = triangles[i];
@@ -406,14 +408,14 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 1000;
+    float restDensity = 100;
     for (Particle *p : particles) {
-        p->density = densityField->eval(p, grid);
+        p->density = densityField->eval(p);
         meanDensity += p->density;
     }
     meanDensity /= particles.size();
 
-    float k = 2.f;
+    float k = .1f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -528,16 +530,6 @@ VectorXf System::checkBoundingBox(VectorXf newState) {
             }
         }
     }
-
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 1] > dist) {
-            newState[i * 6 + 1] = dist;
-            if (newState[i * 6 + 4] > 0) {
-                newState[i * 6 + 4] = -newState[i * 6 + 4] * dec;
-            }
-        }
-    }
-
     return newState;
 }
 

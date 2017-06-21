@@ -6,10 +6,11 @@
 #include "../Kernels.h"
 #include "../System.h"
 
-Vector3f PressureField::eval(Particle* pi, UniformGrid &grid) {
+Vector3f PressureField::eval(Particle* pi) {
     Vector3f force = Vector3f(0, 0, 0);
-    for (Particle* pj : grid.query(pi->position)) {
-        force -= pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position, .1f);
+    for (Particle* pj : sys->grid.query(pi->position)) {
+        if ((pi->position - pj->position).norm() > 0.01f)
+            force -= pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position, .025f);
     }
     return force;
 }

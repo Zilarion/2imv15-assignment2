@@ -9,13 +9,15 @@ class System;
 class SystemBuilder {
 public:
     enum AvailableSystems {
-        BASIC,
+        WATER,
+        SMOKE
     };
 
     static System* get(AvailableSystems s);
 
 private:
     static System* initBasic();
+    static System* initSmoke();
 };
 
 
