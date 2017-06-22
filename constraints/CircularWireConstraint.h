@@ -2,7 +2,6 @@
 
 #include "../Particle.h"
 #include "Constraint.h"
-#include <gfx/vec3.h>
 #include <vector>
 
 using namespace std;

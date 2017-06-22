@@ -1,6 +1,5 @@
 #pragma once
 
-#include <gfx/vec3.h>
 #include <Eigen/Dense>
 #include "Object.h"
 

@@ -6,7 +6,6 @@
 #define PARTICLETOY_DIRECTIONALFORCE_H
 
 #include "Force.h"
-#include "gfx/vec3.h"
 
 using namespace Eigen;
 
