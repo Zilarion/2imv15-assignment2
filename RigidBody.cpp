@@ -111,6 +111,7 @@ void RigidBody::draw(bool drawVelocity, bool drawForce) {
     glVertex3f(v4[0], v4[1], v4[2]);
     glVertex3f(v8[0], v8[1], v8[2]);
     glEnd();
+
 }
 
 Vector3f RigidBody::pt_velocity(Vector3f p) {
@@ -334,5 +335,19 @@ bool RigidBody::isContact(float epsilon, Particle *p) {
            (((abs(bodyCoords[2] - boundingBox[2]) < epsilon) || (abs(bodyCoords[2] - boundingBox[5]) < epsilon)) &&
             bodyCoords[1] - boundingBox[1] > epsilon && boundingBox[4] - bodyCoords[1] > epsilon &&
             bodyCoords[0] - boundingBox[0] > epsilon && boundingBox[3] - bodyCoords[0] > epsilon);
+}
+
+Particle *RigidBody::getClosestParticle(Vector3f bodyCoords) {
+    float minDist = 1000000;
+    Particle *closestParticle;
+    for (Particle *p:particles) {
+        float dist = pow(abs(p->position[0] - bodyCoords[0]), 2) + pow(abs(p->position[1] - bodyCoords[1]), 2) +
+                     pow(abs(p->position[2] - bodyCoords[2]), 2);
+        if (dist < minDist) {
+            minDist = dist;
+            closestParticle = p;
+        }
+    }
+    return closestParticle;
 }
 

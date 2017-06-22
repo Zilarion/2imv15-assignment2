@@ -7,6 +7,7 @@
 #include "solvers/RungeKutta.h"
 #include "solvers/Euler.h"
 #include "solvers/Midpoint.h"
+#include "forces/DragForce.h"
 
 #if defined(__CYGWIN__) || defined(WIN32)
 #include <GL/glut.h>
@@ -181,6 +182,14 @@ void View::onKeyPress ( unsigned char key, int x, int y )
                 sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, .3f, (rand() % 10 + 1) * 0.01f),
                                           1.f, sys->particles.size() + 1, true));
             break;
+        case 'r':
+        {
+            RigidBody* r = new RigidBody(Vector3f(0,1,0), Vector3f(.5f,.5f,.5f), Vector3f(5,5,5), 50.0f);
+            sys->addRigidBody(r);
+            sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -4.81f, 0.0f)));
+            sys->addForce(new DragForce(r->particles, 0.9f));
+            break;
+        }
         case ' ':
             isSimulating = !isSimulating;
             if(isSimulating)
