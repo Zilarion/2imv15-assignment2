@@ -7,25 +7,113 @@
 
 #include "Eigen/Dense"
 #include <vector>
+#include <string>
 
 using namespace Eigen;
 using namespace std;
 
-typedef struct {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Vector3f p[3];
-} TRIANGLE;
-
-typedef struct {
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Vector3f p[8];
-    double val[8];
-} GRIDCELL;
-
-int Polygonise(const GRIDCELL &grid, double isolevel, TRIANGLE *triangles);
 bool operator<(const Vector3f &left, const Vector3f &right);
-Vector3f VertexInterp(double isovalue, const Vector3f &p1, const Vector3f &p2, double val1, double val2);
-void updateGradient(float grid[], int dim[3], int index, Vector3f gradients[]);
-Vector3f getEdgeNormal(Vector3f &edgePoint, Vector3f &gridStart, Vector3f &gridEnd, int gridDim[3], float gridStep, Vector3f gradients[]);
 
+class MarchingCubes {
+
+public:
+
+    struct XYZ {
+        float x, y, z;
+
+        XYZ operator+(const XYZ &other) const {
+            return XYZ{x + other.x, y + other.y, z + other.z};
+        }
+        void operator+=(const XYZ &other) {
+            x += other.x;
+            y += other.y;
+            z += other.z;
+        }
+        XYZ operator^(const XYZ &other) const {
+            return XYZ{y*other.z - z*other.y, z*other.x - x*other.z, x*other.y - y*other.x};
+        }
+        XYZ operator-(const XYZ &other) const{
+            return XYZ{x - other.x, y - other.y, z - other.z};
+        }
+        XYZ mult(float left) const {
+            return XYZ{left * x, left * y, left * z};
+        }
+        XYZ div(float right) const {
+            return XYZ{x / right, y / right, z / right};
+        }
+
+        string toString(float prec) {
+            return to_string((int) (x * prec)) + "," + to_string((int) (y * prec)) + "," +
+                   to_string((int) (z * prec));
+        }
+
+        float operator[](int i) const {
+            if (i == 0) {
+                return x;
+            } else if (i == 1) {
+                return y;
+            } else {
+                return z;
+            }
+        }
+        bool operator<(XYZ &other) const{
+            return x < other.x && y < other.y && z < other.z;
+        }
+
+        float size() const {
+            return sqrt(x * x + y * y + z * z);
+        }
+
+        void normalize(){
+            float s = size();
+            x = x / s;
+            y = y / s;
+            z = z / s;
+        }
+
+    };
+
+    struct TRIANGLE {
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        XYZ p[3];
+    };
+
+    struct GRIDCELL {
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        XYZ p[8];
+        float val[8];
+    };
+
+    MarchingCubes(System* system);
+    ~MarchingCubes();
+
+    int Polygonise(GRIDCELL &grid, TRIANGLE *triangles);
+
+    XYZ VertexInterp(float isovalue, XYZ &p1, XYZ &p2, float val1, float val2);
+
+    void updateGradient(int index);
+
+    XYZ getEdgeNormal(XYZ edgePoint);
+
+    void drawMarching();
+
+    System* system;
+
+    XYZ cubeStart;
+    XYZ cubeEnd;
+    float cubeStep;
+
+    int* cubeStartInt;
+    int* cubeEndInt;
+    int *cubeCornerDim;
+    int size;
+    float *cubeCorners;
+    XYZ *gradientCorners;
+
+    float particleRange;
+    float iso;
+    vector<TRIANGLE> triangles;
+    map<string, XYZ> normals;
+
+};
 #endif //FLUIDS_MARCHINGCUBES_H

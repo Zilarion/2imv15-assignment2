@@ -20,7 +20,6 @@
 #include "Contact.h"
 
 #include <vector>
-#include <unordered_map>
 
 using namespace Eigen;
 
@@ -31,7 +30,6 @@ private:
     void drawRigidBodies(bool drawVelocity, bool drawForce);
     void drawForces();
     void drawConstraints();
-    void drawMarching();
 
     void computeForces();
     void clearForces();
@@ -50,6 +48,7 @@ public:
     PressureField* pressureField;
     ColorField* colorField;
     UniformGrid grid;
+    MarchingCubes* marchingCubes;
 
     float meanDensity = 0;
     bool springsCanBreak = false;
