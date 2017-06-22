@@ -7,7 +7,14 @@
 #include "System.h"
 #include <random>
 #include <GL/gl.h>
+#include <string>
 #include "MarchingCubes.h"
+
+#if defined(__CYGWIN__) || defined(WIN32)
+#include <GL/glut.h>
+#else
+#include <GLUT/glut.h>
+#endif
 
 const int edgeTable[256]={
         0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
