@@ -32,42 +32,31 @@ System* SystemBuilder::initBasic()
     System* sys = new System(new Euler(Euler::SEMI));
 //    System* sys = new System(new RungeKutta());
 
-    int dimensions = 20;
+    int dimensions = 10;
     float mass = 1.f;
-    float staticMass = 1000.f;
+    float massStatic = 10000.f;
     int index = 0;
-    float d = 0.03f;
-    float ds = 0.1f;
+    float d = 0.04f;
+    float ds = 0.05f;
 
     // Movable particles
     for (int i = -dimensions; i < dimensions; i++) {
         for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * d + (rand() % 10 + 1) * 0.001f, 0.f, j * d + (rand() % 10 + 1) * 0.001f), mass, index++, true));
+            sys->addParticle(new Particle(Vector3f(i * d + (rand() % 10 + 1) * 0.001f, -0.5f, j * d + (rand() % 10 + 1) * 0.001f), mass, index++, true));
         }
     }
 
     //Add a rigid body
-    RigidBody* r = new RigidBody(Vector3f(0,2,0), Vector3f(1,1,1), Vector3f(5,5,5), staticMass);
-    sys->addRigidBody(r);
-    sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -9.81f, 0.0f)));
+//    RigidBody* r = new RigidBody(Vector3f(0,2,0), Vector3f(1,1,1), Vector3f(5,5,5), massStatic);
+//    sys->addRigidBody(r);
+//    sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -9.81f, 0.0f)));
 //    sys->addForce(new DragForce(r->particles, 0.9f));
-    //*/
 
-    dimensions += 1;
-    // A small static particle set
-//    for (int i = -dimensions; i < dimensions; i++) {
-//        for (int j = -dimensions; j < dimensions; j++) {
-//            sys->addParticle(new Particle(Vector3f(i * ds, -2.f, j * ds), staticMass, index++, false));
-//            sys->addParticle(new Particle(Vector3f(-ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
-//            sys->addParticle(new Particle(Vector3f( ds * dimensions, -2.f + ds * dimensions + i * ds, j * ds), staticMass, index++, false));
-//        }
-//    }
-
-    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -2.81f, .0f)));
-    sys->addForce(new DragForce(sys->particles, 0.6f));
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -9.81f, .0f)));
+    sys->addForce(new DragForce(sys->particles, 0.3f));
     sys->addForce(new PressureForce(sys->particles));
-    sys->addForce(new ViscosityForce(sys->particles));
-    sys->addForce(new SurfaceForce(sys->particles));
+//    sys->addForce(new ViscosityForce(sys->particles));
+//    sys->addForce(new SurfaceForce(sys->particles));
 
     return sys;
 }
@@ -90,7 +79,7 @@ System* SystemBuilder::initSmoke()
         }
     }
 
-    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, .81f, .0f)));
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, 3.81f, .0f)));
     sys->addForce(new DragForce(sys->particles, 0.2f));
     sys->addForce(new PressureForce(sys->particles));
     sys->addForce(new ViscosityForce(sys->particles));
