@@ -16,6 +16,7 @@ class RigidBody : public Object {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+    static const int STATE_SIZE = 18;
     RigidBody(Eigen::Vector3f startPos, Vector3f dimensions, Vector3f numParticles, float particleMass);
 
     virtual ~RigidBody(void);

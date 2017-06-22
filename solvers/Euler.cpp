@@ -45,7 +45,7 @@ void Euler::simulateStep(System *system, float h) {
         system->setState(newState, system->getTime() + h);
         VectorXf derivNew = system->derivEval();
         // If we are running semi implicit euler, use the new velocity instead
-        VectorXf semiImpl(system->getParticleDim() + system->rigidBodies.size() * 13);
+        VectorXf semiImpl(system->getParticleDim() + system->rigidBodies.size() * RigidBody::STATE_SIZE);
         for (int i = 0; i < system->particles.size(); i++) {
             semiImpl[i * 6 + 0] = oldState[i * 6 + 0] + h * derivNew[i * 6 + 0];  // Xnew implicit, using Vnew
             semiImpl[i * 6 + 1] = oldState[i * 6 + 1] + h * derivNew[i * 6 + 1];  // Xold + h * Vnew
