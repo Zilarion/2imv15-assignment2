@@ -12,6 +12,8 @@
 #include "forces/DragForce.h"
 #include "forces/SurfaceForce.h"
 
+#include <iostream>
+
 System* SystemBuilder::get(AvailableSystems s) {
     System* sys;
     switch (s) {
@@ -32,7 +34,7 @@ System* SystemBuilder::initBasic()
     System* sys = new System(new Euler(Euler::SEMI));
 //    System* sys = new System(new RungeKutta());
 
-    int dimensions = 30;
+    int dimensions = 20;
     float mass = 1.f;
     float massStatic = 50.f;
     int index = 0;
@@ -54,28 +56,47 @@ System* SystemBuilder::initBasic()
     sys->addForce(new DragForce(sys->particles, 0.5f));
 
     // Static particles
-    float delta = ds * 20;
-    dimensions = 40;
-    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
-        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
-            sys->addParticle(new Particle(Vector3f(i * ds, -delta, j * ds), massStatic, index++, false));
+
+    float radius = .5f;
+
+    int angleSteps = 120;
+    float angleStep = M_PI * 2 / angleSteps;
+    for (int i = 0; i < angleSteps; i++) {
+        float angle = angleStep * i;
+        for (int y = -20; y < 10; y++) {
+            float x = cos(angle) * radius;
+            float z = sin(angle) * radius;
+            sys->addParticle(new Particle(Vector3f(x, y * ds, z), mass, index++, false));
+        }
+        for (float rd = 0; rd < radius; rd+=ds) {
+            float x = cos(angle) * rd;
+            float z = sin(angle) * rd;
+            sys->addParticle(new Particle(Vector3f(x, -20 * ds, z), mass, index++, false));
         }
     }
 
-    for (int i = -dimensions / 2; i < 0; i++) {
-        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
-            sys->addParticle(new Particle(Vector3f(-delta, i * ds, j * ds), massStatic, index++, false));
-            sys->addParticle(new Particle(Vector3f(delta, i * ds, j * ds), massStatic, index++, false));
-        }
-    }
-
-
-    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
-        for (int j = -dimensions / 2; j < 0; j++) {
-            sys->addParticle(new Particle(Vector3f(i * ds, j * ds, delta), massStatic, index++, false));
-            sys->addParticle(new Particle(Vector3f(i * ds, j * ds, -delta), massStatic, index++, false));
-        }
-    }
+//    float delta = ds * 20;
+//    dimensions = 40;
+//    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
+//        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
+//            sys->addParticle(new Particle(Vector3f(i * ds, -delta, j * ds), massStatic, index++, false));
+//        }
+//    }
+//
+//    for (int i = -dimensions / 2; i < 0; i++) {
+//        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
+//            sys->addParticle(new Particle(Vector3f(-delta, i * ds, j * ds), massStatic, index++, false));
+//            sys->addParticle(new Particle(Vector3f(delta, i * ds, j * ds), massStatic, index++, false));
+//        }
+//    }
+//
+//
+//    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
+//        for (int j = -dimensions / 2; j < 0; j++) {
+//            sys->addParticle(new Particle(Vector3f(i * ds, j * ds, delta), massStatic, index++, false));
+//            sys->addParticle(new Particle(Vector3f(i * ds, j * ds, -delta), massStatic, index++, false));
+//        }
+//    }
 
 
     //Add a rigid body

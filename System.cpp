@@ -92,6 +92,7 @@ void System::reset() {
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
+
     drawRigidBodies(drawVelocity, drawForce);
 
     if (drawForce) {
@@ -105,8 +106,6 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     if (drawMarchingCubes) {
         marchingCubes->drawMarching();
     }
-    glNormal3f(1.f, 0.f, 0.f);
-    glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 
 /**
@@ -225,7 +224,7 @@ void System::computeForces() {
     }
     meanDensity /= numParticles;
 
-    float k = 5.f;
+    float k = 20.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {

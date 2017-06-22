@@ -7,9 +7,12 @@
 #include "System.h"
 #include <random>
 #include <string>
-#include <GL/gl.h>
 #include "MarchingCubes.h"
-
+#if defined(__CYGWIN__) || defined(WIN32)
+#include <GL/glut.h>
+#else
+#include <GLUT/glut.h>
+#endif
 const int edgeTable[256]={
         0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
         0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -515,6 +518,7 @@ void MarchingCubes::drawMarching() {
     }
 
     for (Particle *p: system->particles) {
+        if (!p->movable) continue;
         Vector3f pos = p->position;
         // only apply marching cube to particle when it is inside the rendering volume
         if (pos[0] > cubeStart[0] && pos[1] > cubeStart[1] && pos[2] > cubeStart[2]
@@ -648,10 +652,11 @@ void MarchingCubes::drawMarching() {
     }
 
     //// draw triangles
-    glColor4f(.8f, .7f, .9f, 1.f);
     glBegin(GL_TRIANGLES);
+    glColor4f(.2f, .7f, .7f, 1.f);
     for (int i = 0; i < triangles.size(); i++) {
         TRIANGLE triangle = triangles[i];
+
         XYZ a = triangle.p[0];
         XYZ b = triangle.p[1];
         XYZ c = triangle.p[2];
