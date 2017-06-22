@@ -90,8 +90,7 @@ void System::reset() {
  * Draws the forces
  */
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
-    if (!drawMarchingCubes)
-        drawParticles(drawVelocity, drawForce);
+    drawParticles(drawVelocity, drawForce, drawMarchingCubes);
     drawRigidBodies(drawVelocity, drawForce);
 
     if (drawForce) {
@@ -270,9 +269,10 @@ VectorXf System::computeDerivative() {
     return dst;
 }
 
-void System::drawParticles(bool drawVelocity, bool drawForce) {
+void System::drawParticles(bool drawVelocity, bool drawForce, bool drawMarchingCubes) {
     for (Particle *p : particles) {
-        p->draw(drawVelocity, drawForce, meanDensity);
+        if (!p->movable || !drawMarchingCubes)
+            p->draw(drawVelocity, drawForce, meanDensity);
     }
 }
 
