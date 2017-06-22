@@ -6,7 +6,6 @@
 
 #include "System.h"
 #include <random>
-#include <string>
 #include <GL/gl.h>
 #include "MarchingCubes.h"
 
@@ -426,10 +425,6 @@ float valp1, float valp2)
     return p;
 }
 
-//string MarchingCubes::VectorToString(Vector3f vec, float prec) {
-//    return to_string((int)(vec[0] * prec)) + "," + to_string((int)(vec[1] * prec)) + "," + to_string((int)(vec[2] * prec));
-//}
-
 void MarchingCubes::updateGradient(int index) {
     //only update normals if center index is within cube grid
     if (0 <= index && index < size) {
@@ -463,7 +458,7 @@ void MarchingCubes::updateGradient(int index) {
                             float dy = cubeCorners[plusYIndex] - cubeCorners[minusYIndex];
                             float dz = cubeCorners[plusZIndex] - cubeCorners[minusZIndex];
                             //save gradient
-                            gradientCorners[index] = XYZ{-dx, -dy, -dz};
+                            gradientCorners[index] = XYZ{dx, dy, dz};
                         }
                     }
                 }
@@ -501,7 +496,9 @@ MarchingCubes::XYZ MarchingCubes::getEdgeNormal(MarchingCubes::XYZ edgePoint) {
         XYZ endNormal = gradientCorners[edgeEndIndex];
 
         // return average of start end end normal
-        return (startNormal + endNormal).div(2.f);
+        XYZ normal = (startNormal + endNormal).div(2.f);
+        normal.normalize();
+        return normal;
     } else {
         return XYZ{0.f, 0.f, 0.f};
     }
@@ -515,6 +512,7 @@ void MarchingCubes::drawMarching() {
     }
 
     for (Particle *p: system->particles) {
+        if (!p->movable) continue;
         Vector3f pos = p->position;
         // only apply marching cube to particle when it is inside the rendering volume
         if (pos[0] > cubeStart[0] && pos[1] > cubeStart[1] && pos[2] > cubeStart[2]
@@ -551,8 +549,8 @@ void MarchingCubes::drawMarching() {
         }
     }
 
-    //unordered_map<string, Vector3f> normals = {};
     triangles.clear();
+    normals.clear();
 
     for (int x = cubeStartInt[0]; x < cubeEndInt[0] - 1; x++) {
         for (int y = cubeStartInt[1]; y < cubeEndInt[1] - 1; y++) {
@@ -610,20 +608,20 @@ void MarchingCubes::drawMarching() {
                             TRIANGLE tri = tris[i];
                             triangles.push_back(tri);
 
-                            /* add normal to combined normals of each point in triangle. (per-vertex normals) DEPRECATED
-                            Vector3f a = tri.p[0];
-                            Vector3f b = tri.p[1];
-                            Vector3f c = tri.p[2];
-                            Vector3f norm = (b - a).cross(c - b);
-                            string aindex = VectorToString(a, 10.f);
+                            //* add normal to combined normals of each point in triangle. (per-vertex normals) DEPRECATED
+                            XYZ a = tri.p[0];
+                            XYZ b = tri.p[1];
+                            XYZ c = tri.p[2];
+                            XYZ norm = (b - a)^(c - b);
+                            string aindex = a.toString(100.f);
                             if (!normals.emplace(aindex, norm).second) {
                                 normals[aindex] += norm;
                             }
-                            string bindex = VectorToString(b, 10.f);
+                            string bindex = b.toString(100.f);
                             if (!normals.emplace(bindex, norm).second) {
                                 normals[bindex] += norm;
                             }
-                            string cindex = VectorToString(c, 10.f);
+                            string cindex = c.toString(100.f);
                             if (!normals.emplace(cindex, norm).second) {
                                 normals[cindex] += norm;
                             }
@@ -656,26 +654,24 @@ void MarchingCubes::drawMarching() {
         XYZ b = triangle.p[1];
         XYZ c = triangle.p[2];
         /* per-face normals
-        Vector3f norm = (b - a).cross(c - b);
-        Vector3f anorm = norm;
-        Vector3f bnorm = norm;
-        Vector3f cnorm = norm;
-        //// per vertex normals
-        Vector3f anorm = normals[VectorToString(a, 10.f)];
-        Vector3f bnorm = normals[VectorToString(b, 10.f)];
-        Vector3f cnorm = normals[VectorToString(c, 10.f)];
+        XYZ norm = (b - a)^(c - b);
+        norm.normalize();
+        XYZ anorm = norm;
+        XYZ bnorm = norm;
+        XYZ cnorm = norm;
+        /*/// per vertex normals
+        XYZ anorm = normals[a];
+        XYZ bnorm = normals[b];
+        XYZ cnorm = normals[c];
         anorm.normalize();
         bnorm.normalize();
         cnorm.normalize();
+        ///
+        /* per vertex normals 2
+        XYZ anorm = getEdgeNormal(a).mult(-1.f);
+        XYZ bnorm = getEdgeNormal(b).mult(-1.f);
+        XYZ cnorm = getEdgeNormal(c).mult(-1.f);
         //*/
-        //* per vertex normals 2
-        XYZ anorm = getEdgeNormal(a);
-        anorm.normalize();
-        XYZ bnorm = getEdgeNormal(b);
-        bnorm.normalize();
-        XYZ cnorm = getEdgeNormal(c);
-        cnorm.normalize();
-        //* /
         glNormal3f(anorm[0], anorm[1], anorm[2]);
         glVertex3f(a[0], a[1], a[2]);
 
@@ -692,7 +688,7 @@ void MarchingCubes::drawMarching() {
 MarchingCubes::MarchingCubes(System *system) : system(system) {
     cubeStart = XYZ{-1.1f, -1.1f, -1.1f};
     cubeEnd = XYZ{1.1f, 1.1f, 1.1f};
-    cubeStep = .05f; // a whole number of steps should fit into interval
+    cubeStep = .025f; // a whole number of steps should fit into interval
 
     float cubeStart0 = cubeStart[0];
 
@@ -717,6 +713,7 @@ MarchingCubes::MarchingCubes(System *system) : system(system) {
     particleRange = .1f;
     iso = .3f;
     triangles = {};
+    normals = {};
 }
 
 MarchingCubes::~MarchingCubes() {

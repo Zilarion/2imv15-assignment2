@@ -7,6 +7,7 @@
 
 #include "Eigen/Dense"
 #include <vector>
+#include <string>
 
 using namespace Eigen;
 using namespace std;
@@ -23,6 +24,14 @@ public:
         XYZ operator+(const XYZ &other) const {
             return XYZ{x + other.x, y + other.y, z + other.z};
         }
+        void operator+=(const XYZ &other) {
+            x += other.x;
+            y += other.y;
+            z += other.z;
+        }
+        XYZ operator^(const XYZ &other) const {
+            return XYZ{y*other.z - z*other.y, z*other.x - x*other.z, x*other.y - y*other.x};
+        }
         XYZ operator-(const XYZ &other) const{
             return XYZ{x - other.x, y - other.y, z - other.z};
         }
@@ -32,6 +41,12 @@ public:
         XYZ div(float right) const {
             return XYZ{x / right, y / right, z / right};
         }
+
+        string toString(float prec) {
+            return to_string((int) (x * prec)) + "," + to_string((int) (y * prec)) + "," +
+                   to_string((int) (z * prec));
+        }
+
         float operator[](int i) const {
             if (i == 0) {
                 return x;
@@ -76,8 +91,6 @@ public:
 
     XYZ VertexInterp(float isovalue, XYZ &p1, XYZ &p2, float val1, float val2);
 
-//    string VectorToString(Vector3f vec, float prec);
-
     void updateGradient(int index);
 
     XYZ getEdgeNormal(XYZ edgePoint);
@@ -100,6 +113,7 @@ public:
     float particleRange;
     float iso;
     vector<TRIANGLE> triangles;
+    map<string, XYZ> normals;
 
 };
 #endif //FLUIDS_MARCHINGCUBES_H

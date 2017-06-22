@@ -20,7 +20,6 @@
 #include "Contact.h"
 
 #include <vector>
-#include <unordered_map>
 
 using namespace Eigen;
 

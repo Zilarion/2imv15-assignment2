@@ -2,6 +2,7 @@
 // Created by Ruud Andriessen on 10/05/2017.
 //
 
+#include <iostream>
 #include "SystemBuilder.h"
 #include "solvers/Euler.h"
 #include "solvers/Midpoint.h"
