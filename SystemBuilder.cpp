@@ -12,6 +12,8 @@
 #include "forces/DragForce.h"
 #include "forces/SurfaceForce.h"
 
+#include <iostream>
+
 System* SystemBuilder::get(AvailableSystems s) {
     System* sys;
     switch (s) {
