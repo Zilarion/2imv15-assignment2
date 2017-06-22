@@ -15,11 +15,11 @@
 
 #include <iostream>
 
-System* SystemBuilder::get(AvailableSystems s) {
-    System* sys;
+System *SystemBuilder::get(AvailableSystems s) {
+    System *sys;
     switch (s) {
         case WATER:
-            sys = initBasic();
+            sys = initTrechter();
             sys->type = WATER;
             return sys;
         case SMOKE:
@@ -94,11 +94,59 @@ System* SystemBuilder::initBasic()
     std::cout << "Running with: " << sys->particles.size() << " particles" << std::endl;
     return sys;
 }
+System *SystemBuilder::initTrechter() {
+    System *sys = new System(new Euler(Euler::SEMI));
+//    System* sys = new System(new RungeKutta());
 
+    int dimensions = 15;
+    float mass = 1.f;
+    float massStatic = 50.f;
+    int index = 0;
+    float d = 0.04f;
+    float ds = 0.04f;
 
-System* SystemBuilder::initSmoke()
-{
-    System* sys = new System(new Euler(Euler::SEMI));
+    // Movable particles
+    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
+        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
+            for(int k = 0; k<5;k++) {
+                float x = i * d + (rand() % 10 + 1) * 0.001f;
+                float y = k*d+.2f + (rand() % 10 + 1) * 0.001f;
+                float z = j * d + (rand() % 10 + 1) * 0.001f;
+                sys->addParticle(new Particle(Vector3f(x, y, z), mass, index++, true));
+            }
+        }
+    }
+
+    // These forces only apply to non-static particles
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -9.81f, .0f)));
+    sys->addForce(new DragForce(sys->particles, 0.5f));
+
+    // Static particles
+    float topRadius = .5f;
+    float bottomRadius = .1f;
+    float radiusStep = (topRadius - bottomRadius)/30;
+    int angleSteps = 120;
+    float angleStep = M_PI * 2 / angleSteps;
+    for (int i = 0; i < angleSteps; i++) {
+        float angle = angleStep * i;
+        float radius = bottomRadius;
+        for (int y = -20; y < 10; y++) {
+            float x = cos(angle) * radius;
+            float z = sin(angle) * radius;
+            sys->addParticle(new Particle(Vector3f(x, y * ds, z), mass, index++, false));
+            radius+=radiusStep;
+        }
+    }
+    sys->addForce(new PressureForce(sys->particles));
+    sys->addForce(new ViscosityForce(sys->particles));
+    sys->addForce(new SurfaceForce(sys->particles));
+
+    std::cout << "Running with: " << sys->particles.size() << " particles" << std::endl;
+    return sys;
+}
+
+System *SystemBuilder::initSmoke() {
+    System *sys = new System(new Euler(Euler::SEMI));
 //    System* sys = new System(new RungeKutta());
 
     int dimensions = 2;
