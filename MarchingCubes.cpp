@@ -6,7 +6,6 @@
 
 #include "System.h"
 #include <random>
-#include <GL/gl.h>
 #include <string>
 #include "MarchingCubes.h"
 

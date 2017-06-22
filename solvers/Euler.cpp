@@ -12,24 +12,29 @@ using namespace Eigen;
 Euler::Euler(Euler::TYPE type) : type(type) {}
 
 void Euler::simulateStep(System *system, float h) {
+    for (RigidBody *r:system->rigidBodies) {
+        VectorXf boundingBox = r->getBoundingBox();
+        if (boundingBox[1] < -.8f && r->P[1] < 0) {
+            r->x[1] += -.8f - boundingBox[1];
+            r->P[1] = -.2f * r->P[1];
+            r->recomputeAuxiliaryVars();
+        }
+    }
     // Get the old state
     VectorXf oldState = system->getState();
     float epsilon = 0;
     for (RigidBody *r :system->rigidBodies) {
         for (Particle *p:system->particles) {
-            Vector3f c = r->getBodyCoordinates(p->position);
-//            printf("bodyx: %f, bodyy: %f, bodyz: %f\n", c[0], c[1], c[2]);
             if (r->isPenetrating(epsilon, p)) {
-//                printf("fx: %f, fy: %f, fz: %f\n", p->force[0], p->force[1], p->force[2]);
                 Vector3f n = r->getNormal(p->position);
-                if((n.dot(p->force))>0) {
-                    system->addForce(new DirectionalForce({p}, abs(n.dot(p->force)) * n));
-//                    printf("nx: %f, ny: %f, nz: %f\n", n[0], n[1], n[2]);
+                if ((n.dot(p->velocity)) < 0) {
+                    p->velocity = -2 * (p->velocity.dot(n)) * n + p->velocity;
                 }
             }
         }
-        r->recomputeAuxiliaryVars();
+//        r->recomputeAuxiliaryVars();
     }
+    oldState = system->getState();
     // Evaluate derivative
     VectorXf deriv = system->derivEval();
 
