@@ -6,22 +6,24 @@
 #include "../Kernels.h"
 #include "../System.h"
 
-ViscosityForce::ViscosityForce(vector<Particle *> particles) {
+ViscosityForce::ViscosityForce(const vector<Particle *> &particles) {
     this->setTarget(particles);
 }
 
-void ViscosityForce::setTarget(std::vector<Particle *> particles) {
+void ViscosityForce::setTarget(const vector<Particle *> &particles) {
     this->particles = particles;
 }
 
 void ViscosityForce::apply(System *s) {
-    float u = 100.f;
+    float u = 1000.f;
     // Evaluate viscosity force for every particle
     for (Particle *pi : particles) {
         Vector3f viscosityForce = Vector3f(0, 0, 0);
-        for (Particle *pj : s->grid.query(pi->position)) {
+
+        vector<Particle*> targets = s->grid.query(pi->position);
+        for (Particle *pj : targets) {
             viscosityForce = pj->mass * (pj->velocity - pi->velocity) / pj->density
-                             * Viscosity::ddW(pi->position - pj->position, .05f);
+                             * Viscosity::ddW(pi->position - pj->position);
         }
         pi->force += u * viscosityForce;
     }

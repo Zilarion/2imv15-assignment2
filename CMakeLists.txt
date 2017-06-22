@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 3.6)
 project(Fluids)
 
 set(CMAKE_CXX_STANDARD 14)
-SET(CMAKE_CXX_FLAGS_DISTRIBUTION "-O3")
-SET(CMAKE_CXX_FLAGS "-pg")
-SET(CMAKE_EXE_LINKER_FLAGS "-pg")
-SET(CMAKE_SHARED_LINKER_FLAGS "-pg")
+SET(CMAKE_CXX_FLAGS "-O3")
 #set(CMAKE_EXE_LINKER_FLAGS -static)
+
 
 FIND_PACKAGE(PNG REQUIRED)
 INCLUDE_DIRECTORIES(${PNG_INCLUDE_DIRS})
@@ -74,7 +72,7 @@ set(SOURCE_FILES
         forces/DragForce.cpp
         forces/DragForce.h
         fields/DensityField.cpp
-        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h data/UniformGrid.cpp data/UniformGrid.h RigidBody.cpp RigidBody.h MarchingCubes.cpp MarchingCubes.h solvers/LeapFrog.cpp solvers/LeapFrog.h Contact.h Object.cpp Object.h)
+        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h data/UniformGrid.cpp data/UniformGrid.h RigidBody.cpp RigidBody.h MarchingCubes.cpp MarchingCubes.h solvers/LeapFrog.cpp solvers/LeapFrog.h Contact.h Object.cpp Object.h Contact.cpp)
 
 
 add_executable(Fluids ${SOURCE_FILES})

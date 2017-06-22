@@ -4,12 +4,12 @@
 
 #include "DragForce.h"
 
-DragForce::DragForce(std::vector<Particle*> particles, float amount) : amount(amount)
+DragForce::DragForce(const vector<Particle*> &particles, float amount) : amount(amount)
 {
     this->setTarget(particles);
 }
 
-void DragForce::setTarget(std::vector<Particle*> particles)
+void DragForce::setTarget(const vector<Particle*> &particles)
 {
     this->particles = particles;
 }

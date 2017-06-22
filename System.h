@@ -31,7 +31,6 @@ private:
     void drawRigidBodies(bool drawVelocity, bool drawForce);
     void drawForces();
     void drawConstraints();
-    void drawBorder();
 
     void computeForces();
     void clearForces();
@@ -53,7 +52,6 @@ public:
     MarchingCubes* marchingCubes;
 
     float meanDensity = 0;
-    bool wallExists;
     bool springsCanBreak = false;
     float dt;
     SystemBuilder::AvailableSystems type;
@@ -72,7 +70,6 @@ public:
     void setState(VectorXf src);
     void setState(VectorXf newState, float time);
     unsigned long getParticleDim();
-    VectorXf checkBoundingBox(VectorXf newState);
     vector<Contact*> findContacts(VectorXf newState);   //bool indicates if there are any
 
     void step(bool adaptive);

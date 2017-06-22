@@ -10,9 +10,7 @@
 
 class Contact {
 public:
-    Contact(RigidBody *r, Particle *p, Vector3f n) {
-
-    }
+    Contact(RigidBody *r, Particle *p, Vector3f n);
 
     RigidBody *r;
     Particle *p;

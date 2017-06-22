@@ -1,6 +1,5 @@
 #pragma once
 
-#include <gfx/vec3.h>
 #include <Eigen/Dense>
 #include "Object.h"
 
@@ -33,5 +32,4 @@ public:
     int index;
     float mass;
     bool movable;
-
 };

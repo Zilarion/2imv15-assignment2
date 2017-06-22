@@ -17,7 +17,7 @@
 #include <GLUT/glut.h>
 #endif
 
-System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
+System::System(Solver *solver) : solver(solver), time(0.0f), dt(0.005),
                                  grid(40, 40, 40, 0.05f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
@@ -93,7 +93,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
-    drawBorder();
+
     if (drawForce) {
         drawForces();
     }
@@ -214,14 +214,18 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 100;
+    float restDensity = 10000;
+    int numParticles = 0;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
-        meanDensity += p->density;
+        if (p->movable) {
+            meanDensity += p->density;
+            numParticles++;
+        }
     }
-    meanDensity /= particles.size();
+    meanDensity /= numParticles;
 
-    float k = .1f;
+    float k = 5.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -290,55 +294,6 @@ void System::drawConstraints() {
     }
 }
 
-VectorXf System::checkBoundingBox(VectorXf newState) {
-    float dist = .95f;
-    float dec = .8f;
-    //collision from x side
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] < -dist) {
-            newState[i * 6] = -dist;
-            if (newState[i * 6 + 3] < 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] > dist) {
-            newState[i * 6] = dist;
-            if (newState[i * 6 + 3] > 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    //collision from z side
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] < -dist) {
-            newState[i * 6 + 2] = -dist;
-            if (newState[i * 6 + 5] < 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] > dist) {
-            newState[i * 6 + 2] = dist;
-            if (newState[i * 6 + 5] > 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    //Check collision with y side
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 1] < -dist) {
-            newState[i * 6 + 1] = -dist;
-            if (newState[i * 6 + 4] < 0) {
-                newState[i * 6 + 4] = -newState[i * 6 + 4] * dec;
-            }
-        }
-    }
-    return newState;
-}
-
 vector<Contact *> System::findContacts(VectorXf newState) {
     vector<Contact *> contacts;
     //sweep sort
@@ -384,13 +339,4 @@ vector<Contact *> System::findContacts(VectorXf newState) {
         }
     }
     return contacts;
-}
-void System::drawBorder() {
-    glBegin(GL_LINES);
-        glColor3f(.8f, .8f, .8f);
-        glVertex3f(-0.95f, -0.95f, -0.95f);
-        glVertex3f(0.95f, -0.95f, -0.95f);
-        glVertex3f(0.95f, -0.95f, 0.95f);
-        glVertex3f(-0.95f, -0.95f, 0.95f);
-    glEnd();
 }

@@ -6,7 +6,7 @@
 #if defined(__CYGWIN__) || defined(WIN32)
 	#include <GL/glut.h>
 #else
-	#include <GLUT/glut.h>
+#include <GLUT/glut.h>
 #endif
 
 
@@ -50,8 +50,8 @@ int main ( int argc, char ** argv )
 	printf ( "\t 4: Midpoint\n" );
 	printf ( "\t 5: 4th order Runge-Kutta\n" );
 
-	View v(768, 512, dt, SystemBuilder::WATER, N);
-
-	exit ( 0 );
+	View v(768, 512, dt, N);
+    v.initialize(SystemBuilder::WATER);
+	exit (0);
 }
 

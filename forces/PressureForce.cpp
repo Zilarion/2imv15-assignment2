@@ -5,18 +5,18 @@
 #include "PressureForce.h"
 #include "../System.h"
 
-PressureForce::PressureForce(vector<Particle *, allocator<Particle *>> particles) {
+PressureForce::PressureForce(const vector<Particle*> &particles) {
     this->setTarget(particles);
 }
 
-void PressureForce::setTarget(std::vector<Particle*> particles) {
+void PressureForce::setTarget(const vector<Particle*> &particles) {
     this->particles = particles;
 }
 
 void PressureForce::apply(System *s) {
     // Evaluate pressure force for every particle
     for (Particle* p : particles) {
-        p->force += s->pressureField->eval(p);
+        p->force -= s->pressureField->eval(p);
     }
 }
 void PressureForce::draw() {

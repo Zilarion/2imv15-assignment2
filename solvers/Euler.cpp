@@ -3,6 +3,7 @@
 //
 
 #include "Euler.h"
+#include "../forces/DirectionalForce.h"
 #include <Eigen/Sparse>
 #include <Eigen/IterativeLinearSolvers>
 
@@ -13,7 +14,22 @@ Euler::Euler(Euler::TYPE type) : type(type) {}
 void Euler::simulateStep(System *system, float h) {
     // Get the old state
     VectorXf oldState = system->getState();
-
+    float epsilon = 0;
+    for (RigidBody *r :system->rigidBodies) {
+        for (Particle *p:system->particles) {
+            Vector3f c = r->getBodyCoordinates(p->position);
+//            printf("bodyx: %f, bodyy: %f, bodyz: %f\n", c[0], c[1], c[2]);
+            if (r->isPenetrating(epsilon, p)) {
+//                printf("fx: %f, fy: %f, fz: %f\n", p->force[0], p->force[1], p->force[2]);
+                Vector3f n = r->getNormal(p->position);
+                if((n.dot(p->force))>0) {
+                    system->addForce(new DirectionalForce({p}, abs(n.dot(p->force)) * n));
+//                    printf("nx: %f, ny: %f, nz: %f\n", n[0], n[1], n[2]);
+                }
+            }
+        }
+        r->recomputeAuxiliaryVars();
+    }
     // Evaluate derivative
     VectorXf deriv = system->derivEval();
 
@@ -51,9 +67,25 @@ void Euler::simulateStep(System *system, float h) {
             semiImpl[startIndex + 11] = newState[startIndex + 11];
             semiImpl[startIndex + 12] = newState[startIndex + 12];
         }
-        semiImpl = system->checkBoundingBox(semiImpl);
+
         // Set the new state, using semi implicit computation
         system->setState(semiImpl, system->getTime() + h);
+
+
+//        vector<Contact *> contacts = system->findContacts(semiImpl);
+//        float epsilon = 0.01f;
+//        if (contacts.size() > 0) {
+//            for (Contact *contact:contacts) {
+//                if (contact->isPenetrating(epsilon)) {
+//                    hasCollisions = true;
+//                }
+//            }
+//            if (hasCollisions) {
+//                simulateStep(system, h / 2);
+//            }
+//        } else if (hasCollisions) {
+//            simulateStep(system, 1.5f * h);
+//        }
     } else {
         system->setState(newState, system->getTime() + h);
     }

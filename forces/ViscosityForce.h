@@ -9,8 +9,8 @@
 
 class ViscosityForce : public Force {
 public:
-    ViscosityForce(std::vector<Particle*> particles);
-    void setTarget(std::vector<Particle*> particles) override;
+    ViscosityForce(const vector<Particle*> &particles);
+    void setTarget(const vector<Particle*> &particles) override;
     void apply(System* s) override;
     void draw() override;
 

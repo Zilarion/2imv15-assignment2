@@ -21,8 +21,8 @@ protected:
     bool active = true;
 
 public:
-    std::vector<Particle*> particles;
-    virtual void setTarget(std::vector<Particle*> particles) = 0;
+    vector<Particle*> particles;
+    virtual void setTarget(const vector<Particle*> &particles) = 0;
     void addAsTarget(Particle* p) {
         particles.push_back(p);
     }

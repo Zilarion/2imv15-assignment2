@@ -24,24 +24,19 @@ void Particle::reset()
 }
 
 void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
-    if (movable) {
-        if (meanDensity == 0)
-            meanDensity = 0.0001f;
-        float perc = density / meanDensity;
-        if (perc > 1.f)
-            perc = 1.f;
-        glColor3f(1.f - perc, 1.f, 1.f);
-    } else {
-        glColor3f(1.f, 1.f, 1.f);
-    }
-    glBegin(GL_POINTS);
-        glVertex3f(position[0], position[1], position[2]);
-    glEnd();
+    glPushMatrix();
+        float sphereSize = 0.01f;
+        if (movable) {
+            glColor3f(.2f, 1.f, 1.f);
+        } else {
+            sphereSize = 0.01f;
+            glColor4f(1.f, 1.f, 1.f, 0.1f);
+        }
+        glTranslated(position[0], position[1], position[2]);
+        glutSolidSphere(sphereSize, 3, 3);
+    glPopMatrix();
 
-//    glPushMatrix();
-//    glTranslated(position[0], position[1], position[2]);
-//    glutSolidSphere(.01f, 8, 8);
-//    glPopMatrix();
+    float fMult = 0.00001f;
 
     if (drawVelocity && movable) {
         glColor3f(0.0, 0.6, 0.0);
@@ -52,11 +47,11 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
         glEnd();
     }
     if (drawForce && movable) {
-        glColor3f(0.0, 0.6, 0.6);
+        glColor3f(0.0, 1.f, 1.f);
         glBegin(GL_LINES);
         glVertex3f(position[0], position[1], position[2]);
-        glVertex3f(position[0] + force[0] * 0.2f, position[1] + force[1] * 0.2f,
-                   position[2] + force[2] * 0.2f);
+        glVertex3f(position[0] + force[0] * fMult, position[1] + force[1] * fMult,
+                   position[2] + force[2] * fMult);
         glEnd();
     }
 }

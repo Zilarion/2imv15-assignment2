@@ -423,7 +423,7 @@ float valp1, float valp2)
 
     p = p1 + (p2 - p1).mult(mu);
 
-    return(p);
+    return p;
 }
 
 //string MarchingCubes::VectorToString(Vector3f vec, float prec) {
