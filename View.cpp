@@ -285,7 +285,7 @@ void View::onReshape(int width, int height )
     glLoadIdentity();
     glTranslatef(0.0f, .5f, .0f);
 
-    gluPerspective(90.0f, aspect, 0.1f, 1000.0f);
+    gluPerspective(90.0f, aspect, 0.1f, 100.0f);
 
     this->width = width;
     this->height = height;

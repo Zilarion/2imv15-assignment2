@@ -619,17 +619,17 @@ void MarchingCubes::drawMarching() {
                             XYZ b = tri.p[1];
                             XYZ c = tri.p[2];
                             XYZ norm = (b - a)^(c - b);
-                            string aindex = a.toString(100.f);
-                            if (!normals.emplace(aindex, norm).second) {
-                                normals[aindex] += norm;
+                            long akey = a.toLongHash();
+                            if (!normals.emplace(akey, norm).second) {
+                                normals[akey] += norm;
                             }
-                            string bindex = b.toString(100.f);
-                            if (!normals.emplace(bindex, norm).second) {
-                                normals[bindex] += norm;
+                            long bkey = b.toLongHash();
+                            if (!normals.emplace(bkey, norm).second) {
+                                normals[bkey] += norm;
                             }
-                            string cindex = c.toString(100.f);
-                            if (!normals.emplace(cindex, norm).second) {
-                                normals[cindex] += norm;
+                            long ckey = c.toLongHash();
+                            if (!normals.emplace(ckey, norm).second) {
+                                normals[ckey] += norm;
                             }
                             //*/
                         }
@@ -666,9 +666,9 @@ void MarchingCubes::drawMarching() {
         XYZ bnorm = norm;
         XYZ cnorm = norm;
         /*/// per vertex normals
-        XYZ anorm = normals[a.toString(100.f)];
-        XYZ bnorm = normals[b.toString(100.f)];
-        XYZ cnorm = normals[c.toString(100.f)];
+        XYZ anorm = normals[a.toLongHash()];
+        XYZ bnorm = normals[b.toLongHash()];
+        XYZ cnorm = normals[c.toLongHash()];
         anorm.normalize();
         bnorm.normalize();
         cnorm.normalize();
@@ -695,8 +695,6 @@ MarchingCubes::MarchingCubes(System *system) : system(system) {
     cubeStart = XYZ{-1.1f, -1.1f, -1.1f};
     cubeEnd = XYZ{1.1f, 1.1f, 1.1f};
     cubeStep = .025f; // a whole number of steps should fit into interval
-
-    float cubeStart0 = cubeStart[0];
 
     cubeStartInt = new int[3];
     cubeEndInt = new int[3];
