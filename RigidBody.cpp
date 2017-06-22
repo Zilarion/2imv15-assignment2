@@ -57,6 +57,7 @@ void RigidBody::reset() {
 void RigidBody::initializeVariables() {
     x = startPos;
     R = Matrix3f::Identity();
+    q = Quaternionf(1,0,0,0);
     P = Vector3f(0, 0, 0);
     L = Vector3f(0, 0, 0);
     Iinv = IbodyInv;

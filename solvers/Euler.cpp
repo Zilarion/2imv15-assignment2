@@ -27,8 +27,9 @@ void Euler::simulateStep(System *system, float h) {
         for (Particle *p:system->particles) {
             if (r->isPenetrating(epsilon, p)) {
                 Vector3f n = r->getNormal(p->position);
-                if ((n.dot(p->velocity)) < 0) {
-                    p->velocity = -2 * (p->velocity.dot(n)) * n + p->velocity;
+                Vector3f relativeV = p->velocity - r->v;
+                if ((n.dot(relativeV)) < 0) {
+                    p->velocity = -2 * (relativeV.dot(n)) * n + relativeV;
                 }
             }
         }
