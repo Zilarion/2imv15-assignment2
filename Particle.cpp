@@ -43,6 +43,8 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
     glutSolidSphere(.01f, 8, 8);
     glPopMatrix();
 
+    float fMult = 0.00001f;
+
     if (drawVelocity && movable) {
         glColor3f(0.0, 0.6, 0.0);
         glBegin(GL_LINES);
@@ -52,11 +54,11 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
         glEnd();
     }
     if (drawForce && movable) {
-        glColor3f(0.0, 0.6, 0.6);
+        glColor3f(0.0, 1.f, 1.f);
         glBegin(GL_LINES);
         glVertex3f(position[0], position[1], position[2]);
-        glVertex3f(position[0] + force[0] * 0.2f, position[1] + force[1] * 0.2f,
-                   position[2] + force[2] * 0.2f);
+        glVertex3f(position[0] + force[0] * fMult, position[1] + force[1] * fMult,
+                   position[2] + force[2] * fMult);
         glEnd();
     }
 }

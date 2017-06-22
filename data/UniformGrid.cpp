@@ -56,17 +56,17 @@ vector<Particle *> UniformGrid::query(const Vector3f &pos) {
             }
     }
     result.reserve(count);
-    for (int x = -1; x < 1; x++) {
+    for (int x = -1; x <= 1; x++) {
         if (xC + x < xMax && xC + x >= 0)
-            for (int y = -1; y < 1; y++) {
+            for (int y = -1; y <= 1; y++) {
                 if (yC + y < yMax && yC + y >= 0)
-                    for (int z = -1; z < 1; z++) {
-                        if (zC + z < zMax && zC + z >= 0)
+                    for (int z = -1; z <= 1; z++) {
+                        if (zC + z < zMax && zC + z >= 0) {
                             appendVect(result, grid[xC + x][yC + y][zC + z].particles);
+                        }
                     }
             }
     }
-
     return result;
 }
 

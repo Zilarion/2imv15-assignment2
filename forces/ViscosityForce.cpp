@@ -21,7 +21,7 @@ void ViscosityForce::apply(System *s) {
         Vector3f viscosityForce = Vector3f(0, 0, 0);
         for (Particle *pj : s->grid.query(pi->position)) {
             viscosityForce = pj->mass * (pj->velocity - pi->velocity) / pj->density
-                             * Viscosity::ddW(pi->position - pj->position, .05f);
+                             * Viscosity::ddW(pi->position - pj->position);
         }
         pi->force += u * viscosityForce;
     }

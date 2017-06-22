@@ -32,11 +32,11 @@ System* SystemBuilder::initBasic()
     System* sys = new System(new Euler(Euler::SEMI));
 //    System* sys = new System(new RungeKutta());
 
-    int dimensions = 10;
+    int dimensions = 6;
     float mass = 1.f;
     float massStatic = 10000.f;
     int index = 0;
-    float d = 0.04f;
+    float d = 0.05f;
     float ds = 0.05f;
 
     // Movable particles
@@ -55,8 +55,8 @@ System* SystemBuilder::initBasic()
     sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -9.81f, .0f)));
     sys->addForce(new DragForce(sys->particles, 0.3f));
     sys->addForce(new PressureForce(sys->particles));
-//    sys->addForce(new ViscosityForce(sys->particles));
-//    sys->addForce(new SurfaceForce(sys->particles));
+    sys->addForce(new ViscosityForce(sys->particles));
+    sys->addForce(new SurfaceForce(sys->particles));
 
     return sys;
 }

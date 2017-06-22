@@ -18,7 +18,7 @@
 #endif
 
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(80, 80, 80, 0.025f, Vector3f(1.f, 1.f, 1.f)) {
+                                 grid(20, 20, 20, 0.1f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -412,14 +412,14 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 400;
+    float restDensity = 10;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
         meanDensity += p->density;
     }
     meanDensity /= particles.size();
 
-    float k = 10.f;
+    float k = 1.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -490,7 +490,7 @@ void System::drawConstraints() {
 
 VectorXf System::checkBoundingBox(VectorXf newState) {
     float dist = .95f;
-    float dec = .8f;
+    float dec = 1.f;
     //collision from x side
     for (int i = 0; i < particles.size(); i++) {
         if (newState[i * 6] < -dist) {
