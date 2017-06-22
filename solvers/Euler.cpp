@@ -27,8 +27,9 @@ void Euler::simulateStep(System *system, float h) {
         for (Particle *p:system->particles) {
             if (r->isPenetrating(epsilon, p)) {
                 Vector3f n = r->getNormal(p->position);
-                if ((n.dot(p->velocity)) < 0) {
-                    p->velocity = -2 * (p->velocity.dot(n)) * n + p->velocity;
+                Vector3f relativeV = p->velocity - r->v;
+                if ((n.dot(relativeV)) < 0) {
+                    p->velocity = -2 * (relativeV.dot(n)) * n + relativeV;
                 }
             }
         }
@@ -45,7 +46,7 @@ void Euler::simulateStep(System *system, float h) {
         system->setState(newState, system->getTime() + h);
         VectorXf derivNew = system->derivEval();
         // If we are running semi implicit euler, use the new velocity instead
-        VectorXf semiImpl(system->getParticleDim() + system->rigidBodies.size() * 13);
+        VectorXf semiImpl(system->getParticleDim() + system->rigidBodies.size() * RigidBody::STATE_SIZE);
         for (int i = 0; i < system->particles.size(); i++) {
             semiImpl[i * 6 + 0] = oldState[i * 6 + 0] + h * derivNew[i * 6 + 0];  // Xnew implicit, using Vnew
             semiImpl[i * 6 + 1] = oldState[i * 6 + 1] + h * derivNew[i * 6 + 1];  // Xold + h * Vnew
