@@ -18,7 +18,7 @@
 #endif
 
 System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(40, 40, 40, 0.05f, Vector3f(1.f, 1.f, 1.f)) {
+                                 grid(80, 80, 80, 0.025f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -111,7 +111,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 void System::drawMarching() {
     Vector3f cubeStart = Vector3f(-1.1f, -1.1f, -1.1f);
     Vector3f cubeEnd = Vector3f(1.1f, 1.1f, 1.1f);
-    float cubeStep = .05f; // a whole number of steps should fit into interval
+    float cubeStep = .1f; // a whole number of steps should fit into interval
 
     Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
     Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
@@ -268,7 +268,7 @@ void System::drawMarching() {
     }
 
     // draw triangles
-    glColor4f(.8f, .7f, .9f, 1.f);
+    glColor4f(.2f, .9f, .9f, 1.f);
     GLfloat specular[] = {.5f, .5f, .5f, 1.f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
     glBegin(GL_TRIANGLES);
@@ -412,14 +412,14 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 100;
+    float restDensity = 400;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
         meanDensity += p->density;
     }
     meanDensity /= particles.size();
 
-    float k = .1f;
+    float k = 10.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {

@@ -184,7 +184,7 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'p':
             for (int i = 0; i < 10; i++)
-                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, -.9f, (rand() % 10 + 1) * 0.01f),
+                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, .9f, (rand() % 10 + 1) * 0.01f),
                                           1.f, sys->particles.size() + 1, true));
             break;
         case ' ':

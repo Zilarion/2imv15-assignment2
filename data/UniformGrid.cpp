@@ -27,10 +27,6 @@ void UniformGrid::insert(Particle *p) {
 
     if (xC >= 0 && yC >= 0 && zC >= 0 && xC < xMax && yC < yMax && zC < zMax)
         grid[xC][yC][zC].insert(p);
-//    else {
-//        std::cout << p->position << std::endl;
-//        std::cout << xC << " " << yC << " " << zC << std::endl;
-//    }
 }
 
 void appendVect(vector<Particle*> &target, vector<Particle*> &from) {
@@ -48,28 +44,28 @@ vector<Particle *> UniformGrid::query(const Vector3f &pos) {
     if (xC < 0 || yC < 0 || zC < 0 || xC >= xMax || yC >= yMax || zC >= zMax)
         return result;
 
-    unsigned long count = grid[xC][yC][zC].particles.size() +
-                xC + 1 < xMax ? grid[xC + 1][yC][zC].particles.size() : 0 +
-                xC - 1 >= 0 ? grid[xC - 1][yC][zC].particles.size() : 0 +
-                yC + 1 < xMax ? grid[xC][yC + 1][zC].particles.size() : 0 +
-                yC - 1 >= 0 ? grid[xC][yC - 1][zC].particles.size() : 0 +
-                zC + 1 < zMax ? grid[xC][yC][zC + 1].particles.size() : 0 +
-                zC - 1 >= 0 ? grid[xC][yC][zC - 1].particles.size() : 0;
+    unsigned long count = 0;
+    for (int x = -1; x < 1; x++) {
+        if (xC + x < xMax && xC + x >= 0)
+            for (int y = -1; y < 1; y++) {
+                if (yC + y < yMax && yC + y >= 0)
+                    for (int z = -1; z < 1; z++) {
+                        if (zC + z < zMax && zC + z >= 0)
+                            count += grid[xC + x][yC + y][zC + z].particles.size();
+                    }
+            }
+    }
     result.reserve(count);
-
-    appendVect(result, grid[xC][yC][zC].particles);
-    if (xC + 1 < xMax)
-        appendVect(result, grid[xC + 1][yC][zC].particles);
-    if (xC - 1 >= 0)
-        appendVect(result, grid[xC - 1][yC][zC].particles);
-    if (yC + 1 < yMax)
-        appendVect(result, grid[xC][yC + 1][zC].particles);
-    if (yC - 1 >= 0)
-        appendVect(result, grid[xC][yC - 1][zC].particles);
-    if (zC + 1 < zMax)
-        appendVect(result, grid[xC][yC][zC + 1].particles);
-    if (zC - 1 >= 0)
-        appendVect(result, grid[xC][yC][zC - 1].particles);
+    for (int x = -1; x < 1; x++) {
+        if (xC + x < xMax && xC + x >= 0)
+            for (int y = -1; y < 1; y++) {
+                if (yC + y < yMax && yC + y >= 0)
+                    for (int z = -1; z < 1; z++) {
+                        if (zC + z < zMax && zC + z >= 0)
+                            appendVect(result, grid[xC + x][yC + y][zC + z].particles);
+                    }
+            }
+    }
 
     return result;
 }

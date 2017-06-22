@@ -9,8 +9,7 @@
 float DensityField::eval(Particle* pi) {
     float density = 0;
     for (Particle* pj : sys->grid.query(pi->position)) {
-        density += pj->mass * Poly6::W(pi->position - pj->position, .1f);
+        density += pj->mass * Poly6::W(pi->position - pj->position);
     }
-
     return density;
 }
