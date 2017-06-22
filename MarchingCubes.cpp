@@ -4,8 +4,10 @@
 // source: http://paulbourke.net/geometry/polygonise/ (with minor changes to work with our codebase)
 //
 
+#include "System.h"
 #include <random>
 #include <string>
+#include <GL/gl.h>
 #include "MarchingCubes.h"
 
 const int edgeTable[256]={
@@ -307,25 +309,25 @@ const int triTable[256][16] =
 	0 will be returned if the grid cell is either totally above
    of totally below the isolevel.
 */
-int Polygonise(GRIDCELL &grid,double isolevel,TRIANGLE *triangles)
+int MarchingCubes::Polygonise(GRIDCELL &grid, TRIANGLE *triangles)
 {
     int i,ntriang;
     int cubeindex;
-    Vector3f vertlist[12];
+    XYZ vertlist[12];
 
     /*
        Determine the index into the edge table which
        tells us which vertices are inside of the surface
     */
     cubeindex = 0;
-    if (grid.val[0] < isolevel) cubeindex |= 1;
-    if (grid.val[1] < isolevel) cubeindex |= 2;
-    if (grid.val[2] < isolevel) cubeindex |= 4;
-    if (grid.val[3] < isolevel) cubeindex |= 8;
-    if (grid.val[4] < isolevel) cubeindex |= 16;
-    if (grid.val[5] < isolevel) cubeindex |= 32;
-    if (grid.val[6] < isolevel) cubeindex |= 64;
-    if (grid.val[7] < isolevel) cubeindex |= 128;
+    if (grid.val[0] < iso) cubeindex |= 1;
+    if (grid.val[1] < iso) cubeindex |= 2;
+    if (grid.val[2] < iso) cubeindex |= 4;
+    if (grid.val[3] < iso) cubeindex |= 8;
+    if (grid.val[4] < iso) cubeindex |= 16;
+    if (grid.val[5] < iso) cubeindex |= 32;
+    if (grid.val[6] < iso) cubeindex |= 64;
+    if (grid.val[7] < iso) cubeindex |= 128;
 
     /* Cube is entirely in/out of the surface */
     if (edgeTable[cubeindex] == 0)
@@ -334,40 +336,40 @@ int Polygonise(GRIDCELL &grid,double isolevel,TRIANGLE *triangles)
     /* Find the vertices where the surface intersects the cube */
     if (edgeTable[cubeindex] & 1)
         vertlist[0] =
-                VertexInterp(isolevel,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
+                VertexInterp(iso,grid.p[0],grid.p[1],grid.val[0],grid.val[1]);
     if (edgeTable[cubeindex] & 2)
         vertlist[1] =
-                VertexInterp(isolevel,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
+                VertexInterp(iso,grid.p[1],grid.p[2],grid.val[1],grid.val[2]);
     if (edgeTable[cubeindex] & 4)
         vertlist[2] =
-                VertexInterp(isolevel,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
+                VertexInterp(iso,grid.p[2],grid.p[3],grid.val[2],grid.val[3]);
     if (edgeTable[cubeindex] & 8)
         vertlist[3] =
-                VertexInterp(isolevel,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
+                VertexInterp(iso,grid.p[3],grid.p[0],grid.val[3],grid.val[0]);
     if (edgeTable[cubeindex] & 16)
         vertlist[4] =
-                VertexInterp(isolevel,grid.p[4],grid.p[5],grid.val[4],grid.val[5]);
+                VertexInterp(iso,grid.p[4],grid.p[5],grid.val[4],grid.val[5]);
     if (edgeTable[cubeindex] & 32)
         vertlist[5] =
-                VertexInterp(isolevel,grid.p[5],grid.p[6],grid.val[5],grid.val[6]);
+                VertexInterp(iso,grid.p[5],grid.p[6],grid.val[5],grid.val[6]);
     if (edgeTable[cubeindex] & 64)
         vertlist[6] =
-                VertexInterp(isolevel,grid.p[6],grid.p[7],grid.val[6],grid.val[7]);
+                VertexInterp(iso,grid.p[6],grid.p[7],grid.val[6],grid.val[7]);
     if (edgeTable[cubeindex] & 128)
         vertlist[7] =
-                VertexInterp(isolevel,grid.p[7],grid.p[4],grid.val[7],grid.val[4]);
+                VertexInterp(iso,grid.p[7],grid.p[4],grid.val[7],grid.val[4]);
     if (edgeTable[cubeindex] & 256)
         vertlist[8] =
-                VertexInterp(isolevel,grid.p[0],grid.p[4],grid.val[0],grid.val[4]);
+                VertexInterp(iso,grid.p[0],grid.p[4],grid.val[0],grid.val[4]);
     if (edgeTable[cubeindex] & 512)
         vertlist[9] =
-                VertexInterp(isolevel,grid.p[1],grid.p[5],grid.val[1],grid.val[5]);
+                VertexInterp(iso,grid.p[1],grid.p[5],grid.val[1],grid.val[5]);
     if (edgeTable[cubeindex] & 1024)
         vertlist[10] =
-                VertexInterp(isolevel,grid.p[2],grid.p[6],grid.val[2],grid.val[6]);
+                VertexInterp(iso,grid.p[2],grid.p[6],grid.val[2],grid.val[6]);
     if (edgeTable[cubeindex] & 2048)
         vertlist[11] =
-                VertexInterp(isolevel,grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
+                VertexInterp(iso,grid.p[3],grid.p[7],grid.val[3],grid.val[7]);
 
     /* Create the triangle */
     ntriang = 0;
@@ -405,12 +407,11 @@ bool operator<(const Vector3f &left, const Vector3f &right)
    Linearly interpolate the position where an isosurface cuts
    an edge between two vertices, each with their own scalar value
 */
-Vector3f VertexInterp(double isolevel,
-Vector3f &p1, Vector3f &p2,
-double valp1, double valp2)
+MarchingCubes::XYZ MarchingCubes::VertexInterp(float isolevel, MarchingCubes::XYZ &p1, MarchingCubes::XYZ &p2,
+float valp1, float valp2)
 {
-    double mu;
-    Vector3f p;
+    float mu;
+    XYZ p;
 
     if (fabs(isolevel-valp1) < 0.00001)
         return(p1);
@@ -420,15 +421,18 @@ double valp1, double valp2)
         return(p1);
     mu = (isolevel - valp1) / (valp2 - valp1);
 
-    p = p1 + mu * (p2 - p1);
+    p = p1 + (p2 - p1).mult(mu);
 
     return(p);
 }
 
-void updateGradient(float grid[], int dim[3], int index, Vector3f gradients[]) {
-    int gridSize = dim[0] * dim[1] * dim[2];
+//string MarchingCubes::VectorToString(Vector3f vec, float prec) {
+//    return to_string((int)(vec[0] * prec)) + "," + to_string((int)(vec[1] * prec)) + "," + to_string((int)(vec[2] * prec));
+//}
+
+void MarchingCubes::updateGradient(int index) {
     //only update normals if center index is within cube grid
-    if (0 <= index && index < gridSize) {
+    if (0 <= index && index < size) {
         //for each neighbouring grid cell
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
@@ -436,30 +440,30 @@ void updateGradient(float grid[], int dim[3], int index, Vector3f gradients[]) {
                     // only neighbouring cells though, not the cell itself
                     if (abs(x) + abs(y) + abs(z) == 1) {
                         //calculate grid cell index
-                        int centerIndex = index + x + dim[0] * (y + dim[1] * z);
+                        int centerIndex = index + x + cubeCornerDim[0] * (y + cubeCornerDim[1] * z);
                         //only update normals if grid cell is within cube grid
-                        if (0 <= centerIndex && centerIndex < gridSize) {
+                        if (0 <= centerIndex && centerIndex < size) {
                             //get all the indices of grid cell-neighbouring cells, setting them to the cell
                             // itself when they are outside the cube grid
                             int plusXIndex = index + 1;
-                            plusXIndex = plusXIndex < gridSize ? plusXIndex : index;
+                            plusXIndex = plusXIndex < size ? plusXIndex : index;
                             int minusXIndex = index - 1;
                             minusXIndex = minusXIndex >= 0 ? minusXIndex : index;
-                            int plusYIndex = index + dim[0];
-                            plusYIndex = plusYIndex < gridSize ? plusYIndex : index;
-                            int minusYIndex = index - dim[0];
+                            int plusYIndex = index + cubeCornerDim[0];
+                            plusYIndex = plusYIndex < size ? plusYIndex : index;
+                            int minusYIndex = index - cubeCornerDim[0];
                             minusYIndex = minusYIndex >= 0 ? minusYIndex : index;
-                            int plusZIndex = index + dim[0] * dim[1];
-                            plusZIndex = plusZIndex < gridSize ? plusZIndex : index;
-                            int minusZIndex = index - dim[0] * dim[1];
+                            int plusZIndex = index + cubeCornerDim[0] * cubeCornerDim[1];
+                            plusZIndex = plusZIndex < size ? plusZIndex : index;
+                            int minusZIndex = index - cubeCornerDim[0] * cubeCornerDim[1];
                             minusZIndex = minusZIndex >= 0 ? minusZIndex : index;
 
                             //calculate gradient from neighbouring cell difference
-                            float dx = grid[plusXIndex] - grid[minusXIndex];
-                            float dy = grid[plusYIndex] - grid[minusYIndex];
-                            float dz = grid[plusZIndex] - grid[minusZIndex];
+                            float dx = cubeCorners[plusXIndex] - cubeCorners[minusXIndex];
+                            float dy = cubeCorners[plusYIndex] - cubeCorners[minusYIndex];
+                            float dz = cubeCorners[plusZIndex] - cubeCorners[minusZIndex];
                             //save gradient
-                            gradients[index] = Vector3f(-dx, -dy, -dz);
+                            gradientCorners[index] = XYZ{-dx, -dy, -dz};
                         }
                     }
                 }
@@ -468,37 +472,257 @@ void updateGradient(float grid[], int dim[3], int index, Vector3f gradients[]) {
     }
 }
 
-Vector3f getEdgeNormal(Vector3f &edgePoint, Vector3f &gridStart, Vector3f &gridEnd, int gridDim[3], float gridStep, Vector3f gradients[]) {
-    Vector3f edgeStart = Vector3f(floorf(edgePoint[0] / gridStep) * gridStep,
-                                  floorf(edgePoint[1] / gridStep) * gridStep,
-                                  floorf(edgePoint[2] / gridStep) * gridStep);
+MarchingCubes::XYZ MarchingCubes::getEdgeNormal(MarchingCubes::XYZ edgePoint) {
+    XYZ edgeStart = XYZ{floorf(edgePoint[0] / cubeStep) * cubeStep,
+                        floorf(edgePoint[1] / cubeStep) * cubeStep,
+                        floorf(edgePoint[2] / cubeStep) * cubeStep};
 
-    Vector3f edgeEnd = Vector3f(ceilf(edgePoint[0] / gridStep) * gridStep,
-                                ceilf(edgePoint[1] / gridStep) * gridStep,
-                                ceilf(edgePoint[2] / gridStep) * gridStep);
+    XYZ edgeEnd = XYZ{ceilf(edgePoint[0] / cubeStep) * cubeStep,
+                      ceilf(edgePoint[1] / cubeStep) * cubeStep,
+                      ceilf(edgePoint[2] / cubeStep) * cubeStep};
 
     //edge should fall inside of grid
-    if (gridStart < edgeStart && edgeStart < gridEnd
-        && gridStart < edgeEnd && edgeEnd < gridEnd) {
+    if (cubeStart < edgeStart && edgeStart < cubeEnd
+        && cubeStart < edgeEnd && edgeEnd < cubeEnd) {
         // get normal at edge start
-        Vector3f relEdgeStart = edgeStart - gridStart;
-        int edgeStartGridPos[3] = {(int) lroundf(relEdgeStart[0] / gridStep),
-                                   (int) lroundf(relEdgeStart[1] / gridStep),
-                                   (int) lroundf(relEdgeStart[2] / gridStep)};
-        int edgeStartIndex = edgeStartGridPos[0] + gridDim[0] * (edgeStartGridPos[1] + (gridDim[1] * edgeStartGridPos[2]));
-        Vector3f startNormal = gradients[edgeStartIndex];
+        XYZ relEdgeStart = edgeStart - cubeStart;
+        int edgeStartGridPos[3] = {(int) lroundf(relEdgeStart[0] / cubeStep),
+                                   (int) lroundf(relEdgeStart[1] / cubeStep),
+                                   (int) lroundf(relEdgeStart[2] / cubeStep)};
+        int edgeStartIndex = edgeStartGridPos[0] + cubeCornerDim[0] * (edgeStartGridPos[1] + (cubeCornerDim[1] * edgeStartGridPos[2]));
+        XYZ startNormal = gradientCorners[edgeStartIndex];
 
         // get normal at edge end
-        Vector3f relEdgeEnd = edgeEnd - gridStart;
-        int edgeEndGridPos[3] = {(int) lroundf(relEdgeEnd[0] / gridStep),
-                                 (int) lroundf(relEdgeEnd[1] / gridStep),
-                                 (int) lroundf(relEdgeEnd[2] / gridStep)};
-        int edgeEndIndex = edgeEndGridPos[0] + gridDim[0] * (edgeEndGridPos[1] + (gridDim[1] * edgeEndGridPos[2]));
-        Vector3f endNormal = gradients[edgeEndIndex];
+        XYZ relEdgeEnd = edgeEnd - cubeStart;
+        int edgeEndGridPos[3] = {(int) lroundf(relEdgeEnd[0] / cubeStep),
+                                 (int) lroundf(relEdgeEnd[1] / cubeStep),
+                                 (int) lroundf(relEdgeEnd[2] / cubeStep)};
+        int edgeEndIndex = edgeEndGridPos[0] + cubeCornerDim[0] * (edgeEndGridPos[1] + (cubeCornerDim[1] * edgeEndGridPos[2]));
+        XYZ endNormal = gradientCorners[edgeEndIndex];
 
         // return average of start end end normal
-        return (startNormal + endNormal) / 2.f;
+        return (startNormal + endNormal).div(2.f);
     } else {
-        return Vector3f(0.f, 0.f, 0.f);
+        return XYZ{0.f, 0.f, 0.f};
     }
+}
+
+void MarchingCubes::drawMarching() {
+
+    for (int i = 0; i < size; i++) {
+        cubeCorners[i] = 0.f;
+        gradientCorners[i] = XYZ{0.f,0.f,0.f};
+    }
+
+    for (Particle *p: system->particles) {
+        Vector3f pos = p->position;
+        // only apply marching cube to particle when it is inside the rendering volume
+        if (pos[0] > cubeStart[0] && pos[1] > cubeStart[1] && pos[2] > cubeStart[2]
+            && pos[0] < cubeEnd[0] && pos[1] < cubeEnd[1] && pos[2] < cubeEnd[2]) {
+            // add the distance between the point and each of the 8 corners of its surrounding gridcube
+            // to the grid values
+
+        // lower corner [0, 0, 0] of gridcube
+        Vector3f lowerGridPos = Vector3f(floor(pos[0] / cubeStep) * cubeStep,
+                                         floor(pos[1] / cubeStep) * cubeStep,
+                                         floor(pos[2] / cubeStep) * cubeStep);
+        int lowerCubePos = (int) (floor(pos[0] / cubeStep) + -cubeStartInt[0] +
+                                  cubeCornerDim[0] * (floor(pos[1] / cubeStep) + -cubeStartInt[1]
+                                                      + (cubeCornerDim[1] *
+                                                         (floor(pos[2] / cubeStep) + -cubeStartInt[2]))));
+
+            //fill in all the gridcube values
+            int steps = (int) ceilf(particleRange / cubeStep);
+            for (int x = -steps; x <= steps + 1; x++) {
+                for (int y = -steps; y <= steps + 1; y++) {
+                    for (int z = -steps; z <= steps + 1; z++) {
+                        Vector3f gridPos = lowerGridPos + Vector3f(x * cubeStep, y * cubeStep, z * cubeStep);
+                        int cubePos = lowerCubePos + x + (cubeCornerDim[0] * (y + cubeCornerDim[1] * z));
+                        if (cubePos < cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[0] && cubePos >= 0) {
+                            cubeCorners[cubePos] = min(
+                                    cubeCorners[cubePos] +
+                                    max(particleRange - (pos - gridPos).norm(), 0.f) / particleRange, 1.f);
+                            // update gradients based on change in grid
+                            updateGradient(cubePos);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //unordered_map<string, Vector3f> normals = {};
+    triangles.clear();
+
+    for (int x = cubeStartInt[0]; x < cubeEndInt[0] - 1; x++) {
+        for (int y = cubeStartInt[1]; y < cubeEndInt[1] - 1; y++) {
+            for (int z = cubeStartInt[2]; z < cubeEndInt[2] - 1; z++) {
+                int cubePos0 =
+                        x + -cubeStartInt[0] + cubeCornerDim[0] * (y + -cubeStartInt[1] +
+                                                                   (cubeCornerDim[1] * (z + -cubeStartInt[2])));
+                int cubePos1 = cubePos0 + 1; // [1,0,0]
+                int cubePos2 = cubePos0 + 1 + cubeCornerDim[0]; // [1,1,0]
+                int cubePos3 = cubePos0 + cubeCornerDim[0]; // [0,1,0]
+                int cubePos4 = cubePos0 + cubeCornerDim[0] * cubeCornerDim[1]; // [0,0,1]
+                int cubePos5 = cubePos0 + 1 + cubeCornerDim[0] * cubeCornerDim[1]; // [1,0,1]
+                int cubePos6 = cubePos0 + 1 + cubeCornerDim[0] + cubeCornerDim[0] * cubeCornerDim[1]; // [1,1,1]
+                int cubePos7 = cubePos0 + cubeCornerDim[0] + cubeCornerDim[0] * cubeCornerDim[1]; // [0,1,1]
+
+                GRIDCELL cell = {
+                    {
+                        XYZ{x * cubeStep, y * cubeStep, z * cubeStep}, //[0,0,0]
+                        XYZ{x * cubeStep + cubeStep, y * cubeStep, z * cubeStep}, //[1,0,0]
+                        XYZ{x * cubeStep + cubeStep, y * cubeStep + cubeStep, z * cubeStep}, //[1,1,0]
+                        XYZ{x * cubeStep, y * cubeStep + cubeStep, z * cubeStep}, //[0,1,0]
+                        XYZ{x * cubeStep, y * cubeStep, z * cubeStep + cubeStep}, //[0,0,1]
+                        XYZ{x * cubeStep + cubeStep, y * cubeStep, z * cubeStep + cubeStep}, //[1,0,1]
+                        XYZ{x * cubeStep + cubeStep, y * cubeStep + cubeStep, z * cubeStep + cubeStep}, //[1,1,1]
+                        XYZ{x * cubeStep, y * cubeStep + cubeStep, z * cubeStep + cubeStep} //[0,1,1]
+                    },
+                    {
+                        cubeCorners[cubePos0],
+                        cubeCorners[cubePos1],
+                        cubeCorners[cubePos2],
+                        cubeCorners[cubePos3],
+                        cubeCorners[cubePos4],
+                        cubeCorners[cubePos5],
+                        cubeCorners[cubePos6],
+                        cubeCorners[cubePos7]
+                    }
+                };
+
+                double cellsum = 0;
+                cellsum += cubeCorners[cubePos0];
+                cellsum += cubeCorners[cubePos1];
+                cellsum += cubeCorners[cubePos2];
+                cellsum += cubeCorners[cubePos3];
+                cellsum += cubeCorners[cubePos4];
+                cellsum += cubeCorners[cubePos5];
+                cellsum += cubeCorners[cubePos6];
+                cellsum += cubeCorners[cubePos7];
+
+                if (cellsum > 0) {
+                    TRIANGLE tris[5] = {};
+                    int n = Polygonise(cell, tris);
+
+                    if (n > 0) {
+                        for (int i = 0; i < n; i++) {
+                            TRIANGLE tri = tris[i];
+                            triangles.push_back(tri);
+
+                            /* add normal to combined normals of each point in triangle. (per-vertex normals) DEPRECATED
+                            Vector3f a = tri.p[0];
+                            Vector3f b = tri.p[1];
+                            Vector3f c = tri.p[2];
+                            Vector3f norm = (b - a).cross(c - b);
+                            string aindex = VectorToString(a, 10.f);
+                            if (!normals.emplace(aindex, norm).second) {
+                                normals[aindex] += norm;
+                            }
+                            string bindex = VectorToString(b, 10.f);
+                            if (!normals.emplace(bindex, norm).second) {
+                                normals[bindex] += norm;
+                            }
+                            string cindex = VectorToString(c, 10.f);
+                            if (!normals.emplace(cindex, norm).second) {
+                                normals[cindex] += norm;
+                            }
+                            //*/
+                        }
+                    }
+                }
+
+                /* draw each grid cell DEBUG
+                if (cubeCorners[cubePos0] > 0.f) {
+                    glColor3f(cubeCorners[cubePos0], 0.f, 0.f);
+                    glPushMatrix();
+                    glTranslated(x*cubeStep, y*cubeStep, z*cubeStep);
+                    glBegin(GL_POINTS);
+                        glVertex3f(0.f, 0.f, 0.f);
+                    glEnd();
+                    glPopMatrix();
+                }
+                //*/
+            }
+        }
+    }
+
+    //// draw triangles
+    glColor4f(.8f, .7f, .9f, 1.f);
+    glBegin(GL_TRIANGLES);
+    for (int i = 0; i < triangles.size(); i++) {
+        TRIANGLE triangle = triangles[i];
+        XYZ a = triangle.p[0];
+        XYZ b = triangle.p[1];
+        XYZ c = triangle.p[2];
+        /* per-face normals
+        Vector3f norm = (b - a).cross(c - b);
+        Vector3f anorm = norm;
+        Vector3f bnorm = norm;
+        Vector3f cnorm = norm;
+        //// per vertex normals
+        Vector3f anorm = normals[VectorToString(a, 10.f)];
+        Vector3f bnorm = normals[VectorToString(b, 10.f)];
+        Vector3f cnorm = normals[VectorToString(c, 10.f)];
+        anorm.normalize();
+        bnorm.normalize();
+        cnorm.normalize();
+        //*/
+        //* per vertex normals 2
+        XYZ anorm = getEdgeNormal(a);
+        anorm.normalize();
+        XYZ bnorm = getEdgeNormal(b);
+        bnorm.normalize();
+        XYZ cnorm = getEdgeNormal(c);
+        cnorm.normalize();
+        //* /
+        glNormal3f(anorm[0], anorm[1], anorm[2]);
+        glVertex3f(a[0], a[1], a[2]);
+
+        glNormal3f(bnorm[0], bnorm[1], bnorm[2]);
+        glVertex3f(b[0], b[1], b[2]);
+
+        glNormal3f(cnorm[0], cnorm[1], cnorm[2]);
+        glVertex3f(c[0], c[1], c[2]);
+    }
+    glEnd();
+    //*/
+}
+
+MarchingCubes::MarchingCubes(System *system) : system(system) {
+    cubeStart = XYZ{-1.1f, -1.1f, -1.1f};
+    cubeEnd = XYZ{1.1f, 1.1f, 1.1f};
+    cubeStep = .05f; // a whole number of steps should fit into interval
+
+    float cubeStart0 = cubeStart[0];
+
+    cubeStartInt = new int[3];
+    cubeEndInt = new int[3];
+    cubeCornerDim = new int[3];
+    for (int i = 0; i < 3; i++) {
+        cubeStartInt[i] = (int)roundf(cubeStart[i] / cubeStep);
+        cubeEndInt[i] = (int)roundf(cubeEnd[i] / cubeStep);
+        cubeCornerDim[i] = cubeEndInt[0] - cubeStartInt[0] + 1;
+    }
+    size = cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[2];
+
+    cubeCorners = new float[size];
+    gradientCorners = new XYZ[size];
+
+    for (int i = 0; i < size; i++) {
+        cubeCorners[i] = 0.f;
+        gradientCorners[i] = XYZ{0.f,0.f,0.f};
+    }
+
+    particleRange = .1f;
+    iso = .3f;
+    triangles = {};
+}
+
+MarchingCubes::~MarchingCubes() {
+    delete cubeCorners;
+    delete gradientCorners;
+    delete[] cubeStartInt;
+    delete[] cubeEndInt;
+    delete[] cubeCornerDim;
 }

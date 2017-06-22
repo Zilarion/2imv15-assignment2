@@ -32,7 +32,6 @@ private:
     void drawForces();
     void drawConstraints();
     void drawBorder();
-    void drawMarching();
 
     void computeForces();
     void clearForces();
@@ -51,6 +50,7 @@ public:
     PressureField* pressureField;
     ColorField* colorField;
     UniformGrid grid;
+    MarchingCubes* marchingCubes;
 
     float meanDensity = 0;
     bool wallExists;

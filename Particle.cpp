@@ -34,14 +34,14 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
     } else {
         glColor3f(1.f, 1.f, 1.f);
     }
-//    glBegin(GL_POINTS);
-//        glVertex3f(position[0], position[1], position[2]);
-//    glEnd();
+    glBegin(GL_POINTS);
+        glVertex3f(position[0], position[1], position[2]);
+    glEnd();
 
-    glPushMatrix();
-    glTranslated(position[0], position[1], position[2]);
-    glutSolidSphere(.01f, 8, 8);
-    glPopMatrix();
+//    glPushMatrix();
+//    glTranslated(position[0], position[1], position[2]);
+//    glutSolidSphere(.01f, 8, 8);
+//    glPopMatrix();
 
     if (drawVelocity && movable) {
         glColor3f(0.0, 0.6, 0.0);

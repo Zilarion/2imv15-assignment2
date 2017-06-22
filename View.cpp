@@ -66,6 +66,8 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
+    glPointSize(3.0f);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

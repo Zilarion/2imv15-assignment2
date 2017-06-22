@@ -32,7 +32,7 @@ System* SystemBuilder::initBasic()
     System* sys = new System(new Euler(Euler::SEMI));
 //    System* sys = new System(new RungeKutta());
 
-    int dimensions = 20;
+    int dimensions = 5;
     float mass = 1.f;
     float staticMass = 1000.f;
     int index = 0;
