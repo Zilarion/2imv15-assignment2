@@ -17,7 +17,6 @@
 // Callback handles due to glut being ugly
 static View* currentInstance = NULL;
 
-extern "C"
 void displayCallback() {
     currentInstance->onDisplay();
 }
@@ -37,9 +36,12 @@ void keypressCallback(unsigned char k, int x, int y) {
     currentInstance->onKeyPress(k, x, y);
 }
 
-View::View(int width, int height, float dt, SystemBuilder::AvailableSystems system, int N)
+View::View(int width, int height, float dt, int N)
         : width(width), height(height), isSimulating(false), dumpFrames(false), drawVelocity(false), drawForces(false),
           drawConstraints(true), drawMarchingCubes(false), adaptive(false), frameNumber(0), dt(dt), N(N) {
+}
+
+void View::initialize(SystemBuilder::AvailableSystems system) {
     glutInitDisplayMode ( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 
     glutInitWindowPosition ( 0, 0 );
@@ -52,19 +54,19 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
 
 
     // enable lights
-    GLfloat ambient[] = {.2f ,.2f ,.2f };
-    GLfloat diffuse[] = {.5f ,.5f ,.5f, 1.0f};
-    GLfloat specular[] = {0.5f, 0.5f, 0.5f, 1.0f};
-    GLfloat lightPosition[] = { 0.f, 2.f, 2.f };
+    GLfloat ambient[] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat diffuse[] = {0.8, 0.8, 0.8, 1.0};
+    GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat lightPosition[] = {1.0, 1.0, 1.0, 0.0};
+
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -82,15 +84,11 @@ View::View(int width, int height, float dt, SystemBuilder::AvailableSystems syst
     glutIdleFunc ( idleCallback );
     glutDisplayFunc ( displayCallback );
 
-    initialize(system);
-
-    glutMainLoop ();
-}
-
-void View::initialize(SystemBuilder::AvailableSystems type) {
-    sys = SystemBuilder::get(type);
+    sys = SystemBuilder::get(system);
     wind = new DirectionalForce(sys->particles, Vector3f(0.f, 0.f, 0.f));
     sys->addForce(wind);
+
+    glutMainLoop ();
 }
 
 void View::onKeyPress ( unsigned char key, int x, int y )
@@ -299,7 +297,7 @@ void View::onDisplay()
 
     //get the current time
     currenttime = glutGet(GLUT_ELAPSED_TIME);
-    char title[20];
+    char title[30];
 
     //check if a second has passed
     if (currenttime - timebase > 1000)
@@ -335,27 +333,6 @@ void View::preDisplay3D()
 
 void View::postDisplay()
 {
-    // Write frames if necessary.
-//    if (dumpFrames) {
-//        const int FRAME_INTERVAL = 40;
-//        if ((frameNumber % FRAME_INTERVAL) == 0) {
-//            const unsigned int w = glutGet(GLUT_WINDOW_WIDTH);
-//            const unsigned int h = glutGet(GLUT_WINDOW_HEIGHT);
-//            unsigned char * buffer = (unsigned char *) malloc(w * h * 4 * sizeof(unsigned char));
-//            if (!buffer)
-//                exit(-1);
-//            //glRasterPos2i(0, 0);
-//            glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-//            static char filename[80];
-//            sprintf(filename, "snapshots/img%.5i.png", frameNumber / FRAME_INTERVAL);
-//            printf("Dumped %s.\n", filename);
-//            saveImageRGBA(filename, buffer, w, h);
-//
-//            free(buffer);
-//        }
-//    }
-//    frameNumber++;
-
     glutSwapBuffers ();
 }
 

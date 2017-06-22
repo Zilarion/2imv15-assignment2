@@ -11,7 +11,7 @@
 
 class View {
 public:
-    View(int width, int height, float dt, SystemBuilder::AvailableSystems system, int N);
+    View(int width, int height, float dt, int N);
 
     ~View() { delete sys; };
 
@@ -22,6 +22,8 @@ public:
     void onReshape(int width, int height);
     void onMouseEvent(int button, int state, int x, int y);
     void onKeyPress(unsigned char key, int x, int y);
+
+    void initialize(SystemBuilder::AvailableSystems type);
 
 private:
     System* sys = NULL;
@@ -48,7 +50,6 @@ private:
 
     void getFromGUI();
     void remapGUI();
-    void initialize(SystemBuilder::AvailableSystems type);
 
     // Display utility
     void preDisplay3D();

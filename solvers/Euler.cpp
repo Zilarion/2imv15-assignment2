@@ -68,7 +68,6 @@ void Euler::simulateStep(System *system, float h) {
             semiImpl[startIndex + 12] = newState[startIndex + 12];
         }
 
-
         // Set the new state, using semi implicit computation
         system->setState(semiImpl, system->getTime() + h);
 

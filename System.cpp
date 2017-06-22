@@ -111,7 +111,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
 void System::drawMarching() {
     Vector3f cubeStart = Vector3f(-1.1f, -1.1f, -1.1f);
     Vector3f cubeEnd = Vector3f(1.1f, 1.1f, 1.1f);
-    float cubeStep = .1f; // a whole number of steps should fit into interval
+    float cubeStep = .05f; // a whole number of steps should fit into interval
 
     Vector3i cubeStartInt = Vector3i((int)roundf(cubeStart[0] / cubeStep), (int)roundf(cubeStart[1] / cubeStep), (int)roundf(cubeStart[2] / cubeStep));
     Vector3i cubeEndInt = Vector3i((int)roundf(cubeEnd[0] / cubeStep), (int)roundf(cubeEnd[1] / cubeStep), (int)roundf(cubeEnd[2] / cubeStep));
@@ -128,6 +128,7 @@ void System::drawMarching() {
     float particleRange = 1.f; //percentage of step size for speed increase
     particleRange = particleRange * cubeStep;
     for (Particle *p: particles) {
+        if (!p->movable) continue;
         Vector3f pos = p->position;
         // only apply marching cube to particle when it is inside the rendering volume
         if (pos[0] > cubeStart[0] && pos[1] > cubeStart[1] && pos[2] > cubeStart[2]
@@ -394,13 +395,17 @@ void System::computeForces() {
 
     // Compute all densities
     float restDensity = 100;
+    int numParticles = 0;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
-        meanDensity += p->density;
+        if (p->movable) {
+            meanDensity += p->density;
+            numParticles++;
+        }
     }
-    meanDensity /= particles.size();
+    meanDensity /= numParticles;
 
-    float k = 10.f;
+    float k = 4.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
