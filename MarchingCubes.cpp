@@ -667,9 +667,9 @@ void MarchingCubes::drawMarching() {
         XYZ bnorm = norm;
         XYZ cnorm = norm;
         /*/// per vertex normals
-        XYZ anorm = normals[a];
-        XYZ bnorm = normals[b];
-        XYZ cnorm = normals[c];
+        XYZ anorm = normals[a.toString(100.f)];
+        XYZ bnorm = normals[b.toString(100.f)];
+        XYZ cnorm = normals[c.toString(100.f)];
         anorm.normalize();
         bnorm.normalize();
         cnorm.normalize();
