@@ -652,7 +652,7 @@ void MarchingCubes::drawMarching() {
     }
 
     //// draw triangles
-    glColor4f(.8f, .7f, .9f, 1.f);
+    glColor4f(0.1f, 0.9f, 0.9f, 1.0f);
     glBegin(GL_TRIANGLES);
     for (int i = 0; i < triangles.size(); i++) {
         TRIANGLE triangle = triangles[i];
