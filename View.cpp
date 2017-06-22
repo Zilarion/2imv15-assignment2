@@ -139,16 +139,16 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             drawForces = !drawForces;
             break;
         case 'i':
-            wind->direction = Vector3f(0.0f, 0.0f, -5.0f);
+            wind->direction = Vector3f(0.0f, 0.0f, -10.0f);
             break;
         case 'j':
-            wind->direction = Vector3f(-5.0f, 0.0f, 0.0f);
+            wind->direction = Vector3f(-10.0f, 0.0f, 0.0f);
             break;
         case 'k':
-            wind->direction = Vector3f(0.0f, 0.0f, 5.0f);
+            wind->direction = Vector3f(0.0f, 0.0f, 10.0f);
             break;
         case 'l':
-            wind->direction = Vector3f(5.0f, 0.0f, 0.0f);
+            wind->direction = Vector3f(10.0f, 0.0f, 0.0f);
             break;
         case 'u':
             wind->direction = Vector3f(0.0f, 0.0f, 0.0f);
@@ -178,7 +178,7 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'p':
             for (int i = 0; i < 1; i++)
-                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, .9f, (rand() % 10 + 1) * 0.01f),
+                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, .3f, (rand() % 10 + 1) * 0.01f),
                                           1.f, sys->particles.size() + 1, true));
             break;
         case ' ':
@@ -322,7 +322,7 @@ void View::preDisplay3D()
     glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity ();
-    glTranslatef(0.0f, 0.0f, -3.0f);
+    glTranslatef(0.0f, -.5f, -2.5f);
 //    glRotatef(20, 1.0f, 0.0f, 0.0f);
     glRotatef(camAngle, 0.0f, 1.0f, 0.0f);
 

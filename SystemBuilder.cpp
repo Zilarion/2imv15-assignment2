@@ -34,16 +34,16 @@ System* SystemBuilder::initBasic()
 
     int dimensions = 30;
     float mass = 1.f;
-    float massStatic = 10.f;
+    float massStatic = 50.f;
     int index = 0;
-    float d = 0.05f;
+    float d = 0.03f;
     float ds = 0.04f;
 
     // Movable particles
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
             float x = i * d + (rand() % 10 + 1) * 0.001f;
-            float y = -0.4f + (rand() % 10 + 1) * 0.001f;
+            float y = -0.7f + (rand() % 10 + 1) * 0.001f;
             float z = j * d + (rand() % 10 + 1) * 0.001f;
             sys->addParticle(new Particle(Vector3f(x, y, z), mass, index++, true));
         }
@@ -51,7 +51,7 @@ System* SystemBuilder::initBasic()
 
     // These forces only apply to non-static particles
     sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -9.81f, .0f)));
-    sys->addForce(new DragForce(sys->particles, 0.3f));
+    sys->addForce(new DragForce(sys->particles, 0.5f));
 
     // Static particles
     float delta = ds * 20;
@@ -59,7 +59,6 @@ System* SystemBuilder::initBasic()
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
             sys->addParticle(new Particle(Vector3f(i * ds, -delta, j * ds), massStatic, index++, false));
-            sys->addParticle(new Particle(Vector3f(i * ds, -delta - ds, j * ds), massStatic, index++, false));
         }
     }
 
@@ -89,6 +88,7 @@ System* SystemBuilder::initBasic()
     sys->addForce(new ViscosityForce(sys->particles));
     sys->addForce(new SurfaceForce(sys->particles));
 
+    std::cout << "Running with: " << sys->particles.size() << " particles" << std::endl;
     return sys;
 }
 

@@ -31,7 +31,6 @@ private:
     void drawRigidBodies(bool drawVelocity, bool drawForce);
     void drawForces();
     void drawConstraints();
-    void drawBorder();
     void drawMarching();
 
     void computeForces();

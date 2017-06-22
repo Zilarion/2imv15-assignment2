@@ -92,7 +92,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     if (!drawMarchingCubes)
         drawParticles(drawVelocity, drawForce);
     drawRigidBodies(drawVelocity, drawForce);
-    drawBorder();
+
     if (drawForce) {
         drawForces();
     }
@@ -250,7 +250,7 @@ void System::drawMarching() {
     }
 
     // draw triangles
-    glColor4f(.2f, .9f, .9f, .5f);
+    glColor4f(.2f, .9f, .9f, .4f);
     GLfloat specular[] = {.5f, .5f, .5f, 1.f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
     glBegin(GL_TRIANGLES);
@@ -259,17 +259,7 @@ void System::drawMarching() {
         Vector3f a = triangle.p[0];
         Vector3f b = triangle.p[1];
         Vector3f c = triangle.p[2];
-        /* per-face normals
-        Vector3f norm = (b - a).cross(c - b);
-        glNormal3f(norm[0], norm[1], norm[2]);
-        //// per vertex normals
-        Vector3f anorm = normals[VectorToString(a, 10.f)];
-        Vector3f bnorm = normals[VectorToString(b, 10.f)];
-        Vector3f cnorm = normals[VectorToString(c, 10.f)];
-        anorm.normalize();
-        bnorm.normalize();
-        cnorm.normalize();
-        //*/
+
         //* per vertex normals 2
         Vector3f anorm = getEdgeNormal(a, cubeStart, cubeEnd, cubeCornerDim, cubeStep, gradientCorners);
         anorm.normalize();
@@ -394,7 +384,7 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 100;
+    float restDensity = 10000;
     int numParticles = 0;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
@@ -405,7 +395,7 @@ void System::computeForces() {
     }
     meanDensity /= numParticles;
 
-    float k = 4.f;
+    float k = 5.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -519,13 +509,4 @@ vector<Contact *> System::findContacts(VectorXf newState) {
         }
     }
     return contacts;
-}
-void System::drawBorder() {
-    glBegin(GL_LINES);
-        glColor3f(.8f, .8f, .8f);
-        glVertex3f(-0.95f, -0.95f, -0.95f);
-        glVertex3f(0.95f, -0.95f, -0.95f);
-        glVertex3f(0.95f, -0.95f, 0.95f);
-        glVertex3f(-0.95f, -0.95f, 0.95f);
-    glEnd();
 }
