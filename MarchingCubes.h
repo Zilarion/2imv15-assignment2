@@ -22,9 +22,9 @@ typedef struct {
     double val[8];
 } GRIDCELL;
 
-int Polygonise(GRIDCELL &grid, double isolevel, TRIANGLE *triangles);
+int Polygonise(const GRIDCELL &grid, double isolevel, TRIANGLE *triangles);
 bool operator<(const Vector3f &left, const Vector3f &right);
-Vector3f VertexInterp(double isovalue, Vector3f &p1, Vector3f &p2, double val1, double val2);
+Vector3f VertexInterp(double isovalue, const Vector3f &p1, const Vector3f &p2, double val1, double val2);
 void updateGradient(float grid[], int dim[3], int index, Vector3f gradients[]);
 Vector3f getEdgeNormal(Vector3f &edgePoint, Vector3f &gridStart, Vector3f &gridEnd, int gridDim[3], float gridStep, Vector3f gradients[]);
 

@@ -307,7 +307,7 @@ const int triTable[256][16] =
 	0 will be returned if the grid cell is either totally above
    of totally below the isolevel.
 */
-int Polygonise(GRIDCELL &grid,double isolevel,TRIANGLE *triangles)
+int Polygonise(const GRIDCELL &grid,double isolevel,TRIANGLE *triangles)
 {
     int i,ntriang;
     int cubeindex;
@@ -406,7 +406,7 @@ bool operator<(const Vector3f &left, const Vector3f &right)
    an edge between two vertices, each with their own scalar value
 */
 Vector3f VertexInterp(double isolevel,
-Vector3f &p1, Vector3f &p2,
+const Vector3f &p1, const Vector3f &p2,
 double valp1, double valp2)
 {
     double mu;
@@ -422,7 +422,7 @@ double valp1, double valp2)
 
     p = p1 + mu * (p2 - p1);
 
-    return(p);
+    return p;
 }
 
 void updateGradient(float grid[], int dim[3], int index, Vector3f gradients[]) {
