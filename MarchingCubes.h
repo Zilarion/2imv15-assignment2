@@ -57,7 +57,13 @@ public:
             }
         }
         bool operator<(XYZ &other) const{
-            return x < other.x && y < other.y && z < other.z;
+            return x - other.x < .005f && y - other.y < .005f && z - other.z < .005f;
+        }
+
+        long toLongHash() {
+            float p = 100.f;
+            long w = 1000;
+            return (long)(x * p) + (long)(y * p) * w + (long)(z * p) * w * w;
         }
 
         float size() const {
@@ -113,7 +119,7 @@ public:
     float particleRange;
     float iso;
     vector<TRIANGLE> triangles;
-    map<string, XYZ> normals;
+    map<long, XYZ> normals;
 
 };
 #endif //FLUIDS_MARCHINGCUBES_H
