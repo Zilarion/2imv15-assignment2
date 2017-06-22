@@ -12,9 +12,6 @@ using namespace Eigen;
 Euler::Euler(Euler::TYPE type) : type(type) {}
 
 void Euler::simulateStep(System *system, float h) {
-
-
-
     // Get the old state
     VectorXf oldState = system->getState();
     float epsilon = 0;
@@ -70,7 +67,8 @@ void Euler::simulateStep(System *system, float h) {
             semiImpl[startIndex + 11] = newState[startIndex + 11];
             semiImpl[startIndex + 12] = newState[startIndex + 12];
         }
-        semiImpl = system->checkBoundingBox(semiImpl);
+
+
         // Set the new state, using semi implicit computation
         system->setState(semiImpl, system->getTime() + h);
 

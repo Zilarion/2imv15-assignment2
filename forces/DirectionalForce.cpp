@@ -11,12 +11,12 @@
 #endif
 using namespace Eigen;
 
-DirectionalForce::DirectionalForce(std::vector<Particle*> particles, Vector3f direction) : direction(direction)
+DirectionalForce::DirectionalForce(const vector<Particle*> &particles, const Vector3f &direction) : direction(direction)
 {
     this->setTarget(particles);
 }
 
-void DirectionalForce::setTarget(std::vector<Particle*> particles)
+void DirectionalForce::setTarget(const vector<Particle*> &particles)
 {
     this->particles = particles;
 }

@@ -3,18 +3,18 @@
 #include "../System.h"
 #include "../Kernels.h"
 
-SurfaceForce::SurfaceForce(vector<Particle *, allocator<Particle *>> particles) {
+SurfaceForce::SurfaceForce(const vector<Particle*> &particles) {
     this->setTarget(particles);
 }
 
-void SurfaceForce::setTarget(std::vector<Particle *> particles) {
+void SurfaceForce::setTarget(const vector<Particle *> &particles) {
     this->particles = particles;
 }
 
 void SurfaceForce::apply(System *s) {
     //Tension coefficient water-air
-    float sigma = 72.75f/1000.f;
-    float certainThreshold = .02f;
+    float sigma = 72.75f;
+    float certainThreshold = .01f;
 
     // Evaluate surface force for every particle
     for (Particle *pi : particles) {

@@ -8,7 +8,7 @@
 #include <Eigen/Dense>
 
 using namespace Eigen;
-static float hdef = 0.1f;
+static float hdef = 0.05f;
 
 class Poly6 {
 public:

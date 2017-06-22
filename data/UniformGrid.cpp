@@ -5,14 +5,15 @@
 #include "UniformGrid.h"
 #include <math.h>
 
-UniformGrid::UniformGrid(int x, int y, int z, float delta, Vector3f offset): xMax(x), yMax(y), zMax(z), delta(delta), offset(offset) {
-    this->grid = vector<vector<vector<Cell>>>
+UniformGrid::UniformGrid(int x, int y, int z, float delta, Vector3f offset): xMax(x), yMax(y), zMax(z), delta(delta), offset(offset),
+     grid(
+        vector<vector<vector<Cell>>>
             (x, vector<vector<Cell>>
                     (y, vector<Cell>
                             (z, Cell())
                     )
-            );
-}
+            )
+     ) {}
 
 void UniformGrid::insert(const vector<Particle *> &particles) {
     for (Particle * p : particles) {
@@ -81,9 +82,9 @@ void UniformGrid::clear() {
 }
 
 void Cell::insert(Particle *p) {
-    this->particles.push_back(p);
+    particles.push_back(p);
 }
 
 void Cell::clear() {
-    this->particles.clear();
+    particles.clear();
 }

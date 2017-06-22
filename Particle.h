@@ -33,5 +33,4 @@ public:
     int index;
     float mass;
     bool movable;
-
 };

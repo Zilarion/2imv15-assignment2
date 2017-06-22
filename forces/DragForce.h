@@ -12,9 +12,9 @@ using namespace Eigen;
 
 class DragForce : public Force {
 public:
-    DragForce(std::vector<Particle*> particles, float amount);
+    DragForce(const vector<Particle*> &particles, float amount);
 
-    void setTarget(std::vector<Particle*> particles) override;
+    void setTarget(const vector<Particle*> &particles) override;
     void apply(System* s) override;
     void draw() override;
 private:

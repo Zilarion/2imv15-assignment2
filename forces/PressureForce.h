@@ -10,8 +10,8 @@
 
 class PressureForce : public Force {
 public:
-    PressureForce(std::vector<Particle*> particles);
-    void setTarget(std::vector<Particle*> particles) override;
+    PressureForce(const vector<Particle*> &particles);
+    void setTarget(const vector<Particle*> &particles) override;
     void apply(System* s) override;
     void draw() override;
 };

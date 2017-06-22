@@ -17,8 +17,8 @@
 #include <GLUT/glut.h>
 #endif
 
-System::System(Solver *solver) : solver(solver), time(0.0f), wallExists(false), dt(0.005),
-                                 grid(20, 20, 20, 0.1f, Vector3f(1.f, 1.f, 1.f)) {
+System::System(Solver *solver) : solver(solver), time(0.0f), dt(0.005),
+                                 grid(40, 40, 40, 0.05f, Vector3f(1.f, 1.f, 1.f)) {
     densityField = new DensityField(this);
     pressureField = new PressureField(this);
     colorField = new ColorField(this);
@@ -229,25 +229,6 @@ void System::drawMarching() {
                         for (int i = 0; i < n; i++) {
                             TRIANGLE tri = tris[i];
                             triangles.push_back(tri);
-
-                            /*add normal to combined normals of each point in triangle. (per-vertex normals) DEPRECATED
-                            Vector3f a = tri.p[0];
-                            Vector3f b = tri.p[1];
-                            Vector3f c = tri.p[2];
-                            Vector3f norm = (b - a).cross(c - b);
-                            string aindex = VectorToString(a, 10.f);
-                            if (!normals.emplace(aindex, norm).second) {
-                                normals[aindex] += norm;
-                            }
-                            string bindex = VectorToString(b, 10.f);
-                            if (!normals.emplace(bindex, norm).second) {
-                                normals[bindex] += norm;
-                            }
-                            string cindex = VectorToString(c, 10.f);
-                            if (!normals.emplace(cindex, norm).second) {
-                                normals[cindex] += norm;
-                            }
-                            //*/
                         }
                     }
                 }
@@ -268,7 +249,7 @@ void System::drawMarching() {
     }
 
     // draw triangles
-    glColor4f(.2f, .9f, .9f, 1.f);
+    glColor4f(.2f, .9f, .9f, .5f);
     GLfloat specular[] = {.5f, .5f, .5f, 1.f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
     glBegin(GL_TRIANGLES);
@@ -412,14 +393,14 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 10;
+    float restDensity = 100;
     for (Particle *p : particles) {
         p->density = densityField->eval(p);
         meanDensity += p->density;
     }
     meanDensity /= particles.size();
 
-    float k = 1.f;
+    float k = 10.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -486,55 +467,6 @@ void System::drawConstraints() {
     for (Constraint *c : constraints) {
         c->draw();
     }
-}
-
-VectorXf System::checkBoundingBox(VectorXf newState) {
-    float dist = .95f;
-    float dec = 1.f;
-    //collision from x side
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] < -dist) {
-            newState[i * 6] = -dist;
-            if (newState[i * 6 + 3] < 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6] > dist) {
-            newState[i * 6] = dist;
-            if (newState[i * 6 + 3] > 0) {
-                newState[i * 6 + 3] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    //collision from z side
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] < -dist) {
-            newState[i * 6 + 2] = -dist;
-            if (newState[i * 6 + 5] < 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 2] > dist) {
-            newState[i * 6 + 2] = dist;
-            if (newState[i * 6 + 5] > 0) {
-                newState[i * 6 + 5] = -newState[i * 6 + 3] * dec;
-            }
-        }
-    }
-    //Check collision with y side
-    for (int i = 0; i < particles.size(); i++) {
-        if (newState[i * 6 + 1] < -dist) {
-            newState[i * 6 + 1] = -dist;
-            if (newState[i * 6 + 4] < 0) {
-                newState[i * 6 + 4] = -newState[i * 6 + 4] * dec;
-            }
-        }
-    }
-    return newState;
 }
 
 vector<Contact *> System::findContacts(VectorXf newState) {

@@ -13,7 +13,7 @@ using namespace std;
 
 class Cell {
 public:
-    Cell() { particles = vector<Particle*>(); };
+    Cell() : particles(vector<Particle*>()) {};
     void insert(Particle* p);
     void clear();
 

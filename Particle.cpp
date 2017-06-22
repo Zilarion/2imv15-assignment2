@@ -32,7 +32,7 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
             perc = 1.f;
         glColor3f(1.f - perc, 1.f, 1.f);
     } else {
-        glColor3f(1.f, 1.f, 1.f);
+        glColor4f(1.f, 1.f, 1.f, 0.1f);
     }
 //    glBegin(GL_POINTS);
 //        glVertex3f(position[0], position[1], position[2]);

@@ -5,11 +5,11 @@
 #include "PressureForce.h"
 #include "../System.h"
 
-PressureForce::PressureForce(vector<Particle *, allocator<Particle *>> particles) {
+PressureForce::PressureForce(const vector<Particle*> &particles) {
     this->setTarget(particles);
 }
 
-void PressureForce::setTarget(std::vector<Particle*> particles) {
+void PressureForce::setTarget(const vector<Particle*> &particles) {
     this->particles = particles;
 }
 

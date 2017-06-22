@@ -123,10 +123,6 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             printf("Using 4th order Runge-Kutta\n");
             sys->solver = new RungeKutta();
             break;
-        case 'w':
-        case 'W':
-            sys->wallExists = !sys->wallExists;
-            break;
         case '=':
             sys->dt += 0.001f;
             printf("Increase dt: %f\n", sys->dt);
@@ -183,7 +179,7 @@ void View::onKeyPress ( unsigned char key, int x, int y )
                 printf("Springs can no longer break\n");
             break;
         case 'p':
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
                 sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, .9f, (rand() % 10 + 1) * 0.01f),
                                           1.f, sys->particles.size() + 1, true));
             break;
