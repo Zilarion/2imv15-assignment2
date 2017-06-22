@@ -26,7 +26,7 @@ using namespace Eigen;
 class Solver;
 class System {
 private:
-    void drawParticles(bool drawVelocity, bool drawForce);
+    void drawParticles(bool drawVelocity, bool drawForce, bool drawMarchingCubes);
     void drawRigidBodies(bool drawVelocity, bool drawForce);
     void drawForces();
     void drawConstraints();
