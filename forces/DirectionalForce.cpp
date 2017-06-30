@@ -26,7 +26,10 @@ void DirectionalForce::apply(System * s)
     if (!active)
         return;
     for (Particle* p : particles) {
-        p->force += p->mass * p->density * direction;
+        if (p->rigid)
+            p->force += p->mass * direction;
+        else
+            p->force += p->mass * p->density * direction;
     }
 }
 

@@ -21,7 +21,7 @@ void DragForce::apply(System* s)
         p->force -= amount * p->density * p->velocity;
     }
     for (RigidBody* r : s->rigidBodies) {
-        r->force -= amount * r->v;
+        r->force -= amount * r->density() * r->v;
     }
 }
 

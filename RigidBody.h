@@ -21,6 +21,7 @@ public:
 
     virtual ~RigidBody(void);
 
+    float density();
     void reset();
 
     void draw(bool drawVelocity, bool drawForce);

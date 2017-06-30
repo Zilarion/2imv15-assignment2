@@ -14,8 +14,7 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
         startPos(startPos), dimensions(dimensions) {
     initializeVariables();
 
-    float density = particleMass / dimensions[0];
-    std::cout << density << std::endl;
+    float density = particleMass / dimensions[0] + 15000.f;
     //generate particles with body coordinates
     int index = 0;
     for (int x = 0; x < numParticles[0]; x++) {
@@ -42,7 +41,7 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
     for (Particle *p : particles) {
         Vector3f r0i = p->startPos;             //position in body coordinates
         RowVector3f r0iT = r0i.transpose();     //position in body coordinates
-        Ibody += p->mass/12 * (r0i * r0iT);
+        Ibody += p->mass * (r0i * r0iT);
     }
     IbodyInv = Ibody.inverse();
 }
@@ -252,18 +251,18 @@ VectorXf RigidBody::getState() {
     y[1] = x[1];
     y[2] = x[2];
 
-//    y[3] = q.w();
-//    y[4] = q.x();
-//    y[5] = q.y();
-//    y[6] = q.z();
+    y[3] = q.w();
+    y[4] = q.x();
+    y[5] = q.y();
+    y[6] = q.z();
 
     y[7] = P[0];
     y[8] = P[1];
     y[9] = P[2];
 
-//    y[10] = L[0];
-//    y[11] = L[1];
-//    y[12] = L[2];
+    y[10] = L[0];
+    y[11] = L[1];
+    y[12] = L[2];
     return y;
 }
 
@@ -342,5 +341,9 @@ Particle *RigidBody::getClosestParticle(Vector3f bodyCoords) {
         }
     }
     return closestParticle;
+}
+
+float RigidBody::density() {
+    return particles[0]->density * particles.size();
 }
 
