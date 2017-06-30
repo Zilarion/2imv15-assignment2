@@ -8,6 +8,7 @@
 #include "solvers/Euler.h"
 #include "solvers/Midpoint.h"
 #include "forces/DragForce.h"
+#include "forces/PressureForce.h"
 
 #if defined(__CYGWIN__) || defined(WIN32)
 #include <GL/glut.h>
@@ -184,9 +185,10 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'r':
         {
-            RigidBody* r = new RigidBody(Vector3f(0,1,0), Vector3f(.5f,.5f,.5f), Vector3f(5,5,5), 50.0f);
+            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.25f,.25f,.25f), Vector3f(5,5,5), .5f);
             sys->addRigidBody(r);
-            sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -4.81f, 0.0f)));
+            sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -40.81f, 0.0f)));
+            sys->addForce(new PressureForce(r->particles));
             sys->addForce(new DragForce(r->particles, 0.9f));
             break;
         }
@@ -331,8 +333,8 @@ void View::preDisplay3D()
     glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity ();
-    glTranslatef(0.0f, -.5f, -2.5f);
-//    glRotatef(20, 1.0f, 0.0f, 0.0f);
+    glTranslatef(0.0f, .5f, -2.5f);
+//    glRotatef(90, 1.0f, 0.0f, 0.0f);
     glRotatef(camAngle, 0.0f, 1.0f, 0.0f);
 
     if (rotate != 0) {

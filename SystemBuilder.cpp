@@ -58,7 +58,7 @@ System* SystemBuilder::initBasic()
 
     // Static particles
     float delta = ds * 20;
-    dimensions = 40;
+    dimensions = 20;
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
             sys->addParticle(new Particle(Vector3f(i * ds, -delta, j * ds), massStatic, index++, false));
@@ -98,7 +98,7 @@ System *SystemBuilder::initTrechter() {
     System *sys = new System(new Euler(Euler::SEMI));
 //    System* sys = new System(new RungeKutta());
 
-    int dimensions = 15;
+    int dimensions = 7;
     float mass = 1.f;
     float massStatic = 50.f;
     int index = 0;
@@ -108,9 +108,9 @@ System *SystemBuilder::initTrechter() {
     // Movable particles
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
-            for(int k = 0; k<5;k++) {
+            for(int k = 0; k<15;k++) {
                 float x = i * d + (rand() % 10 + 1) * 0.001f;
-                float y = k*d+.2f + (rand() % 10 + 1) * 0.001f;
+                float y = k*d-.6f + (rand() % 10 + 1) * 0.001f;
                 float z = j * d + (rand() % 10 + 1) * 0.001f;
                 sys->addParticle(new Particle(Vector3f(x, y, z), mass, index++, true));
             }
@@ -122,21 +122,29 @@ System *SystemBuilder::initTrechter() {
     sys->addForce(new DragForce(sys->particles, 0.5f));
 
     // Static particles
-    float topRadius = .5f;
+    float topRadius = .3f;
     float bottomRadius = .1f;
     float radiusStep = (topRadius - bottomRadius)/30;
     int angleSteps = 120;
     float angleStep = M_PI * 2 / angleSteps;
     for (int i = 0; i < angleSteps; i++) {
         float angle = angleStep * i;
-        float radius = bottomRadius;
+        float radius = topRadius;
         for (int y = -20; y < 10; y++) {
             float x = cos(angle) * radius;
             float z = sin(angle) * radius;
             sys->addParticle(new Particle(Vector3f(x, y * ds, z), mass, index++, false));
-            radius+=radiusStep;
+//            radius+=radiusStep;
         }
     }
+    //bottom
+
+    for (int i = -20; i < 20; i++) {
+        for (int j = -20; j < 20; j++) {
+            sys->addParticle(new Particle(Vector3f(i * .015f, -20*ds, j * .015f), massStatic, index++, false));
+        }
+    }
+
     sys->addForce(new PressureForce(sys->particles));
     sys->addForce(new ViscosityForce(sys->particles));
     sys->addForce(new SurfaceForce(sys->particles));

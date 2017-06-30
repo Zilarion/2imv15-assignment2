@@ -107,17 +107,17 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     }
 
     //draw boundery
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glDisable(GL_LIGHTING);
-    glColor4f(.6f, .6f, .6f, 1.f);
-    glPushMatrix();
-    glTranslated(0., -.4, 0.);
-    glScaled(1., .5, 1.);
-    glutSolidCube(1.6);
-    glPopMatrix();
-    glEnable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_FRONT);
+//    glDisable(GL_LIGHTING);
+//    glColor4f(.6f, .6f, .6f, 1.f);
+//    glPushMatrix();
+//    glTranslated(0., -.4, 0.);
+//    glScaled(1., .5, 1.);
+//    glutSolidCube(1.6);
+//    glPopMatrix();
+//    glEnable(GL_LIGHTING);
+//    glDisable(GL_CULL_FACE);
     glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 
@@ -246,6 +246,9 @@ void System::computeForces() {
 
     // Apply all forces
     for (Force *f : forces) {
+        f->apply(this);
+    }
+    for (Force *f : collisionForces) {
         f->apply(this);
     }
 }

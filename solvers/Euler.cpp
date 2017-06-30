@@ -20,22 +20,35 @@ void Euler::simulateStep(System *system, float h) {
             r->recomputeAuxiliaryVars();
         }
     }
-    // Get the old state
-    VectorXf oldState = system->getState();
+    system->collisionForces.clear();
     float epsilon = 0;
+    printf("COLLISJUN DETECTION\n");
     for (RigidBody *r :system->rigidBodies) {
         for (Particle *p:system->particles) {
             if (r->isPenetrating(epsilon, p)) {
+                Vector3f body = r->getBodyCoordinates(p->position);
+                if (body[0] < r->dimensions[0] / 2 - .05f && body[1] < r->dimensions[1] / 2 - .05f &&
+                    body[2] < r->dimensions[2] / 2 - .05f &&
+                    body[0] > -r->dimensions[0] / 2 + .05f && body[1] > -r->dimensions[1] / 2 + .05f &&
+                    body[2] > -r->dimensions[2] / 2 + .05f) {
+                    printf("Body: [%f, %f, %f]\n", body[0], body[1], body[2]);
+                }
                 Vector3f n = r->getNormal(p->position);
                 Vector3f relativeV = p->velocity - r->v;
                 if ((n.dot(relativeV)) < 0) {
-                    p->velocity = -2 * (relativeV.dot(n)) * n + relativeV;
+                    Vector3f rForceVec = 30.f*p->mass * relativeV;
+                    Vector3f pForcevec = r->M * -relativeV;
+//                    printf("rForceVec: [%f, %f, %f]\n", rForceVec[0], rForceVec[1], rForceVec[2]);
+                    Force *rForce = new DirectionalForce({r->getClosestParticle(p->position)}, rForceVec);
+                    Force *pForce = new DirectionalForce({p}, pForcevec);
+//                    system->collisionForces.push_back(pForce);
+//                    system->collisionForces.push_back(rForce);
                 }
             }
         }
 //        r->recomputeAuxiliaryVars();
     }
-    oldState = system->getState();
+    VectorXf oldState = system->getState();
     // Evaluate derivative
     VectorXf deriv = system->derivEval();
 
