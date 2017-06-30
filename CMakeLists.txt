@@ -72,7 +72,33 @@ set(SOURCE_FILES
         forces/DragForce.cpp
         forces/DragForce.h
         fields/DensityField.cpp
-        fields/DensityField.h forces/PressureForce.cpp forces/PressureForce.h fields/PressureField.cpp fields/PressureField.h forces/ViscosityForce.cpp forces/ViscosityForce.h forces/SurfaceForce.h forces/SurfaceForce.cpp fields/ColorField.cpp fields/ColorField.h data/UniformGrid.cpp data/UniformGrid.h RigidBody.cpp RigidBody.h MarchingCubes.cpp MarchingCubes.h solvers/LeapFrog.cpp solvers/LeapFrog.h Contact.h Object.cpp Object.h Contact.cpp)
+        fields/DensityField.h
+        forces/PressureForce.cpp
+        forces/PressureForce.h
+        fields/PressureField.cpp
+        fields/PressureField.h
+        forces/ViscosityForce.cpp
+        forces/ViscosityForce.h
+        forces/SurfaceForce.h
+        forces/SurfaceForce.cpp
+        forces/SpringForce.h
+        forces/SpringForce.cpp
+        forces/AngularSpringForce.h
+        forces/AngularSpringForce.cpp
+        fields/ColorField.cpp
+        fields/ColorField.h
+        data/UniformGrid.cpp
+        data/UniformGrid.h
+        RigidBody.cpp
+        RigidBody.h
+        MarchingCubes.cpp
+        MarchingCubes.h
+        solvers/LeapFrog.cpp
+        solvers/LeapFrog.h
+        Contact.h
+        Object.cpp
+        Object.h
+        Contact.cpp)
 
 
 add_executable(Fluids ${SOURCE_FILES})

@@ -729,16 +729,17 @@ void MarchingCubes::drawMarching() {
         XYZ a = triangle.p[0];
         XYZ b = triangle.p[1];
         XYZ c = triangle.p[2];
+        //*/// per vertex normals
         XYZ anorm = triangle.n[0].normalize();
         XYZ bnorm = triangle.n[1].normalize();
         XYZ cnorm = triangle.n[2].normalize();
-        /* per-face normals
+        /*/// per-face normals
         XYZ norm = (b - a)^(c - b);
         norm.normalize();
         XYZ anorm = norm;
         XYZ bnorm = norm;
         XYZ cnorm = norm;
-        //// per vertex normals
+        /* /// per vertex normals
         XYZ anorm = normals[a.toLongHash()];
         XYZ bnorm = normals[b.toLongHash()];
         XYZ cnorm = normals[c.toLongHash()];
@@ -746,7 +747,7 @@ void MarchingCubes::drawMarching() {
         bnorm.normalize();
         cnorm.normalize();
         ///
-        /* per vertex normals 2
+        /* per vertex normals 2 DEPRECATED
         XYZ anorm = getEdgeNormal(a).mult(-1.f);
         XYZ bnorm = getEdgeNormal(b).mult(-1.f);
         XYZ cnorm = getEdgeNormal(c).mult(-1.f);
@@ -767,7 +768,7 @@ void MarchingCubes::drawMarching() {
 MarchingCubes::MarchingCubes(System *system) : system(system) {
     cubeStart = XYZ{-1.1f, -1.1f, -1.1f};
     cubeEnd = XYZ{1.1f, 1.1f, 1.1f};
-    cubeStep = .025f; // a whole number of steps should fit into interval
+    cubeStep = .0125f; // a whole number of steps should fit into interval
 
     cubeStartInt = new int[3];
     cubeEndInt = new int[3];

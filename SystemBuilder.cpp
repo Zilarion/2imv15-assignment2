@@ -12,6 +12,10 @@
 #include "forces/DirectionalForce.h"
 #include "forces/DragForce.h"
 #include "forces/SurfaceForce.h"
+#include "forces/SpringForce.h"
+#include "forces/AngularSpringForce.h"
+#include "constraints/RodConstraint.h"
+#include "constraints/CircularWireConstraint.h"
 
 #include <iostream>
 
@@ -29,6 +33,18 @@ System *SystemBuilder::get(AvailableSystems s) {
         case SMOKE:
             sys = initSmoke();
             sys->type = SMOKE;
+            return sys;
+        case BASIC:
+            sys = initBasicCloth();
+            sys->type = BASIC;
+            return sys;
+        case CLOTH:
+            sys = initCloth();
+            sys->type = CLOTH;
+            return sys;
+        case HAIR:
+            sys = initHair();
+            sys->type = HAIR;
             return sys;
     }
     return NULL;
@@ -178,6 +194,148 @@ System *SystemBuilder::initSmoke() {
     sys->addForce(new PressureForce(sys->particles));
     sys->addForce(new ViscosityForce(sys->particles));
     sys->addForce(new SurfaceForce(sys->particles));
+
+    return sys;
+}
+
+System* SystemBuilder::initBasicCloth()
+{
+    System* sys = new System(new Euler(Euler::SEMI));
+
+    const float dist = 0.5f;
+    Vector3f center(0.0, 0.0, 0.0);
+    Vector3f offset(dist, 0.0, 0.0);
+
+    sys->addParticle(new Particle(center + offset, 1.0f, 0, true));
+    sys->addParticle(new Particle(center + (2.f * offset), 1.0f, 1, true));
+    sys->addParticle(new Particle(center + (3.f * offset), 1.0f, 2, true));
+    sys->addParticle(new Particle(center + (3.f * offset), 1.0f, 3, true));
+    sys->addParticle(new Particle(center + (4.f * offset), 1.0f, 4, true));
+    sys->addParticle(new Particle(center + (4.f * offset), 1.0f, 5, true));
+
+    sys->addForce(new DragForce(sys->particles, 0.5f));
+    sys->addForce(new SpringForce(sys->particles[0], sys->particles[1], dist, 150.f, 1.5f));
+    sys->addForce(new SpringForce(sys->particles[2], sys->particles[4], dist, 150.f, 1.5f));
+    sys->addForce(new SpringForce(sys->particles[3], sys->particles[5], dist, 50.f, 1.5f));
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(0, -9.81f, 0)));
+
+    sys->addConstraint(new RodConstraint(sys->particles[1], sys->particles[2], dist));
+    sys->addConstraint(new RodConstraint(sys->particles[1], sys->particles[3], dist));
+    sys->addConstraint(new CircularWireConstraint(sys->particles[0], center, dist));
+
+    return sys;
+}
+
+System* SystemBuilder::initCloth() {
+    System* sys = new System(new Euler(Euler::SEMI));
+
+    const int xSize = 8, ySize = 10;
+    const float deltaX = 2.0f/xSize, deltaY = 2.5f/ySize;
+    int pindex = 0;
+    // Initialize particles
+    for (int y = 0; y < ySize; y++) {
+        for (int x = 0; x < xSize; x++) {
+            sys->addParticle(new Particle(Vector3f(-0.5f + x * deltaX, 0.5f - y * deltaY, deltaY * y), 0.2f, pindex, true));
+            pindex++;
+        }
+    }
+
+    // Add gravity and drag to all particles
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(0, -9.81f, 0)));
+    sys->addForce(new DragForce(sys->particles, 0.3f));
+
+    float spr = 150.0f;
+    float dmp = 4.5f;
+
+    for (int y = 0; y < ySize; y++) {
+        for (int x = 0; x < xSize - 1; x++) {
+            sys->addForce(new SpringForce(sys->particles[x + y * xSize],
+                                          sys->particles[x + 1 + y * xSize],
+                                          deltaX, spr, dmp));
+        }
+    }
+
+    for (int y = 0; y < ySize - 1; y++) {
+        for (int x = 0; x < xSize; x++) {
+            sys->addForce(new SpringForce(sys->particles[x + y * xSize],
+                                          sys->particles[x + (y + 1) * xSize],
+                                          sqrt(pow(deltaY, 2) + pow(deltaY, 2)), spr, dmp));
+        }
+    }
+
+    for (int y = 0; y < ySize - 1; y++) {
+        for (int x = 0; x < xSize - 1; x++) {
+            sys->addForce(new SpringForce(sys->particles[x + y * xSize],
+                                          sys->particles[x + 1 + (y + 1) * xSize],
+                                          sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaY, 2)), spr, dmp));
+        }
+    }
+
+
+
+    for (int y = 0; y < ySize - 1; y++) {
+        for (int x = 1; x < xSize; x++) {
+            sys->addForce(new SpringForce(sys->particles[x + y * xSize],
+                                          sys->particles[x - 1 + (y + 1) * xSize],
+                                          sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaY, 2)), spr, dmp));
+        }
+    }
+
+    float r = 0.05f;
+    sys->addConstraint(new CircularWireConstraint(sys->particles[0],
+                                                  sys->particles[0]->startPos + Vector3f(0.f, 0.05f, 0.f),
+                                                  r));
+//    sys->addConstraint(new CircularWireConstraint(sys->particles[ySize/2 * xSize],
+//                                                  sys->particles[ySize/2 * xSize]->startPos + Vec3f(-r, 0.f, 0.f),
+//                                                  r));
+    sys->addConstraint(new CircularWireConstraint(sys->particles[xSize-1],
+                                                  sys->particles[xSize-1]->startPos + Vector3f(0.f, r, 0.f),
+                                                  r));
+    return sys;
+}
+
+
+System* SystemBuilder::initHair() {
+    System* sys = new System(new Euler(Euler::SEMI));
+
+    const int ySize = 10;
+    const float deltaY = 3.0f/ySize;
+    const int numHairs = 8;
+
+
+    for (int k = 0; k < numHairs; k++) {
+        // Initialize particles
+        for (int y = 0; y < ySize; y++) {
+            sys->addParticle(new Particle(Vector3f(-0.5f + 0.03f*k, 0.5f - y * deltaY, deltaY * y), 0.2f, k * ySize + y, true));
+        }
+
+        float spr = 120.0f;
+        float dmp = 1.5f;
+
+
+        for (int y = 0; y < ySize - 1; y++) {
+            sys->addForce(new SpringForce(sys->particles[k * ySize + y],
+                                          sys->particles[k * ySize + y + 1],
+                                          deltaY, spr, dmp));
+        }
+
+        for (int y = 2; y < ySize - 2; y++) {
+            sys->addForce(new AngularSpringForce(sys->particles[k * ySize + y],
+                                                 sys->particles[k * ySize + y + 1],
+                                                 sys->particles[k * ySize + y + 2],
+                                                 2.5f, 20.f, dmp));
+        }
+
+        float r = 0.05f;
+        sys->addConstraint(new CircularWireConstraint(sys->particles[k * ySize],
+                                                      sys->particles[k * ySize]->startPos + Vector3f(-r, 0.f, 0.f),
+                                                      r));
+    }
+
+
+    // Add gravity and drag to all particles
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(0, -9.81f, 0)));
+    sys->addForce(new DragForce(sys->particles, 0.5f));
 
     return sys;
 }
