@@ -106,7 +106,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
         marchingCubes->drawMarching();
     }
 
-    //draw boundery
+    /*/draw boundery
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glDisable(GL_LIGHTING);
@@ -119,6 +119,7 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     glEnable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
     glColor4f(1.f, 1.f, 1.f, 1.f);
+    //*/
 }
 
 /**
