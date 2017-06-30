@@ -70,24 +70,31 @@ public:
             return sqrt(x * x + y * y + z * z);
         }
 
-        void normalize(){
+        XYZ normalize(){
             float s = size();
             x = x / s;
             y = y / s;
             z = z / s;
+            return *this;
         }
 
     };
 
+    struct XYZA {
+        XYZ v;
+        float a;
+    };
+
     struct TRIANGLE {
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        //EIGEN MAKE ALIGNED OPERATOR NEW
         XYZ p[3];
+        XYZ n[3];
     };
 
     struct GRIDCELL {
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        XYZ p[8];
-        float val[8];
+        //EIGEN MAKE ALIGNED OPERATOR NEW
+        XYZA p[8];
+        XYZ n[8];
     };
 
     MarchingCubes(System* system);
@@ -96,10 +103,11 @@ public:
     int Polygonise(GRIDCELL &grid, TRIANGLE *triangles);
 
     XYZ VertexInterp(float isovalue, XYZ &p1, XYZ &p2, float val1, float val2);
+    XYZ VertexInterpNormal(float isolevel, XYZ &np1, XYZ &np2, float valp1, float valp2);
 
-    void updateGradient(int index);
+    //void updateGradient(int index);
 
-    XYZ getEdgeNormal(XYZ edgePoint);
+    //XYZ getEdgeNormal(XYZ edgePoint);
 
     void drawMarching();
 
@@ -113,13 +121,13 @@ public:
     int* cubeEndInt;
     int *cubeCornerDim;
     int size;
-    float *cubeCorners;
-    XYZ *gradientCorners;
+    XYZA *cubeCorners;
+    //XYZ *gradientCorners;
 
     float particleRange;
     float iso;
     vector<TRIANGLE> triangles;
-    map<long, XYZ> normals;
+    //map<long, XYZ> normals;
 
 };
 #endif //FLUIDS_MARCHINGCUBES_H
