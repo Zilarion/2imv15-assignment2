@@ -17,9 +17,9 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
     for (int x = 0; x < numParticles[0]; x++) {
         for (int y = 0; y < numParticles[1]; y++) {
             for (int z = 0; z < numParticles[2]; z++) {
-                float xStart = -dimensions[0] / 2 + dimensions[0] * (float) x / float(numParticles[0]);
-                float yStart = -dimensions[1] / 2 + dimensions[1] * (float) y / float(numParticles[1]);
-                float zStart = -dimensions[2] / 2 + dimensions[2] * (float) z / float(numParticles[2]);
+                float xStart = -dimensions[0] / 2 + dimensions[0] * (float) x / (numParticles[0] - 1);
+                float yStart = -dimensions[1] / 2 + dimensions[1] * (float) y / (numParticles[1] - 1);
+                float zStart = -dimensions[2] / 2 + dimensions[2] * (float) z / (numParticles[2] - 1);
                 Particle *p = new Particle(Vector3f(xStart, yStart, zStart), particleMass, index, true);
                 //A rigid body has constant density
                 p->density = 1.0f;

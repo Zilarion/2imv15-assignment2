@@ -18,6 +18,7 @@ public:
 private:
     static System* initBasic();
     static System* initSmoke();
+    static System* initTrechter();
 };
 
 
