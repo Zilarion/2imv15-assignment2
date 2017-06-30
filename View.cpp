@@ -185,11 +185,8 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'r':
         {
-            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.25f,.25f,.25f), Vector3f(5,5,5), .5f);
+            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.25f,.25f,.25f), Vector3f(5,5,5), .001f);
             sys->addRigidBody(r);
-            sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -40.81f, 0.0f)));
-            sys->addForce(new PressureForce(r->particles));
-            sys->addForce(new DragForce(r->particles, 0.9f));
             break;
         }
         case ' ':

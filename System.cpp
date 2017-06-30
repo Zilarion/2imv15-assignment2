@@ -8,6 +8,10 @@
 #include "fields/PressureField.h"
 #include "fields/ColorField.h"
 #include "MarchingCubes.h"
+#include "forces/DirectionalForce.h"
+
+
+const int RigidBody::STATE_SIZE;
 
 #if defined(_WIN32) || defined(WIN32)
 
@@ -37,9 +41,8 @@ System::~System() {
  */
 void System::addParticle(Particle *p) {
     particles.push_back(p);
-    for (Force *f : forces) {
+    for (Force *f : forces)
         f->addAsTarget(p);
-    }
 }
 
 /**
@@ -48,6 +51,8 @@ void System::addParticle(Particle *p) {
  */
 void System::addRigidBody(RigidBody *r) {
     rigidBodies.push_back(r);
+    for (Particle * p: r->particles)
+        addParticle(p);
 }
 
 /**
@@ -105,20 +110,6 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     if (drawMarchingCubes) {
         marchingCubes->drawMarching();
     }
-
-    //draw boundery
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_FRONT);
-//    glDisable(GL_LIGHTING);
-//    glColor4f(.6f, .6f, .6f, 1.f);
-//    glPushMatrix();
-//    glTranslated(0., -.4, 0.);
-//    glScaled(1., .5, 1.);
-//    glutSolidCube(1.6);
-//    glPopMatrix();
-//    glEnable(GL_LIGHTING);
-//    glDisable(GL_CULL_FACE);
-    glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 
 /**
@@ -248,9 +239,6 @@ void System::computeForces() {
     for (Force *f : forces) {
         f->apply(this);
     }
-    for (Force *f : collisionForces) {
-        f->apply(this);
-    }
 }
 
 void System::clearForces() {
@@ -310,49 +298,49 @@ void System::drawConstraints() {
     }
 }
 
-vector<Contact *> System::findContacts(VectorXf newState) {
-    vector<Contact *> contacts;
-    //sweep sort
-    //bool indicates start or end, start=true
-    map<float, pair<Object *, bool>> xMap;
-    map<float, pair<Object *, bool>> yMap;
-    map<float, pair<Object *, bool>> zMap;
-    for (RigidBody *r:rigidBodies) {
-        VectorXf boundingBox = r->getBoundingBox();
-        xMap[boundingBox[0]] = make_pair(r, true);
-        xMap[boundingBox[3]] = make_pair(r, false);
-        yMap[boundingBox[1]] = make_pair(r, true);
-        yMap[boundingBox[4]] = make_pair(r, false);
-        zMap[boundingBox[2]] = make_pair(r, true);
-        zMap[boundingBox[5]] = make_pair(r, false);
-//        printf("minY: %f\n",boundingBox[1]);
-    }
-    for (Particle *p:particles) {
-        xMap[p->position[0]] = make_pair(p, true);
-        yMap[p->position[1]] = make_pair(p, true);
-        zMap[p->position[2]] = make_pair(p, true);
-    }
-    vector<RigidBody *> activeRigidBodies;
-    //keep track of particles that are in x/y/z range of a rigid body
-    //there is a collision if a  particle is present in all 3 ranges
-    vector<pair<RigidBody *, Particle *>> xRange;
-    vector<pair<RigidBody *, Particle *>> yRange;
-    vector<pair<RigidBody *, Particle *>> zRange;
-    for (pair<int, pair<Object *, bool>> xPair:xMap) {
-        xPair.second.first->handleSweep(xPair.second.second, &activeRigidBodies, &xRange);
-    }
-    for (pair<int, pair<Object *, bool>> yPair:yMap) {
-        yPair.second.first->handleSweep(yPair.second.second, &activeRigidBodies, &yRange);
-    }
-    for (pair<int, pair<Object *, bool>> zPair:zMap) {
-        zPair.second.first->handleSweep(zPair.second.second, &activeRigidBodies, &zRange);
-    }
-    for (pair<RigidBody *, Particle *> xPair:xRange) {
-        //check if there is a collision in all three directions x,y,z
-        if (find(yRange.begin(), yRange.end(), xPair) != yRange.end() &&
-            find(zRange.begin(), zRange.end(), xPair) != zRange.end()) {
-            contacts.push_back(new Contact(xPair.first, xPair.second, xPair.first->getNormal(xPair.second->position)));
-        }
-    }
-    return contacts;
-}
+//vector<Contact *> System::findContacts(VectorXf newState) {
+//    vector<Contact *> contacts;
+//    //sweep sort
+//    //bool indicates start or end, start=true
+//    map<float, pair<Object *, bool>> xMap;
+//    map<float, pair<Object *, bool>> yMap;
+//    map<float, pair<Object *, bool>> zMap;
+//    for (RigidBody *r:rigidBodies) {
+//        VectorXf boundingBox = r->getBoundingBox();
+//        xMap[boundingBox[0]] = make_pair(r, true);
+//        xMap[boundingBox[3]] = make_pair(r, false);
+//        yMap[boundingBox[1]] = make_pair(r, true);
+//        yMap[boundingBox[4]] = make_pair(r, false);
+//        zMap[boundingBox[2]] = make_pair(r, true);
+//        zMap[boundingBox[5]] = make_pair(r, false);
+////        printf("minY: %f\n",boundingBox[1]);
+//    }
+//    for (Particle *p:particles) {
+//        xMap[p->position[0]] = make_pair(p, true);
+//        yMap[p->position[1]] = make_pair(p, true);
+//        zMap[p->position[2]] = make_pair(p, true);
+//    }
+//    vector<RigidBody *> activeRigidBodies;
+//    //keep track of particles that are in x/y/z range of a rigid body
+//    //there is a collision if a  particle is present in all 3 ranges
+//    vector<pair<RigidBody *, Particle *>> xRange;
+//    vector<pair<RigidBody *, Particle *>> yRange;
+//    vector<pair<RigidBody *, Particle *>> zRange;
+//    for (pair<int, pair<Object *, bool>> xPair:xMap) {
+//        xPair.second.first->handleSweep(xPair.second.second, &activeRigidBodies, &xRange);
+//    }
+//    for (pair<int, pair<Object *, bool>> yPair:yMap) {
+//        yPair.second.first->handleSweep(yPair.second.second, &activeRigidBodies, &yRange);
+//    }
+//    for (pair<int, pair<Object *, bool>> zPair:zMap) {
+//        zPair.second.first->handleSweep(zPair.second.second, &activeRigidBodies, &zRange);
+//    }
+//    for (pair<RigidBody *, Particle *> xPair:xRange) {
+//        //check if there is a collision in all three directions x,y,z
+//        if (find(yRange.begin(), yRange.end(), xPair) != yRange.end() &&
+//            find(zRange.begin(), zRange.end(), xPair) != zRange.end()) {
+//            contacts.push_back(new Contact(xPair.first, xPair.second, xPair.first->getNormal(xPair.second->position)));
+//        }
+//    }
+//    return contacts;
+//}

@@ -18,6 +18,10 @@
 System *SystemBuilder::get(AvailableSystems s) {
     System *sys;
     switch (s) {
+        case BASIC:
+            sys = initBasic();
+            sys->type = BASIC;
+            return sys;
         case WATER:
             sys = initTrechter();
             sys->type = WATER;
@@ -35,7 +39,7 @@ System* SystemBuilder::initBasic()
     System* sys = new System(new Euler(Euler::SEMI));
 //    System* sys = new System(new RungeKutta());
 
-    int dimensions = 30;
+    int dimensions = 10;
     float mass = 1.f;
     float massStatic = 50.f;
     int index = 0;
@@ -46,7 +50,7 @@ System* SystemBuilder::initBasic()
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
             float x = i * d + (rand() % 10 + 1) * 0.001f;
-            float y = -0.7f + (rand() % 10 + 1) * 0.001f;
+            float y = -0.4f + (rand() % 10 + 1) * 0.001f;
             float z = j * d + (rand() % 10 + 1) * 0.001f;
             sys->addParticle(new Particle(Vector3f(x, y, z), mass, index++, true));
         }
@@ -57,26 +61,26 @@ System* SystemBuilder::initBasic()
     sys->addForce(new DragForce(sys->particles, 0.5f));
 
     // Static particles
-    float delta = ds * 20;
+    float delta = ds * 20 / 2;
     dimensions = 20;
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
-            sys->addParticle(new Particle(Vector3f(i * ds, -delta, j * ds), massStatic, index++, false));
+            sys->addParticle(new Particle(Vector3f(i * ds, -delta - .5f, j * ds), massStatic, index++, false));
         }
     }
 
     for (int i = -dimensions / 2; i < 0; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
-            sys->addParticle(new Particle(Vector3f(-delta, i * ds, j * ds), massStatic, index++, false));
-            sys->addParticle(new Particle(Vector3f(delta, i * ds, j * ds), massStatic, index++, false));
+            sys->addParticle(new Particle(Vector3f(-delta, i * ds - .5f, j * ds), massStatic, index++, false));
+            sys->addParticle(new Particle(Vector3f(delta, i * ds - .5f, j * ds), massStatic, index++, false));
         }
     }
 
 
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < 0; j++) {
-            sys->addParticle(new Particle(Vector3f(i * ds, j * ds, delta), massStatic, index++, false));
-            sys->addParticle(new Particle(Vector3f(i * ds, j * ds, -delta), massStatic, index++, false));
+            sys->addParticle(new Particle(Vector3f(i * ds, j * ds - .5f, delta), massStatic, index++, false));
+            sys->addParticle(new Particle(Vector3f(i * ds, j * ds - .5f, -delta), massStatic, index++, false));
         }
     }
 
@@ -108,7 +112,7 @@ System *SystemBuilder::initTrechter() {
     // Movable particles
     for (int i = -dimensions / 2; i < dimensions / 2; i++) {
         for (int j = -dimensions / 2; j < dimensions / 2; j++) {
-            for(int k = 0; k<15;k++) {
+            for(int k = 0; k<10;k++) {
                 float x = i * d + (rand() % 10 + 1) * 0.001f;
                 float y = k*d-.6f + (rand() % 10 + 1) * 0.001f;
                 float z = j * d + (rand() % 10 + 1) * 0.001f;
@@ -130,7 +134,7 @@ System *SystemBuilder::initTrechter() {
     for (int i = 0; i < angleSteps; i++) {
         float angle = angleStep * i;
         float radius = topRadius;
-        for (int y = -20; y < 10; y++) {
+        for (int y = -20; y < 0; y++) {
             float x = cos(angle) * radius;
             float z = sin(angle) * radius;
             sys->addParticle(new Particle(Vector3f(x, y * ds, z), mass, index++, false));

@@ -31,7 +31,6 @@ public:
 
     void setActive(bool state);
     bool toggle();
-
 };
 
 

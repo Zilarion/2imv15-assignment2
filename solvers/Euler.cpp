@@ -12,42 +12,6 @@ using namespace Eigen;
 Euler::Euler(Euler::TYPE type) : type(type) {}
 
 void Euler::simulateStep(System *system, float h) {
-    for (RigidBody *r:system->rigidBodies) {
-        VectorXf boundingBox = r->getBoundingBox();
-        if (boundingBox[1] < -.8f && r->P[1] < 0) {
-            r->x[1] += -.8f - boundingBox[1];
-            r->P[1] = -.2f * r->P[1];
-            r->recomputeAuxiliaryVars();
-        }
-    }
-    system->collisionForces.clear();
-    float epsilon = 0;
-    printf("COLLISJUN DETECTION\n");
-    for (RigidBody *r :system->rigidBodies) {
-        for (Particle *p:system->particles) {
-            if (r->isPenetrating(epsilon, p)) {
-                Vector3f body = r->getBodyCoordinates(p->position);
-                if (body[0] < r->dimensions[0] / 2 - .05f && body[1] < r->dimensions[1] / 2 - .05f &&
-                    body[2] < r->dimensions[2] / 2 - .05f &&
-                    body[0] > -r->dimensions[0] / 2 + .05f && body[1] > -r->dimensions[1] / 2 + .05f &&
-                    body[2] > -r->dimensions[2] / 2 + .05f) {
-                    printf("Body: [%f, %f, %f]\n", body[0], body[1], body[2]);
-                }
-                Vector3f n = r->getNormal(p->position);
-                Vector3f relativeV = p->velocity - r->v;
-                if ((n.dot(relativeV)) < 0) {
-                    Vector3f rForceVec = 30.f*p->mass * relativeV;
-                    Vector3f pForcevec = r->M * -relativeV;
-//                    printf("rForceVec: [%f, %f, %f]\n", rForceVec[0], rForceVec[1], rForceVec[2]);
-                    Force *rForce = new DirectionalForce({r->getClosestParticle(p->position)}, rForceVec);
-                    Force *pForce = new DirectionalForce({p}, pForcevec);
-//                    system->collisionForces.push_back(pForce);
-//                    system->collisionForces.push_back(rForce);
-                }
-            }
-        }
-//        r->recomputeAuxiliaryVars();
-    }
     VectorXf oldState = system->getState();
     // Evaluate derivative
     VectorXf deriv = system->derivEval();
@@ -71,8 +35,7 @@ void Euler::simulateStep(System *system, float h) {
 
         for (int i = 0; i < system->rigidBodies.size(); i++) {
             unsigned long startIndex = i * 13 + system->getParticleDim();
-            semiImpl[startIndex + 0] =
-                    oldState[startIndex + 0] + h * derivNew[startIndex + 0];  // Xnew implicit, using Vnew
+            semiImpl[startIndex + 0] = oldState[startIndex + 0] + h * derivNew[startIndex + 0];  // Xnew implicit, using Vnew
             semiImpl[startIndex + 1] = oldState[startIndex + 1] + h * derivNew[startIndex + 1];  // Xold + h * Vnew
             semiImpl[startIndex + 2] = oldState[startIndex + 2] + h * derivNew[startIndex + 2];
             semiImpl[startIndex + 3] = oldState[startIndex + 3] + h * derivNew[startIndex + 3];
@@ -89,22 +52,6 @@ void Euler::simulateStep(System *system, float h) {
 
         // Set the new state, using semi implicit computation
         system->setState(semiImpl, system->getTime() + h);
-
-
-//        vector<Contact *> contacts = system->findContacts(semiImpl);
-//        float epsilon = 0.01f;
-//        if (contacts.size() > 0) {
-//            for (Contact *contact:contacts) {
-//                if (contact->isPenetrating(epsilon)) {
-//                    hasCollisions = true;
-//                }
-//            }
-//            if (hasCollisions) {
-//                simulateStep(system, h / 2);
-//            }
-//        } else if (hasCollisions) {
-//            simulateStep(system, 1.5f * h);
-//        }
     } else {
         system->setState(newState, system->getTime() + h);
     }

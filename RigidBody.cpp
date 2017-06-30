@@ -8,6 +8,8 @@
 #include <GLUT/glut.h>
 #endif
 
+#include <iostream>
+
 RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticles, float particleMass) :
         startPos(startPos), dimensions(dimensions) {
     initializeVariables();
@@ -20,7 +22,7 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
                 float xStart = -dimensions[0] / 2 + dimensions[0] * (float) x / (numParticles[0] - 1);
                 float yStart = -dimensions[1] / 2 + dimensions[1] * (float) y / (numParticles[1] - 1);
                 float zStart = -dimensions[2] / 2 + dimensions[2] * (float) z / (numParticles[2] - 1);
-                Particle *p = new Particle(Vector3f(xStart, yStart, zStart), particleMass, index, true);
+                Particle *p = new Particle(Vector3f(xStart, yStart, zStart), particleMass, index, false, true);
                 //A rigid body has constant density
                 p->density = 1.0f;
                 particles.push_back(p);
@@ -36,9 +38,9 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
 
     //Calculate Ibody
     for (Particle *p : particles) {
-        Vector3f r0i = p->position;             //position in body coordinates
+        Vector3f r0i = p->startPos;             //position in body coordinates
         RowVector3f r0iT = r0i.transpose();     //position in body coordinates
-        Ibody += p->mass * (r0i * r0iT);
+        Ibody += p->mass/12 * (r0i * r0iT);
     }
     IbodyInv = Ibody.inverse();
 }
@@ -208,10 +210,9 @@ void RigidBody::updateForce() {
 
 void RigidBody::updateTorque() {
     torque = Vector3f(0, 0, 0);
-    for (Particle *p : particles) {
-        Vector3f ri = R * p->position + x;
-        torque += (ri - x).cross(p->force);
-    }
+//    for (Particle *p : particles) {
+//        torque += (p->position - x).cross(p->force);
+//    }
 }
 
 void RigidBody::setState(VectorXf newState) {
@@ -219,18 +220,22 @@ void RigidBody::setState(VectorXf newState) {
     x[1] = newState[1];
     x[2] = newState[2];
 
-    q.w() = newState[3];
-    q.x() = newState[4];
-    q.y() = newState[5];
-    q.z() = newState[6];
+//    q.w() = newState[3];
+//    q.x() = newState[4];
+//    q.y() = newState[5];
+//    q.z() = newState[6];
 
     P[0] = newState[7];
     P[1] = newState[8];
     P[2] = newState[9];
 
-    L[0] = newState[10];
-    L[1] = newState[11];
-    L[2] = newState[12];
+//    L[0] = newState[10];
+//    L[1] = newState[11];
+//    L[2] = newState[12];
+
+    for (Particle * p : particles) {
+        p->position = p->startPos + x;
+    }
 
     //Compute auxiliary variables
     recomputeAuxiliaryVars();
@@ -294,14 +299,6 @@ VectorXf RigidBody::getDerivativeState() {
     y[11] = torque[1];
     y[12] = torque[2];
     return y;
-}
-
-Matrix3f RigidBody::star(Vector3f a) {
-    Matrix3f m;
-    m << 0, -a[2], a[1],
-            a[2], 0, -a[0],
-            -a[1], a[0], 0;
-    return m;
 }
 
 void RigidBody::handleSweep(bool isStart, vector<RigidBody *> *activeRigidBodies,

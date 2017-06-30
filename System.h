@@ -42,7 +42,6 @@ public:
     std::vector<Particle*> particles;
     std::vector<RigidBody*> rigidBodies;
     std::vector<Force*> forces;
-    std::vector<Force*> collisionForces;
     std::vector<Constraint*> constraints;
 
     DensityField* densityField;

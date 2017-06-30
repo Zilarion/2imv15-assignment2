@@ -6,10 +6,10 @@
     #include <GLUT/glut.h>
 #endif
 
-Particle::Particle(const Vector3f &startPosition, float mass, int index, bool movable) :
+Particle::Particle(const Vector3f &startPosition, float mass, int index, bool movable, bool rigid) :
         startPos(startPosition), density(0), position(Vector3f(0.0, 0.0, 0.0)),
         velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0, 0.0, 0.0)), mass(mass), index(index),
-        movable(movable) {
+        movable(movable), rigid(rigid) {
     position = startPos;
 }
 
@@ -31,6 +31,9 @@ void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
         } else {
             sphereSize = 0.01f;
             glColor4f(1.f, 1.f, 1.f, 0.1f);
+        }
+        if (rigid) {
+            glColor3f(0.f, 0.f, 1.f);
         }
         glTranslated(position[0], position[1], position[2]);
         glutSolidSphere(sphereSize, 3, 3);

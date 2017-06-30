@@ -10,7 +10,8 @@ class SystemBuilder {
 public:
     enum AvailableSystems {
         WATER,
-        SMOKE
+        SMOKE,
+        BASIC
     };
 
     static System* get(AvailableSystems s);
