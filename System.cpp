@@ -220,6 +220,7 @@ void System::computeForces() {
     float restDensity = 10000;
     int numParticles = 0;
     for (Particle *p : particles) {
+        if (p->rigid) continue;
         p->density = densityField->eval(p);
         if (p->movable) {
             meanDensity += p->density;

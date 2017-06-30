@@ -14,6 +14,8 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
         startPos(startPos), dimensions(dimensions) {
     initializeVariables();
 
+    float density = particleMass / dimensions[0];
+    std::cout << density << std::endl;
     //generate particles with body coordinates
     int index = 0;
     for (int x = 0; x < numParticles[0]; x++) {
@@ -24,7 +26,7 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
                 float zStart = -dimensions[2] / 2 + dimensions[2] * (float) z / (numParticles[2] - 1);
                 Particle *p = new Particle(Vector3f(xStart, yStart, zStart), particleMass, index, false, true);
                 //A rigid body has constant density
-                p->density = 1.0f;
+                p->density = density;
                 particles.push_back(p);
                 index++;
             }
@@ -71,12 +73,6 @@ void RigidBody::initializeVariables() {
 
 
 void RigidBody::draw(bool drawVelocity, bool drawForce) {
-//    glBegin(GL_POINTS);
-//    for (Particle *p:particles) {
-//        Vector3f ri = R * p->position + x;
-//        glVertex3f(ri[0], ri[1], ri[2]);
-//    }
-//    glEnd();
     Vector3f v1 = R * Vector3f(-dimensions[0] / 2, -dimensions[1] / 2, -dimensions[2] / 2) + x;
     Vector3f v2 = R * Vector3f(dimensions[0] / 2, -dimensions[1] / 2, -dimensions[2] / 2) + x;
     Vector3f v3 = R * Vector3f(-dimensions[0] / 2, -dimensions[1] / 2, dimensions[2] / 2) + x;
@@ -210,9 +206,8 @@ void RigidBody::updateForce() {
 
 void RigidBody::updateTorque() {
     torque = Vector3f(0, 0, 0);
-//    for (Particle *p : particles) {
-//        torque += (p->position - x).cross(p->force);
-//    }
+    for (Particle *p : particles)
+        torque += (p->position - x).cross(p->force);
 }
 
 void RigidBody::setState(VectorXf newState) {
@@ -220,18 +215,18 @@ void RigidBody::setState(VectorXf newState) {
     x[1] = newState[1];
     x[2] = newState[2];
 
-//    q.w() = newState[3];
-//    q.x() = newState[4];
-//    q.y() = newState[5];
-//    q.z() = newState[6];
+    q.w() = newState[3];
+    q.x() = newState[4];
+    q.y() = newState[5];
+    q.z() = newState[6];
 
     P[0] = newState[7];
     P[1] = newState[8];
     P[2] = newState[9];
 
-//    L[0] = newState[10];
-//    L[1] = newState[11];
-//    L[2] = newState[12];
+    L[0] = newState[10];
+    L[1] = newState[11];
+    L[2] = newState[12];
 
     for (Particle * p : particles) {
         p->position = p->startPos + x;
@@ -257,18 +252,18 @@ VectorXf RigidBody::getState() {
     y[1] = x[1];
     y[2] = x[2];
 
-    y[3] = q.w();
-    y[4] = q.x();
-    y[5] = q.y();
-    y[6] = q.z();
+//    y[3] = q.w();
+//    y[4] = q.x();
+//    y[5] = q.y();
+//    y[6] = q.z();
 
     y[7] = P[0];
     y[8] = P[1];
     y[9] = P[2];
 
-    y[10] = L[0];
-    y[11] = L[1];
-    y[12] = L[2];
+//    y[10] = L[0];
+//    y[11] = L[1];
+//    y[12] = L[2];
     return y;
 }
 
