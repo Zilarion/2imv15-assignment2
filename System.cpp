@@ -90,7 +90,8 @@ void System::reset() {
  * Draws the forces
  */
 void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool drawMarchingCubes) {
-    drawParticles(drawVelocity, drawForce, drawMarchingCubes);
+    if (!drawMarchingCubes)
+        drawParticles(drawVelocity, drawForce, drawMarchingCubes);
     drawRigidBodies(drawVelocity, drawForce);
 
     if (drawForce) {
@@ -104,7 +105,19 @@ void System::draw(bool drawVelocity, bool drawForce, bool drawConstraint, bool d
     if (drawMarchingCubes) {
         marchingCubes->drawMarching();
     }
-    glNormal3f(1.f, 0.f, 0.f);
+
+    //draw boundery
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    glDisable(GL_LIGHTING);
+    glColor4f(.6f, .6f, .6f, 1.f);
+    glPushMatrix();
+    glTranslated(0., -.4, 0.);
+    glScaled(1., .5, 1.);
+    glutSolidCube(1.6);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+    glDisable(GL_CULL_FACE);
     glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 
@@ -271,7 +284,7 @@ VectorXf System::computeDerivative() {
 
 void System::drawParticles(bool drawVelocity, bool drawForce, bool drawMarchingCubes) {
     for (Particle *p : particles) {
-        if (!p->movable || !drawMarchingCubes)
+        //if (!p->movable || !drawMarchingCubes)
             p->draw(drawVelocity, drawForce, meanDensity);
     }
 }
