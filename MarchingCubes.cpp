@@ -392,7 +392,7 @@ int MarchingCubes::Polygonise(GRIDCELL &grid, TRIANGLE *triangles) {
     if (edgeTable[cubeindex] & 256) {
         vertlist[8] =
                 VertexInterp(iso, grid.p[0].v, grid.p[4].v, grid.p[0].a, grid.p[4].a);
-        normlist[5] =
+        normlist[8] =
                 VertexInterpNormal(iso, grid.n[0], grid.n[4], grid.p[0].a, grid.p[4].a);
     }
     if (edgeTable[cubeindex] & 512) {
@@ -604,10 +604,12 @@ void MarchingCubes::drawMarching() {
                         XYZ gridPos = lowerGridPos + XYZ{x * cubeStep, y * cubeStep, z * cubeStep};
                         int cubePos = lowerCubePos + x + (cubeCornerDim[0] * (y + cubeCornerDim[1] * z));
                         if (cubePos < cubeCornerDim[0] * cubeCornerDim[1] * cubeCornerDim[0] && cubePos >= 0) {
+                            XYZ relPos = pos - gridPos;
+                            float relDist = relPos.size();
                             cubeCorners[cubePos].a = min(
                                     cubeCorners[cubePos].a +
-                                    max(particleRange - (pos - gridPos).size(), 0.f) / particleRange, 1.f);
-                            cubeCorners[cubePos].v += (gridPos - pos);
+                                    max(particleRange -  relDist, 0.f) / particleRange, 1.f);
+                            cubeCorners[cubePos].v += relPos.normalize().mult(max(particleRange -  relDist, 0.f) / -particleRange);
                             // update gradients based on change in grid
                             // updateGradient(cubePos);
                         }
