@@ -34,10 +34,6 @@ System *SystemBuilder::get(AvailableSystems s) {
             sys = initSmoke();
             sys->type = SMOKE;
             return sys;
-        case BASIC:
-            sys = initBasicCloth();
-            sys->type = BASIC;
-            return sys;
         case CLOTH:
             sys = initCloth();
             sys->type = CLOTH;
