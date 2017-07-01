@@ -218,16 +218,10 @@ void System::computeForces() {
 
     // Compute all densities
     float restDensity = 10000;
-    int numParticles = 0;
     for (Particle *p : particles) {
         if (p->rigid) continue;
         p->density = densityField->eval(p);
-        if (p->movable) {
-            meanDensity += p->density;
-            numParticles++;
-        }
     }
-    meanDensity /= numParticles;
 
     float k = 5.f;
 
@@ -277,7 +271,7 @@ VectorXf System::computeDerivative() {
 void System::drawParticles(bool drawVelocity, bool drawForce, bool drawMarchingCubes) {
     for (Particle *p : particles) {
         //if (!p->movable || !drawMarchingCubes)
-            p->draw(drawVelocity, drawForce, meanDensity);
+            p->draw(drawVelocity, drawForce);
     }
 }
 

@@ -50,7 +50,6 @@ public:
     UniformGrid grid;
     MarchingCubes* marchingCubes;
 
-    float meanDensity = 0;
     bool springsCanBreak = false;
     float dt;
     SystemBuilder::AvailableSystems type;

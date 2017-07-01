@@ -38,11 +38,11 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
     }
 
     //Calculate Ibody
-    for (Particle *p : particles) {
-        Vector3f r0i = p->startPos;             //position in body coordinates
-        RowVector3f r0iT = r0i.transpose();     //position in body coordinates
-        Ibody += p->mass * (r0i * r0iT);
-    }
+    Matrix3f IbodyMatrix = Matrix3f::Identity();
+    IbodyMatrix(0,0) = pow(dimensions[1],2)+ pow(dimensions[2],2);
+    IbodyMatrix(1,1) = pow(dimensions[0],2)+ pow(dimensions[2],2);
+    IbodyMatrix(2,2) = pow(dimensions[0],2)+ pow(dimensions[1],2);
+    Ibody = M/12 * IbodyMatrix;
     IbodyInv = Ibody.inverse();
 }
 
@@ -110,43 +110,6 @@ void RigidBody::draw(bool drawVelocity, bool drawForce) {
     glVertex3f(v8[0], v8[1], v8[2]);
     glEnd();
 
-}
-
-Vector3f RigidBody::pt_velocity(Vector3f p) {
-    return v + omega.cross(p - x);
-}
-
-Vector3f RigidBody::getNormal(Vector3f p) {
-    Vector3f bodyPos = getBodyCoordinates(p);
-    float minDistance = 100000000;
-    Vector3f n;
-    if (abs(bodyPos[0] - 0.5f * dimensions[0]) < minDistance) {
-        n = Vector3f(-1, 0, 0);
-        minDistance = abs(bodyPos[0] - 0.5f * dimensions[0]);
-    }
-    if (abs(bodyPos[0] + 0.5f * dimensions[0]) < minDistance) {
-        n = Vector3f(1, 0, 0);
-        minDistance = abs(bodyPos[0] + 0.5f * dimensions[0]);
-    }
-    if (abs(bodyPos[1] - 0.5f * dimensions[1]) < minDistance) {
-        n = Vector3f(0, -1, 0);
-        minDistance = abs(bodyPos[1] - 0.5f * dimensions[1]);
-    }
-    if (abs(bodyPos[1] + 0.5f * dimensions[1]) < minDistance) {
-        n = Vector3f(0, 1, 0);
-        minDistance = abs(bodyPos[1] + 0.5f * dimensions[1]);
-    }
-    if (abs(bodyPos[2] - 0.5f * dimensions[2]) < minDistance) {
-        n = Vector3f(0, 0, -1);
-        minDistance = abs(bodyPos[2] - 0.5f * dimensions[2]);
-    }
-    if (abs(bodyPos[2] + 0.5f * dimensions[2]) < minDistance) {
-        n = Vector3f(0, 0, 1);
-        minDistance = abs(bodyPos[2] + 0.5f * dimensions[2]);
-    }
-    Vector3f result = R * -n;
-    //rotate back to obtain world n
-    return result.normalized();
 }
 
 VectorXf RigidBody::getBoundingBox() {
@@ -228,7 +191,7 @@ void RigidBody::setState(VectorXf newState) {
     L[2] = newState[12];
 
     for (Particle * p : particles) {
-        p->position = p->startPos + x;
+        p->position = R * p->startPos + x;
     }
 
     //Compute auxiliary variables
@@ -278,10 +241,10 @@ VectorXf RigidBody::getDerivativeState() {
     //calculate product, convert to resulting matrix to quaternion
     Quaternionf omegaQuaternion(0, omega[0], omega[1], omega[2]);
     Quaternionf qdot(omegaQuaternion * q);
-    y[3] = qdot.w() * 0.5f;
-    y[4] = qdot.x() * 0.5f;
-    y[5] = qdot.y() * 0.5f;
-    y[6] = qdot.z() * 0.5f;
+    y[3] = qdot.w() * 0.05f;
+    y[4] = qdot.x() * 0.05f;
+    y[5] = qdot.y() * 0.05f;
+    y[6] = qdot.z() * 0.05f;
 
     //Pdot = F
     y[7] = force[0];
@@ -305,42 +268,6 @@ void RigidBody::handleSweep(bool isStart, vector<RigidBody *> *activeRigidBodies
         if (it != (*activeRigidBodies).end())
             (*activeRigidBodies).erase(it);
     }
-
-}
-
-bool RigidBody::isPenetrating(float epsilon, Particle *p) {
-    Vector3f bodyCoords = getBodyCoordinates(p->position);
-    return bodyCoords[0] < 0.5f * dimensions[0] - epsilon && bodyCoords[0] > -0.5f * dimensions[0] + epsilon &&
-           bodyCoords[1] < 0.5f * dimensions[1] - epsilon && bodyCoords[1] > -0.5f * dimensions[1] + epsilon &&
-           bodyCoords[2] < 0.5f * dimensions[2] - epsilon && bodyCoords[2] > -0.5f * dimensions[2] + epsilon;
-}
-
-bool RigidBody::isContact(float epsilon, Particle *p) {
-    Vector3f bodyCoords = getBodyCoordinates(p->position);
-    VectorXf boundingBox = getBoundingBox();
-    return (((abs(bodyCoords[0] - boundingBox[0]) < epsilon) || (abs(bodyCoords[0] - boundingBox[3]) < epsilon)) &&
-            bodyCoords[1] - boundingBox[1] > epsilon && boundingBox[4] - bodyCoords[1] > epsilon &&
-            bodyCoords[2] - boundingBox[2] > epsilon && boundingBox[5] - bodyCoords[2] > epsilon) ||
-           (((abs(bodyCoords[1] - boundingBox[1]) < epsilon) || (abs(bodyCoords[1] - boundingBox[4]) < epsilon)) &&
-            bodyCoords[0] - boundingBox[0] > epsilon && boundingBox[3] - bodyCoords[0] > epsilon &&
-            bodyCoords[2] - boundingBox[2] > epsilon && boundingBox[5] - bodyCoords[2] > epsilon) ||
-           (((abs(bodyCoords[2] - boundingBox[2]) < epsilon) || (abs(bodyCoords[2] - boundingBox[5]) < epsilon)) &&
-            bodyCoords[1] - boundingBox[1] > epsilon && boundingBox[4] - bodyCoords[1] > epsilon &&
-            bodyCoords[0] - boundingBox[0] > epsilon && boundingBox[3] - bodyCoords[0] > epsilon);
-}
-
-Particle *RigidBody::getClosestParticle(Vector3f bodyCoords) {
-    float minDist = 1000000;
-    Particle *closestParticle;
-    for (Particle *p:particles) {
-        float dist = pow(abs(p->position[0] - bodyCoords[0]), 2) + pow(abs(p->position[1] - bodyCoords[1]), 2) +
-                     pow(abs(p->position[2] - bodyCoords[2]), 2);
-        if (dist < minDist) {
-            minDist = dist;
-            closestParticle = p;
-        }
-    }
-    return closestParticle;
 }
 
 float RigidBody::density() {

@@ -29,8 +29,6 @@ public:
     //from object
     void handleSweep(bool start, vector<RigidBody *>* activeRigidBodies, vector<pair<RigidBody *, Particle *>> *range) override;
 
-    Vector3f pt_velocity(Vector3f p);   //get velocity at location in world space coordinates
-    Vector3f getNormal(Vector3f p);     //unit normal of closest plane
     VectorXf getBoundingBox();          //minX, minY, minZ, maxX, maxY, maxZ
     Vector3f getBodyCoordinates(Vector3f world);
 
@@ -40,9 +38,6 @@ public:
 
     void setState(VectorXf newState);
     void recomputeAuxiliaryVars();
-    bool isPenetrating(float epsilon, Particle *p);
-    bool isContact(float epsilon, Particle *p);
-    Particle* getClosestParticle(Vector3f bodyCoords);
 
     std::vector<Particle *> particles;
     Vector3f startPos;
@@ -68,16 +63,10 @@ public:
     Vector3f force;
     Vector3f torque;
 
-
 private:
-    Matrix3f star(Vector3f a);
-
     void updateForce();
-
     void updateTorque();
-
     void initializeVariables();
-
 };
 
 
