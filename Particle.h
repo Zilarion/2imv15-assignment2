@@ -12,7 +12,7 @@ class Particle:public Object
 {
 public:
 
-	Particle(const Vector3f & startPosition, float mass, int index, bool movable, bool rigid = false);
+	Particle(const Vector3f & startPosition, float mass, int index, bool movable, bool rigid = false, bool cloth = false);
 	virtual ~Particle(void);
 
 
@@ -33,4 +33,5 @@ public:
     float mass;
     bool movable;
     bool rigid;
+	bool cloth;
 };

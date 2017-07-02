@@ -6,10 +6,10 @@
     #include <GLUT/glut.h>
 #endif
 
-Particle::Particle(const Vector3f &startPosition, float mass, int index, bool movable, bool rigid) :
+Particle::Particle(const Vector3f &startPosition, float mass, int index, bool movable, bool rigid, bool cloth) :
         startPos(startPosition), density(0), position(Vector3f(0.0, 0.0, 0.0)),
         velocity(Vector3f(0.0, 0.0, 0.0)), force(Vector3f(0.0, 0.0, 0.0)), mass(mass), index(index),
-        movable(movable), rigid(rigid) {
+        movable(movable), rigid(rigid), cloth(cloth) {
     position = startPos;
 }
 

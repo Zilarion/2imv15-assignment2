@@ -18,7 +18,7 @@ void ViscosityForce::apply(System *s) {
     float u = 1000.f;
     // Evaluate viscosity force for every particle
     for (Particle *pi : particles) {
-        if (pi->rigid) continue;
+        if (pi->rigid || pi->cloth) continue;
         Vector3f viscosityForce = Vector3f(0, 0, 0);
 
         vector<Particle*> targets = s->grid.query(pi->position);

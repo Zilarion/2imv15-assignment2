@@ -51,7 +51,7 @@ int main ( int argc, char ** argv )
 	printf ( "\t 5: 4th order Runge-Kutta\n" );
 
 	View v(768, 512, dt, N);
-    v.initialize(SystemBuilder::BASIC);
+    v.initialize(SystemBuilder::CLOTH);
 	exit (0);
 }
 

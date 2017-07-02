@@ -26,7 +26,7 @@ void DirectionalForce::apply(System * s)
     if (!active)
         return;
     for (Particle* p : particles) {
-        if (p->rigid)
+        if (p->rigid || p->cloth)
             p->force += p->mass * direction;
         else
             p->force += p->mass * p->density * direction;
@@ -36,13 +36,13 @@ void DirectionalForce::apply(System * s)
 void DirectionalForce::draw()
 {
     if (active) {
-//        glColor3f(.8f, .5f, 0.f);
-//        glBegin(GL_LINES);
-//        Vector3f normDirection = direction / direction.norm();
-//        for (Particle *p : particles) {
-//            glVertex3f(p->position[0], p->position[1], p->position[2]);
-//            glVertex3f(p->position[0] + normDirection[0], p->position[1] + normDirection[1], p->position[2] + normDirection[2]);
-//        }
-//        glEnd();
+        glColor3f(.8f, .5f, 0.f);
+        glBegin(GL_LINES);
+        Vector3f normDirection = direction / direction.norm();
+        for (Particle *p : particles) {
+            glVertex3f(p->position[0], p->position[1], p->position[2]);
+            glVertex3f(p->position[0] + normDirection[0], p->position[1] + normDirection[1], p->position[2] + normDirection[2]);
+        }
+        glEnd();
     }
 }

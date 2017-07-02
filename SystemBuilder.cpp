@@ -34,9 +34,9 @@ System *SystemBuilder::get(AvailableSystems s) {
             sys = initSmoke();
             sys->type = SMOKE;
             return sys;
-        case BASIC:
+        case BASIC_CLOTH:
             sys = initBasicCloth();
-            sys->type = BASIC;
+            sys->type = BASIC_CLOTH;
             return sys;
         case CLOTH:
             sys = initCloth();
@@ -200,18 +200,18 @@ System *SystemBuilder::initSmoke() {
 
 System* SystemBuilder::initBasicCloth()
 {
-    System* sys = new System(new Euler(Euler::SEMI));
+    System* sys = new System(new RungeKutta());
 
     const float dist = 0.5f;
     Vector3f center(0.0, 0.0, 0.0);
     Vector3f offset(dist, 0.0, 0.0);
 
-    sys->addParticle(new Particle(center + offset, 1.0f, 0, true));
-    sys->addParticle(new Particle(center + (2.f * offset), 1.0f, 1, true));
-    sys->addParticle(new Particle(center + (3.f * offset), 1.0f, 2, true));
-    sys->addParticle(new Particle(center + (3.f * offset), 1.0f, 3, true));
-    sys->addParticle(new Particle(center + (4.f * offset), 1.0f, 4, true));
-    sys->addParticle(new Particle(center + (4.f * offset), 1.0f, 5, true));
+    sys->addParticle(new Particle(center + offset, 1.0f, 0, true, false, true));
+    sys->addParticle(new Particle(center + (2.f * offset), 1.0f, 1, true, false, true));
+    sys->addParticle(new Particle(center + (3.f * offset), 1.0f, 2, true, false, true));
+    sys->addParticle(new Particle(center + (3.f * offset), 1.0f, 3, true, false, true));
+    sys->addParticle(new Particle(center + (4.f * offset), 1.0f, 4, true, false, true));
+    sys->addParticle(new Particle(center + (4.f * offset), 1.0f, 5, true, false, true));
 
     sys->addForce(new DragForce(sys->particles, 0.5f));
     sys->addForce(new SpringForce(sys->particles[0], sys->particles[1], dist, 150.f, 1.5f));
@@ -235,7 +235,7 @@ System* SystemBuilder::initCloth() {
     // Initialize particles
     for (int y = 0; y < ySize; y++) {
         for (int x = 0; x < xSize; x++) {
-            sys->addParticle(new Particle(Vector3f(-0.5f + x * deltaX, 0.5f - y * deltaY, deltaY * y), 0.2f, pindex, true));
+            sys->addParticle(new Particle(Vector3f(-0.5f + x * deltaX, 0.5f - y * deltaY, deltaY * y), 0.2f, pindex, true, false, true));
             pindex++;
         }
     }
@@ -306,7 +306,7 @@ System* SystemBuilder::initHair() {
     for (int k = 0; k < numHairs; k++) {
         // Initialize particles
         for (int y = 0; y < ySize; y++) {
-            sys->addParticle(new Particle(Vector3f(-0.5f + 0.03f*k, 0.5f - y * deltaY, deltaY * y), 0.2f, k * ySize + y, true));
+            sys->addParticle(new Particle(Vector3f(-0.5f + 0.03f*k, 0.5f - y * deltaY, deltaY * y), 0.2f, k * ySize + y, true, false, true));
         }
 
         float spr = 120.0f;

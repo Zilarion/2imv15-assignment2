@@ -13,6 +13,7 @@ public:
         SMOKE,
         CLOTH,
         BASIC,
+        BASIC_CLOTH,
         HAIR
     };
 

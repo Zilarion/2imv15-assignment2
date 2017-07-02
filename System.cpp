@@ -135,6 +135,7 @@ void System::step(bool adaptive) {
     }
 
     solver->simulateStep(this, dt);
+
 }
 
 
@@ -180,7 +181,7 @@ float System::getTime() {
 VectorXf System::derivEval() {
     clearForces();
     computeForces();
-//    ConstraintSolver::solve(this, 100.0f, 10.0f);
+    ConstraintSolver::solve(this, 100.0f, 10.0f);
     return computeDerivative();
 }
 
@@ -220,7 +221,7 @@ void System::computeForces() {
     float restDensity = 10000;
     int numParticles = 0;
     for (Particle *p : particles) {
-        if (p->rigid) continue;
+        if (p->rigid || p->cloth) continue;
         p->density = densityField->eval(p);
         if (p->movable) {
             meanDensity += p->density;
@@ -233,6 +234,7 @@ void System::computeForces() {
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
+        if (p->cloth) continue;
         p->pressure = k * (p->density - restDensity);
     }
 
@@ -240,6 +242,7 @@ void System::computeForces() {
     for (Force *f : forces) {
         f->apply(this);
     }
+
 }
 
 void System::clearForces() {
@@ -260,9 +263,15 @@ VectorXf System::computeDerivative() {
         dst[i * 6 + 0] = p->velocity[0];            /* Velocity */
         dst[i * 6 + 1] = p->velocity[1];
         dst[i * 6 + 2] = p->velocity[2];
-        dst[i * 6 + 3] = p->force[0] / p->density;  /* new acceleration is F/density */
-        dst[i * 6 + 4] = p->force[1] / p->density;
-        dst[i * 6 + 5] = p->force[2] / p->density;
+        if (p->cloth) {
+            dst[i * 6 + 3] = p->force[0] / p->mass;  /* "old" acceleration is F/density */
+            dst[i * 6 + 4] = p->force[1] / p->mass;
+            dst[i * 6 + 5] = p->force[2] / p->mass;
+        } else {
+            dst[i * 6 + 3] = p->force[0] / p->density;  /* new acceleration is F/density */
+            dst[i * 6 + 4] = p->force[1] / p->density;
+            dst[i * 6 + 5] = p->force[2] / p->density;
+        }
     }
     for (int i = 0; i < rigidBodies.size(); i++) {
         RigidBody *r = rigidBodies[i];

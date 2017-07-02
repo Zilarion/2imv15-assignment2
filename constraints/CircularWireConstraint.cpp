@@ -66,7 +66,7 @@ vector<Vector3f> CircularWireConstraint::j() {
  */
 vector<Vector3f> CircularWireConstraint::jd() {
     vector<Vector3f> jd;
-    // TODO fix this? I don't know why it doesn't work
-//    jd.push_back( 2 * (particle->velocity));
+//     TODO fix this? I don't know why it doesn't work
+    jd.push_back(Vector3f(2.f * particle->velocity[0], 2.f * particle->velocity[1], 2.f * particle->velocity[2]));
     return jd;
 }

@@ -18,7 +18,7 @@ void SurfaceForce::apply(System *s) {
 
     // Evaluate surface force for every particle
     for (Particle *pi : particles) {
-        if (pi->rigid) continue;
+        if (pi->rigid || pi->cloth) continue;
         Vector3f n = s->colorField->dEval(pi->position);
         if (n.norm() > certainThreshold) {
             pi->force += -sigma * s->colorField->ddEval(pi->position) * n / n.norm();
