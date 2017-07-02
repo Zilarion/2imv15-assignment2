@@ -89,6 +89,7 @@ void View::initialize(SystemBuilder::AvailableSystems system) {
     sys = SystemBuilder::get(system);
     wind = new DirectionalForce(sys->particles, Vector3f(0.f, 0.f, 0.f));
     sys->addForce(wind);
+    mouseDragForce = new DirectionalForce({sys->particles[0]}, Vector3f(0,0,0));
 
     glutMainLoop ();
 }
@@ -185,7 +186,7 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'r':
         {
-            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.25f,.25f,.25f), Vector3f(5,5,5), 25.f);
+            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.25f,.25f,.25f), Vector3f(5,5,5), 10.f);
             sys->addRigidBody(r);
             break;
         }
@@ -204,73 +205,74 @@ void View::onKeyPress ( unsigned char key, int x, int y )
 
 void View::onMouseEvent( int button, int state, int x, int y )
 {
-//    initialMx = omx = mx = x;
-//    initialMy = omx = my = y;
-//
-//    if(!mouse_down[0]){hmx=x; hmy=y;}
-//    if(mouse_down[button]) mouse_release[button] = state == GLUT_UP;
-//    if(mouse_down[button]) mouse_shiftclick[button] = glutGetModifiers()==GLUT_ACTIVE_SHIFT;
-//    mouse_down[button] = state == GLUT_DOWN;
-//
-//    //Reset force on mouse up
-//    if(state == GLUT_UP){
-//        mouseDragForce->setActive(false);
-//    } else {
-//        //get world coordinates of click point
-//        GLdouble modelMatrix[16];
-//        glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix);
-//        GLdouble projectionMatrix[16];
-//        glGetDoublev(GL_PROJECTION_MATRIX, projectionMatrix);
-//        GLint viewMatrix[4];
-//        glGetIntegerv(GL_VIEWPORT, viewMatrix);
-//        Particle *closestParticle;
-//        double closestDistance = 10000000;
-//        vector<Particle*> particleCandidates;
-//        for(RigidBody *r:sys->rigidBodies){
-//            for(Particle *p:r->particles){
-//                particleCandidates.push_back(p);
-//            }
-//        }
-//        for (int i = 0; i < particleCandidates.size(); i++) {
-//            Vector3f position = particleCandidates[i]->position;
-//            double screenCoordinates[3];
-//            gluProject(position[0], position[1], position[2], modelMatrix, projectionMatrix, viewMatrix,
-//                       &screenCoordinates[0], &screenCoordinates[1], &screenCoordinates[2]);
-//            double distance = abs(x - screenCoordinates[0]) + abs(y - (height - screenCoordinates[1]));
-//            if (distance < closestDistance) {
-//                closestDistance = distance;
-//                closestParticle = particleCandidates[i];
-//            }
-//        }
-//        //update mouseDragParticle
-//        mouseDragParticle = closestParticle;
-//        //update the current mousedragforce
-//        mouseDragForce = new DirectionalForce({mouseDragParticle}, Vector3f(0, 0, 0));
-//        sys->addForce(mouseDragForce);
-//    }
+    initialMx = omx = mx = x;
+    initialMy = omx = my = y;
+
+    if(!mouse_down[0]){hmx=x; hmy=y;}
+    if(mouse_down[button]) mouse_release[button] = state == GLUT_UP;
+    if(mouse_down[button]) mouse_shiftclick[button] = glutGetModifiers()==GLUT_ACTIVE_SHIFT;
+    mouse_down[button] = state == GLUT_DOWN;
+
+    //Reset force on mouse up
+    if(state == GLUT_UP){
+        mouseDragForce->setActive(false);
+    } else {
+        //get world coordinates of click point
+        GLdouble modelMatrix[16];
+        glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix);
+        GLdouble projectionMatrix[16];
+        glGetDoublev(GL_PROJECTION_MATRIX, projectionMatrix);
+        GLint viewMatrix[4];
+        glGetIntegerv(GL_VIEWPORT, viewMatrix);
+        Particle *closestParticle = sys->particles[0];
+        double closestDistance = 10000000;
+        vector<Particle*> particleCandidates;
+        for(RigidBody *r:sys->rigidBodies){
+            for(Particle *p:r->particles){
+                particleCandidates.push_back(p);
+            }
+        }
+        for (int i = 0; i < particleCandidates.size(); i++) {
+            Vector3f position = particleCandidates[i]->position;
+            double screenCoordinates[3];
+            gluProject(position[0], position[1], position[2], modelMatrix, projectionMatrix, viewMatrix,
+                       &screenCoordinates[0], &screenCoordinates[1], &screenCoordinates[2]);
+            double distance = abs(x - screenCoordinates[0]) + abs(y - (height - screenCoordinates[1]));
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestParticle = particleCandidates[i];
+            }
+        }
+        //update mouseDragParticle
+            mouseDragParticle = closestParticle;
+            //update the current mousedragforce
+            mouseDragForce = new DirectionalForce({mouseDragParticle}, Vector3f(0, 0, 0));
+            sys->addForce(mouseDragForce);
+    }
 }
 
 void View::onMotionEvent( int x, int y )
 {
-//    this->mx = x;
-//    this->my = y;
-//    GLdouble modelMatrix[16];
-//    glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix);
-//    GLdouble projectionMatrix[16];
-//    glGetDoublev(GL_PROJECTION_MATRIX, projectionMatrix);
-//    GLint viewMatrix[4];
-//    glGetIntegerv(GL_VIEWPORT, viewMatrix);
-//    double screenCoordinates[3];
-//    Particle* midParticle = sys->particles[sys->particles.size()/2];
-//    gluProject(midParticle->position[0], midParticle->position[1], midParticle->position[2], modelMatrix, projectionMatrix, viewMatrix,
-//               &screenCoordinates[0], &screenCoordinates[1], &screenCoordinates[2]);
-//    float z = screenCoordinates[2];
-//    double objCoordinates[3];
-//    gluUnProject(x, height - y, z, modelMatrix, projectionMatrix, viewMatrix, &objCoordinates[0],
-//                 &objCoordinates[1], &objCoordinates[2]);
-//    Vector3f position = mouseDragParticle->position;
-//    mouseDragForce->direction = 0.0001f * Vector3f((objCoordinates[0] - position[0]), (objCoordinates[1] - position[1]),
-//                                      (objCoordinates[2] - position[2]));
+        this->mx = x;
+        this->my = y;
+        GLdouble modelMatrix[16];
+        glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix);
+        GLdouble projectionMatrix[16];
+        glGetDoublev(GL_PROJECTION_MATRIX, projectionMatrix);
+        GLint viewMatrix[4];
+        glGetIntegerv(GL_VIEWPORT, viewMatrix);
+        double screenCoordinates[3];
+        Particle *midParticle = sys->particles[sys->particles.size() / 2];
+        gluProject(midParticle->position[0], midParticle->position[1], midParticle->position[2], modelMatrix,
+                   projectionMatrix, viewMatrix,
+                   &screenCoordinates[0], &screenCoordinates[1], &screenCoordinates[2]);
+        float z = screenCoordinates[2];
+        double objCoordinates[3];
+        gluUnProject(x, height - y, z, modelMatrix, projectionMatrix, viewMatrix, &objCoordinates[0],
+                     &objCoordinates[1], &objCoordinates[2]);
+        Vector3f position = mouseDragParticle->position;
+        mouseDragForce->direction =  30.f * Vector3f((objCoordinates[0] - position[0]), (objCoordinates[1] - position[1]),
+                                   (objCoordinates[2] - position[2]));
 }
 
 void View::onReshape(int width, int height )

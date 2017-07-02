@@ -23,7 +23,7 @@ void Particle::reset()
     force = Vector3f(0.0, 0.0, 0.0);
 }
 
-void Particle::draw(bool drawVelocity, bool drawForce, float meanDensity) {
+void Particle::draw(bool drawVelocity, bool drawForce) {
     glPushMatrix();
         float sphereSize = 0.01f;
         if (movable) {

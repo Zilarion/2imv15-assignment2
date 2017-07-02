@@ -17,7 +17,7 @@ public:
 
 
 	void reset();
-	void draw(bool drawVelocity, bool drawForce, float meanDensity);
+	void draw(bool drawVelocity, bool drawForce);
 
 	//from object
 
