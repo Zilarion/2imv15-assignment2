@@ -130,8 +130,8 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case '0':
             printf("Hair scene\n");
-            sys = SystemBuilder::get(SystemBuilder::HAIR);
-            sys->type = SystemBuilder::HAIR;
+            sys = SystemBuilder::get(SystemBuilder::CLOTH);
+            sys->type = SystemBuilder::CLOTH;
             break;
         case '=':
             sys->dt += 0.001f;
@@ -184,19 +184,16 @@ void View::onKeyPress ( unsigned char key, int x, int y )
                                               1.f, sys->particles.size() + 1, true));
             break;
         case 'o':
-            for (int i = 0; i < 100; i++)
-                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.02f, -.8f - (rand() % 10 + 1) * 0.05f, (rand() % 10 + 1) * 0.02f),
-                                              1.f, sys->particles.size() + 1, true));
+            if(sys->type==SystemBuilder::SMOKE) {
+                for (int i = 0; i < 100; i++)
+                    sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.02f, -.8f - (rand() % 10 + 1) * 0.05f,
+                                                           (rand() % 10 + 1) * 0.02f),
+                                                  1.f, sys->particles.size() + 1, true));
+            }
             break;
         case 'r':
         {
-            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.15f,.15f,.15f), Vector3f(5,5,5), 10.f);
-            sys->addRigidBody(r);
-            break;
-        }
-        case 'h':
-        {
-            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.15f,.15f,.15f), Vector3f(5,5,5), 100.f);
+            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.15f,.15f,.15f), Vector3f(5,5,5), 3.f);
             sys->addRigidBody(r);
             break;
         }
