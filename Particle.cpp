@@ -36,7 +36,7 @@ void Particle::draw(bool drawVelocity, bool drawForce) {
             glColor3f(0.f, 0.f, 1.f);
         }
         glTranslated(position[0], position[1], position[2]);
-        glutSolidSphere(sphereSize, 3, 3);
+        glutSolidSphere(sphereSize, 10, 10);
     glPopMatrix();
 
     float fMult = 0.00001f;
