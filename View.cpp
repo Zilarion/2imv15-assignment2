@@ -140,9 +140,9 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             sys->type = SystemBuilder::SMOKE;
             break;
         case '9':
-            printf("Cloth scene\n");
-            sys = SystemBuilder::get(SystemBuilder::CLOTH);
-            sys->type = SystemBuilder::CLOTH;
+            printf("Water in a glass scene\n");
+            sys = SystemBuilder::get(SystemBuilder::GLASS);
+            sys->type = SystemBuilder::GLASS;
             break;
         case '0':
             printf("Hair scene\n");
@@ -211,7 +211,7 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'r':
         {
-            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.25f,.25f,.25f), Vector3f(5,5,5), 10.f);
+            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.15f,.15f,.15f), Vector3f(5,5,5), 300.f);
             sys->addRigidBody(r);
             break;
         }

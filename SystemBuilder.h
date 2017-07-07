@@ -13,7 +13,7 @@ public:
         SMOKE,
         CLOTH,
         BASIC,
-        BASIC_CLOTH,
+        GLASS,
         HAIR
     };
 
@@ -26,6 +26,7 @@ private:
     static System* initBasicCloth();
     static System* initCloth();
     static System* initHair();
+    static System* initGlass();
 };
 
 

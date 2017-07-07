@@ -51,13 +51,13 @@ int main ( int argc, char ** argv )
 	printf ( "\t 5: 4th order Runge-Kutta\n" );
 	printf ( "\t Use '6' to 9' and '0' to change between Scenes\n" );
 	printf ( "\t 6: Basic water scene\n" );
-	printf ( "\t 2: Water scene in a funnel\n" );
-	printf ( "\t 3: Smoke scene\n" );
-	printf ( "\t 4: Cloth scene\n" );
-	printf ( "\t 5: Hair scene\n" );
+	printf ( "\t 7: Water scene in a funnel\n" );
+	printf ( "\t 8: Smoke scene\n" );
+	printf ( "\t 9: Cloth scene\n" );
+	printf ( "\t 0: Hair scene\n" );
 
 	View v(768, 512, dt, N);
-    v.initialize(SystemBuilder::SMOKE);
+    v.initialize(SystemBuilder::BASIC);
 	exit (0);
 }
 

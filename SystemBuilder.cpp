@@ -34,9 +34,9 @@ System *SystemBuilder::get(AvailableSystems s) {
             sys = initSmoke();
             sys->type = SMOKE;
             return sys;
-        case BASIC_CLOTH:
-            sys = initBasicCloth();
-            sys->type = BASIC_CLOTH;
+        case GLASS:
+            sys = initGlass();
+            sys->type = GLASS;
             return sys;
         case CLOTH:
             sys = initCloth();
@@ -159,11 +159,63 @@ System *SystemBuilder::initTrechter() {
     }
     //bottom
 
-//    for (int i = -20; i < 20; i++) {
-//        for (int j = -20; j < 20; j++) {
-//            sys->addParticle(new Particle(Vector3f(i * .015f, -20*ds, j * .015f), massStatic, index++, false));
-//        }
-//    }
+    sys->addForce(new PressureForce(sys->particles));
+    sys->addForce(new ViscosityForce(sys->particles));
+    sys->addForce(new SurfaceForce(sys->particles));
+
+    std::cout << "Running with: " << sys->particles.size() << " particles" << std::endl;
+    return sys;
+}
+
+System *SystemBuilder::initGlass() {
+    System *sys = new System(new Euler(Euler::SEMI));
+//    System* sys = new System(new RungeKutta());
+
+    int dimensions = 7;
+    float mass = 1.f;
+    float massStatic = 50.f;
+    int index = 0;
+    float d = 0.04f;
+    float ds = 0.04f;
+
+    // Movable particles
+    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
+        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
+            for(int k = 0; k<10;k++) {
+                float x = i * d + (rand() % 10 + 1) * 0.001f;
+                float y = k*d-.4f + (rand() % 10 + 1) * 0.001f;
+                float z = j * d + (rand() % 10 + 1) * 0.001f;
+                Particle *p = new Particle(Vector3f(x, y, z), mass, index++, true);
+                sys->addParticle(p);
+            }
+        }
+    }
+
+    // These forces only apply to non-static particles
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -9.81f, .0f)));
+    sys->addForce(new DragForce(sys->particles, 0.5f));
+
+    // Static particles
+    float topRadius = .3f;
+    float bottomRadius = .05f;
+    int angleSteps = 120;
+    float angleStep = M_PI * 2 / angleSteps;
+    for (int i = 0; i < angleSteps; i++) {
+        float angle = angleStep * i;
+        float radius = topRadius;
+        for (int y = -20; y < 0; y++) {
+            float x = cos(angle) * radius;
+            float z = sin(angle) * radius;
+            sys->addParticle(new Particle(Vector3f(x, y * ds, z), mass, index++, false));
+        }
+    }
+    //bottom
+
+    for (int i = -20; i < 20; i++) {
+        for (int j = -20; j < 20; j++) {
+            sys->addParticle(new Particle(Vector3f(i * .015f, -20*ds, j * .015f), massStatic, index++, false));
+        }
+    }
 
     sys->addForce(new PressureForce(sys->particles));
     sys->addForce(new ViscosityForce(sys->particles));
@@ -172,6 +224,7 @@ System *SystemBuilder::initTrechter() {
     std::cout << "Running with: " << sys->particles.size() << " particles" << std::endl;
     return sys;
 }
+
 
 System *SystemBuilder::initSmoke() {
     System *sys = new System(new Euler(Euler::SEMI));
