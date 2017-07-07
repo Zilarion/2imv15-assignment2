@@ -771,7 +771,7 @@ void MarchingCubes::drawMarching() {
 MarchingCubes::MarchingCubes(System *system) : system(system) {
     cubeStart = XYZ{-1.1f, -1.1f, -1.1f};
     cubeEnd = XYZ{1.1f, 1.1f, 1.1f};
-    cubeStep = .05f; // a whole number of steps should fit into interval
+    cubeStep = .0125f; // a whole number of steps should fit into interval
 
     cubeStartInt = new int[3];
     cubeEndInt = new int[3];

@@ -221,7 +221,7 @@ void System::computeForces() {
 
     // Compute all densities
     for (Particle *p : particles) {
-        if (p->rigid) continue;
+        if (p->rigid || p->cloth) continue;
         p->density = densityField->eval(p);
     }
 

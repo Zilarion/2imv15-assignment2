@@ -36,7 +36,7 @@ void DirectionalForce::apply(System * s)
 void DirectionalForce::draw()
 {
     if (active) {
-        glColor3f(.8f, .5f, 0.f);
+        glColor4f(.8f, .5f, 0.f, .3f);
         glBegin(GL_LINES);
         Vector3f normDirection = direction / direction.norm();
         for (Particle *p : particles) {
