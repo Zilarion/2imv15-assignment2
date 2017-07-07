@@ -108,6 +108,22 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             sys->free ();
             exit ( 0 );
             break;
+        case '1':
+            printf("Using Explicit Euler\n");
+            sys->solver = new Euler(Euler::EXPLICIT);
+            break;
+        case '2':
+            printf("Using Semi Explicit Euler\n");
+            sys->solver = new Euler(Euler::SEMI);
+            break;
+        case '3':
+            printf("Using 4th order Runge-Kutta\n");
+            sys->solver = new RungeKutta();
+            break;
+        case '4':
+            printf("Using Midpoint\n");
+            sys->solver = new Midpoint();
+            break;
         case '5':
             printf("Cloth + water scene\n");
             sys = SystemBuilder::get(SystemBuilder::CLOTH);
