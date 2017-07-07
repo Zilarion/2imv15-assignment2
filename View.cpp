@@ -124,6 +124,31 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             printf("Using 4th order Runge-Kutta\n");
             sys->solver = new RungeKutta();
             break;
+        case '6':
+            printf("Basic water scene\n");
+            sys = SystemBuilder::get(SystemBuilder::BASIC);
+            sys->type = SystemBuilder::BASIC;
+            break;
+        case '7':
+            printf("Water scene with a funnel\n");
+            sys = SystemBuilder::get(SystemBuilder::WATER);
+            sys->type = SystemBuilder::WATER;
+            break;
+        case '8':
+            printf("Smoke scene\n");
+            sys = SystemBuilder::get(SystemBuilder::SMOKE);
+            sys->type = SystemBuilder::SMOKE;
+            break;
+        case '9':
+            printf("Cloth scene\n");
+            sys = SystemBuilder::get(SystemBuilder::CLOTH);
+            sys->type = SystemBuilder::CLOTH;
+            break;
+        case '0':
+            printf("Hair scene\n");
+            sys = SystemBuilder::get(SystemBuilder::HAIR);
+            sys->type = SystemBuilder::HAIR;
+            break;
         case '=':
             sys->dt += 0.001f;
             printf("Increase dt: %f\n", sys->dt);
