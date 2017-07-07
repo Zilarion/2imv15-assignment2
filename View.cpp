@@ -108,22 +108,6 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             sys->free ();
             exit ( 0 );
             break;
-        case '1':
-            printf("Using Explicit Euler\n");
-            sys->solver = new Euler(Euler::EXPLICIT);
-            break;
-        case '2':
-            printf("Using Semi Explicit Euler\n");
-            sys->solver = new Euler(Euler::SEMI);
-            break;
-        case '4':
-            printf("Using Midpoint\n");
-            sys->solver = new Midpoint();
-            break;
-        case '5':
-            printf("Using 4th order Runge-Kutta\n");
-            sys->solver = new RungeKutta();
-            break;
         case '6':
             printf("Basic water scene\n");
             sys = SystemBuilder::get(SystemBuilder::BASIC);
@@ -197,13 +181,6 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             else
                 printf("Adaptive off\n");
             break;
-        case 'b':
-            sys->springsCanBreak = !sys->springsCanBreak;
-            if (sys->springsCanBreak)
-                printf("Springs can now break\n");
-            else
-                printf("Springs can no longer break\n");
-            break;
         case 'p':
             for (int i = 0; i < 1; i++)
                 sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, .3f, (rand() % 10 + 1) * 0.01f),
@@ -211,7 +188,13 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             break;
         case 'r':
         {
-            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.15f,.15f,.15f), Vector3f(5,5,5), 300.f);
+            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.15f,.15f,.15f), Vector3f(5,5,5), 10.f);
+            sys->addRigidBody(r);
+            break;
+        }
+        case 'h':
+        {
+            RigidBody* r = new RigidBody(Vector3f(0,0,0), Vector3f(.15f,.15f,.15f), Vector3f(5,5,5), 100.f);
             sys->addRigidBody(r);
             break;
         }
