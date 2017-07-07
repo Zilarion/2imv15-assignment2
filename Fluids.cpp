@@ -53,7 +53,7 @@ int main ( int argc, char ** argv )
 	printf ( "\t 0: Hair scene\n" );
 
 	View v(768, 512, dt, N);
-    v.initialize(SystemBuilder::BASIC);
+    v.initialize(SystemBuilder::CLOTH);
 	exit (0);
 }
 

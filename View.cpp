@@ -236,21 +236,23 @@ void View::onMouseEvent( int button, int state, int x, int y )
         glGetIntegerv(GL_VIEWPORT, viewMatrix);
         Particle *closestParticle = sys->particles[0];
         double closestDistance = 10000000;
-        vector<Particle*> particleCandidates;
-        for(RigidBody *r:sys->rigidBodies){
-            for(Particle *p:r->particles){
-                particleCandidates.push_back(p);
-            }
-        }
+        vector<Particle*> particleCandidates = sys->particles;
+//        for(RigidBody *r:sys->rigidBodies){
+//            for(Particle *p:r->particles){
+//                particleCandidates.push_back(p);
+//            }
+//        }
         for (int i = 0; i < particleCandidates.size(); i++) {
-            Vector3f position = particleCandidates[i]->position;
-            double screenCoordinates[3];
-            gluProject(position[0], position[1], position[2], modelMatrix, projectionMatrix, viewMatrix,
-                       &screenCoordinates[0], &screenCoordinates[1], &screenCoordinates[2]);
-            double distance = abs(x - screenCoordinates[0]) + abs(y - (height - screenCoordinates[1]));
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestParticle = particleCandidates[i];
+            if (particleCandidates[i]->movable || particleCandidates[i]->rigid) {
+                Vector3f position = particleCandidates[i]->position;
+                double screenCoordinates[3];
+                gluProject(position[0], position[1], position[2], modelMatrix, projectionMatrix, viewMatrix,
+                           &screenCoordinates[0], &screenCoordinates[1], &screenCoordinates[2]);
+                double distance = abs(x - screenCoordinates[0]) + abs(y - (height - screenCoordinates[1]));
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestParticle = particleCandidates[i];
+                }
             }
         }
         //update mouseDragParticle

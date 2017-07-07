@@ -275,22 +275,22 @@ System* SystemBuilder::initBasicCloth()
 System* SystemBuilder::initCloth() {
     System* sys = new System(new Euler(Euler::SEMI));
 
-    const int xSize = 8, ySize = 10;
-    const float deltaX = 2.0f/xSize, deltaY = 2.5f/ySize;
+    const int xSize = 6, ySize = 7;
+    const float deltaX = 1.0f/xSize, deltaY = .5f/ySize;
     int pindex = 0;
     // Initialize particles
     for (int y = 0; y < ySize; y++) {
         for (int x = 0; x < xSize; x++) {
-            sys->addParticle(new Particle(Vector3f(-0.5f + x * deltaX, 0.5f - y * deltaY, deltaY * y), 0.2f, pindex, true, false, true));
+            sys->addParticle(new Particle(Vector3f(-.4f + x * deltaX, 0.15f - y * deltaY, .75f * deltaY * y), 0.2f, pindex, true, false, true));
             pindex++;
         }
     }
 
     // Add gravity and drag to all particles
     sys->addForce(new DirectionalForce(sys->particles, Vector3f(0, -9.81f, 0)));
-    sys->addForce(new DragForce(sys->particles, 0.3f));
+    sys->addForce(new DragForce(sys->particles, 2.f));
 
-    float spr = 150.0f;
+    float spr = 170.0f;
     float dmp = 4.5f;
 
     for (int y = 0; y < ySize; y++) {
@@ -332,11 +332,71 @@ System* SystemBuilder::initCloth() {
                                                   sys->particles[0]->startPos + Vector3f(0.f, 0.05f, 0.f),
                                                   r));
 //    sys->addConstraint(new CircularWireConstraint(sys->particles[ySize/2 * xSize],
-//                                                  sys->particles[ySize/2 * xSize]->startPos + Vec3f(-r, 0.f, 0.f),
+//                                                  sys->particles[ySize/2 * xSize]->startPos + Vector3f(-r, 0.f, 0.f),
 //                                                  r));
     sys->addConstraint(new CircularWireConstraint(sys->particles[xSize-1],
                                                   sys->particles[xSize-1]->startPos + Vector3f(0.f, r, 0.f),
                                                   r));
+
+    // COPY PASTE FROM INIT BASIC
+
+
+    int dimensions = 10;
+    float mass = 1.f;
+    float massStatic = 50.f;
+    int index = 0;
+    float d = 0.03f;
+    float ds = 0.04f;
+
+    // Movable particles
+    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
+        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
+            float x = i * d + (rand() % 10 + 1) * 0.001f;
+            float y = -0.4f + (rand() % 10 + 1) * 0.001f;
+            float z = j * d + (rand() % 10 + 1) * 0.001f;
+            sys->addParticle(new Particle(Vector3f(x, y, z), mass, index++, true));
+        }
+    }
+
+    // Static particles
+    float delta = ds * 24 / 2;
+    dimensions = 24;
+    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
+        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
+            sys->addParticle(new Particle(Vector3f(i * ds, -delta - .25f, j * ds), massStatic, index++, false));
+        }
+    }
+
+    for (int i = -dimensions / 2; i < 0; i++) {
+        for (int j = -dimensions / 2; j < dimensions / 2; j++) {
+            sys->addParticle(new Particle(Vector3f(-delta, i * ds - .25f, j * ds), massStatic, index++, false));
+            sys->addParticle(new Particle(Vector3f(delta, i * ds - .25f, j * ds), massStatic, index++, false));
+        }
+    }
+
+
+    for (int i = -dimensions / 2; i < dimensions / 2; i++) {
+        for (int j = -dimensions / 2; j < 0; j++) {
+            sys->addParticle(new Particle(Vector3f(i * ds, j * ds - .25f, delta), massStatic, index++, false));
+            sys->addParticle(new Particle(Vector3f(i * ds, j * ds - .25f, -delta), massStatic, index++, false));
+        }
+    }
+
+
+    //Add a rigid body
+//    RigidBody* r = new RigidBody(Vector3f(0,2,0), Vector3f(1,1,1), Vector3f(5,5,5), massStatic);
+//    sys->addRigidBody(r);
+//    sys->addForce(new DirectionalForce(r->particles, Vector3f(0.0f, -9.81f, 0.0f)));
+//    sys->addForce(new DragForce(r->particles, 0.9f));
+
+    sys->addForce(new PressureForce(sys->particles));
+    sys->addForce(new ViscosityForce(sys->particles));
+    sys->addForce(new SurfaceForce(sys->particles));
+
+
+    // END COPY PASTE FROM INIT BASIC
+
+
     return sys;
 }
 
