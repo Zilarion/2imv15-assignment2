@@ -98,7 +98,7 @@ set(SOURCE_FILES
         Contact.h
         Object.cpp
         Object.h
-        Contact.cpp)
+        Contact.cpp parameters.h)
 
 
 add_executable(Fluids ${SOURCE_FILES})

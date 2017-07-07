@@ -16,7 +16,9 @@ void PressureForce::setTarget(const vector<Particle*> &particles) {
 void PressureForce::apply(System *s) {
     // Evaluate pressure force for every particle
     for (Particle* p : particles) {
-        p->force -= s->pressureField->eval(p);
+        Vector3f val = s->pressureField->eval(p);
+        p->force -= val;
+        p->pForce = -val;
     }
 }
 void PressureForce::draw() {

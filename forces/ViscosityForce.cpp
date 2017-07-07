@@ -26,6 +26,7 @@ void ViscosityForce::apply(System *s) {
             viscosityForce = pj->mass * (pj->velocity - pi->velocity) / pj->density
                              * Viscosity::ddW(pi->position - pj->position);
         }
+        pi->vForce = u * viscosityForce;
         pi->force += u * viscosityForce;
     }
 }

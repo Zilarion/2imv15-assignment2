@@ -14,7 +14,7 @@ RigidBody::RigidBody(Vector3f startPos, Vector3f dimensions, Vector3f numParticl
         startPos(startPos), dimensions(dimensions) {
     initializeVariables();
 
-    float density = particleMass / dimensions[0] + 15000.f;
+    float density = particleMass / dimensions[0] + 1500.f;
     //generate particles with body coordinates
     int index = 0;
     for (int x = 0; x < numParticles[0]; x++) {
@@ -112,58 +112,14 @@ void RigidBody::draw(bool drawVelocity, bool drawForce) {
 
 }
 
-VectorXf RigidBody::getBoundingBox() {
-    float minX = 100000000;
-    float maxX = -10000000;
-    float minY = 100000000;
-    float maxY = -10000000;
-    float minZ = 100000000;
-    float maxZ = -10000000;
-    for (float i = -0.5f; i < 1; i++) {
-        for (float j = -0.5f; j < 1; j++) {
-            for (float k = -0.5f; k < 1; k++) {
-                Vector3f world = R * Vector3f(i * dimensions[0], j * dimensions[1], k * dimensions[2]) + x;
-                if (world[0] < minX) {
-                    minX = world[0];
-                }
-                if (world[0] > maxX) {
-                    maxX = world[0];
-                }
-                if (world[1] < minY) {
-                    minY = world[1];
-                }
-                if (world[1] > maxY) {
-                    maxY = world[1];
-                }
-                if (world[2] < minZ) {
-                    minZ = world[2];
-                }
-                if (world[2] > maxZ) {
-                    maxZ = world[2];
-                }
-            }
-        }
-    }
-    VectorXf boundingBox(6);
-    boundingBox[0] = minX;
-    boundingBox[1] = minY;
-    boundingBox[2] = minZ;
-    boundingBox[3] = maxX;
-    boundingBox[4] = maxY;
-    boundingBox[5] = maxZ;
-    return boundingBox;
-
-}
-
 Vector3f RigidBody::getBodyCoordinates(Vector3f world) {
     return R.transpose() * (world - x);
 }
 
 void RigidBody::updateForce() {
     force = Vector3f(0, 0, 0);
-    for (Particle *p : particles) {
+    for (Particle *p : particles)
         force += p->force;
-    }
 }
 
 void RigidBody::updateTorque() {
