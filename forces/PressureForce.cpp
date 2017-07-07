@@ -17,8 +17,13 @@ void PressureForce::apply(System *s) {
     // Evaluate pressure force for every particle
     for (Particle* p : particles) {
         Vector3f val = s->pressureField->eval(p);
-        p->force -= val;
-        p->pForce = -val;
+        if(p->rigid){
+            p->force -= .02f*val;
+            p->pForce = -.02f*val;
+        } else {
+            p->force -= val;
+            p->pForce = -val;
+        }
     }
 }
 void PressureForce::draw() {
