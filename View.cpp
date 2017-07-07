@@ -108,6 +108,11 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             sys->free ();
             exit ( 0 );
             break;
+        case '5':
+            printf("Cloth + water scene\n");
+            sys = SystemBuilder::get(SystemBuilder::CLOTH);
+            sys->type = SystemBuilder::CLOTH;
+            break;
         case '6':
             printf("Basic water scene\n");
             sys = SystemBuilder::get(SystemBuilder::BASIC);

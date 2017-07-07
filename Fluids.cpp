@@ -45,7 +45,7 @@ int main ( int argc, char ** argv )
 	printf ( "\t Toggle visibility of forces with the 'f' key\n" );
 	printf ( "\t Toggle visibility of constraints with the 'o' key\n" );
 	printf ( "\t Use ',' '.' and '/' to rotate\n" );
-	printf ( "\t Use '6' to 9' and '0' to change between Scenes\n" );
+	printf ( "\t Use '5' to 9' and '0' to change between Scenes\n" );
 	printf ( "\t 6: Basic water scene\n" );
 	printf ( "\t 7: Water scene in a funnel\n" );
 	printf ( "\t 8: Smoke scene\n" );
