@@ -221,13 +221,12 @@ void System::computeForces() {
 
     // Compute all densities
     for (Particle *p : particles) {
-        if (p->rigid || p->cloth) continue;
+        if (p->rigid) continue;
         p->density = densityField->eval(p);
     }
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
-        if (p->cloth) continue;
         p->pressure = k * (p->density - restDensity);
     }
 
