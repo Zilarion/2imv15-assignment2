@@ -722,7 +722,10 @@ void MarchingCubes::drawMarching() {
     }
 
     //// draw triangles
-    glColor4f(0.1f, 0.9f, 0.9f, 1.0f);
+    if (system->type == SystemBuilder::SMOKE)
+        glColor4f(0.9f, 0.9f, 0.9f, 0.2f);
+    else
+        glColor4f(0.1f, 0.9f, 0.9f, 1.0f);
     glBegin(GL_TRIANGLES);
     for (int i = 0; i < triangles.size(); i++) {
         TRIANGLE triangle = triangles[i];
@@ -768,7 +771,7 @@ void MarchingCubes::drawMarching() {
 MarchingCubes::MarchingCubes(System *system) : system(system) {
     cubeStart = XYZ{-1.1f, -1.1f, -1.1f};
     cubeEnd = XYZ{1.1f, 1.1f, 1.1f};
-    cubeStep = .0125f; // a whole number of steps should fit into interval
+    cubeStep = .05f; // a whole number of steps should fit into interval
 
     cubeStartInt = new int[3];
     cubeEndInt = new int[3];
