@@ -271,7 +271,7 @@ void View::onMotionEvent( int x, int y )
         gluUnProject(x, height - y, z, modelMatrix, projectionMatrix, viewMatrix, &objCoordinates[0],
                      &objCoordinates[1], &objCoordinates[2]);
         Vector3f position = mouseDragParticle->position;
-        mouseDragForce->direction =  30.f * Vector3f((objCoordinates[0] - position[0]), (objCoordinates[1] - position[1]),
+        mouseDragForce->direction =  80.f * Vector3f((objCoordinates[0] - position[0]), (objCoordinates[1] - position[1]),
                                    (objCoordinates[2] - position[2]));
 }
 
