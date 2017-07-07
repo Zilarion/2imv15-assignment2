@@ -149,11 +149,11 @@ void View::onKeyPress ( unsigned char key, int x, int y )
             sys = SystemBuilder::get(SystemBuilder::GLASS);
             sys->type = SystemBuilder::GLASS;
             break;
-        case '0':
-            printf("Hair scene\n");
-            sys = SystemBuilder::get(SystemBuilder::CLOTH);
-            sys->type = SystemBuilder::CLOTH;
-            break;
+//        case '0':
+//            printf("Hair scene\n");
+//            sys = SystemBuilder::get(SystemBuilder::CLOTH);
+//            sys->type = SystemBuilder::CLOTH;
+//            break;
         case '=':
             sys->dt += 0.001f;
             printf("Increase dt: %f\n", sys->dt);
