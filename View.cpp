@@ -160,9 +160,6 @@ void View::onKeyPress ( unsigned char key, int x, int y )
         case 'v':
             drawVelocity = !drawVelocity;
             break;
-        case 'o':
-            drawConstraints = !drawConstraints;
-            break;
         case 'f':
             drawForces = !drawForces;
             break;
@@ -207,7 +204,12 @@ void View::onKeyPress ( unsigned char key, int x, int y )
         case 'p':
             for (int i = 0; i < 1; i++)
                 sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.01f, .3f, (rand() % 10 + 1) * 0.01f),
-                                          1.f, sys->particles.size() + 1, true));
+                                              1.f, sys->particles.size() + 1, true));
+            break;
+        case 'o':
+            for (int i = 0; i < 100; i++)
+                sys->addParticle(new Particle(Vector3f((rand() % 10 + 1) * 0.02f, -.8f - (rand() % 10 + 1) * 0.05f, (rand() % 10 + 1) * 0.02f),
+                                              1.f, sys->particles.size() + 1, true));
             break;
         case 'r':
         {
@@ -357,7 +359,7 @@ void View::preDisplay3D()
     glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity ();
-    glTranslatef(0.0f, .5f, -2.5f);
+    glTranslatef(0.0f, .2f, -2.5f);
 //    glRotatef(90, 1.0f, 0.0f, 0.0f);
     glRotatef(camAngle, 0.0f, 1.0f, 0.0f);
 

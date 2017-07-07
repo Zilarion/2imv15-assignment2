@@ -53,7 +53,6 @@ System *SystemBuilder::get(AvailableSystems s) {
 System* SystemBuilder::initBasic()
 {
     System* sys = new System(new Euler(Euler::SEMI));
-//    System* sys = new System(new RungeKutta());
 
     int dimensions = 20;
     float mass = 1.f;
@@ -110,9 +109,8 @@ System* SystemBuilder::initBasic()
 }
 System *SystemBuilder::initTrechter() {
     System *sys = new System(new Euler(Euler::SEMI));
-//    System* sys = new System(new RungeKutta());
 
-    int dimensions = 7;
+    int dimensions = 4;
     float mass = 1.f;
     float massStatic = 50.f;
     int index = 0;
@@ -126,18 +124,18 @@ System *SystemBuilder::initTrechter() {
                 float x = i * d + (rand() % 10 + 1) * 0.001f;
                 float y = k*d-.4f + (rand() % 10 + 1) * 0.001f;
                 float z = j * d + (rand() % 10 + 1) * 0.001f;
-                sys->addParticle(new Particle(Vector3f(x, y, z), mass, index++, true));
+                sys->addParticle(new Particle(Vector3f(x, y + 0.5f, z), mass, index++, true));
             }
         }
     }
 
     // These forces only apply to non-static particles
     sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, -9.81f, .0f)));
-    sys->addForce(new DragForce(sys->particles, 0.5f));
+    sys->addForce(new DragForce(sys->particles, 2.f));
 
     // Static particles
-    float topRadius = .3f;
-    float bottomRadius = .05f;
+    float topRadius = .2f;
+    float bottomRadius = .075f;
     float radiusStep = (topRadius - bottomRadius)/30;
     int angleSteps = 120;
     float angleStep = M_PI * 2 / angleSteps;
@@ -147,7 +145,7 @@ System *SystemBuilder::initTrechter() {
         for (int y = -20; y < 0; y++) {
             float x = cos(angle) * radius;
             float z = sin(angle) * radius;
-            sys->addParticle(new Particle(Vector3f(x, y * ds, z), mass, index++, false));
+            sys->addParticle(new Particle(Vector3f(x, y * ds + 0.5f, z), mass, index++, false));
             radius+=radiusStep;
         }
     }
@@ -222,7 +220,6 @@ System *SystemBuilder::initGlass() {
 
 System *SystemBuilder::initSmoke() {
     System *sys = new System(new Euler(Euler::SEMI));
-//    System* sys = new System(new RungeKutta());
 
     int dimensions = 2;
     float mass = 1.f;
@@ -230,17 +227,19 @@ System *SystemBuilder::initSmoke() {
     float d = 0.05f;
 
     // Movable particles
-    for (int i = -dimensions; i < dimensions; i++) {
-        for (int j = -dimensions; j < dimensions; j++) {
-            sys->addParticle(new Particle(Vector3f(i * d, -1.f, j * d), mass, index++, true));
-        }
-    }
+//    for (int i = -dimensions; i < dimensions; i++) {
+//        for (int j = -dimensions; j < dimensions; j++) {
+//            sys->addParticle(new Particle(Vector3f(i * d, -1.f, j * d), mass, index++, true));
+//        }
+//    }
 
-    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, 1.81f, .0f)));
-    sys->addForce(new DragForce(sys->particles, 0.2f));
+    sys->addForce(new DirectionalForce(sys->particles, Vector3f(.0f, 9.81f, .0f)));
+    sys->addForce(new DragForce(sys->particles, 2.f));
     sys->addForce(new PressureForce(sys->particles));
     sys->addForce(new ViscosityForce(sys->particles));
     sys->addForce(new SurfaceForce(sys->particles));
+
+    std::cout << "Smoke scene created, press 'o' to spawn smoke." << std::endl;
 
     return sys;
 }

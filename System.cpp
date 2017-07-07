@@ -236,9 +236,10 @@ void System::computeForces() {
         f->apply(this);
     }
 
-    float vfmean, pfmean, sfmean;
+    float vfmean = 0, pfmean = 0, sfmean = 0;
     for (Particle *p : particles) {
-        float sum = (p->vForce + p->pForce + p->sForce).norm();
+        float sum = (p->vForce).norm() + (p->pForce).norm() + (p->sForce).norm();
+        if (sum == 0) sum = 0.01f;
         float vf = (p->vForce).norm() / sum;
         float pf = (p->pForce).norm() / sum;
         float sf = (p->sForce).norm() / sum;
@@ -251,7 +252,7 @@ void System::computeForces() {
     pfmean /= particles.size();
     sfmean /= particles.size();
 
-    std::cout << vfmean << std::endl << pfmean << std::endl << sfmean << std::endl << std::endl;
+//    std::cout << std::endl << vfmean << std::endl << pfmean << std::endl << sfmean << std::endl << std::endl;
 }
 
 void System::clearForces() {
