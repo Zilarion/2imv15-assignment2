@@ -34,4 +34,5 @@ public:
     bool movable;
     bool rigid;
 	bool cloth;
+	Vector3f sForce, pForce, vForce;
 };

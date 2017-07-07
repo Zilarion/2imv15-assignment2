@@ -12,10 +12,7 @@ Vector3f PressureField::eval(Particle* pi) {
     vector<Particle*> targets = sys->grid.query(pi->position);
     for (Particle* pj : targets) {
         if (pi->cloth && pj->cloth) continue;
-        if (pi->rigid && !pj->movable)
-            force += (0.01f * pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position));
-        else
-            force += pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position);
+        force += pj->mass * (pi->pressure + pj->pressure) / (2 * pj->density) * Spiky::dW(pi->position - pj->position);
     }
     return force;
 }

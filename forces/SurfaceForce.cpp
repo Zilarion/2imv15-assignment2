@@ -13,8 +13,8 @@ void SurfaceForce::setTarget(const vector<Particle *> &particles) {
 
 void SurfaceForce::apply(System *s) {
     //Tension coefficient water-air
-    float sigma = 12.75f;
-    float certainThreshold = .01f;
+    float sigma = 120.75f;
+    float certainThreshold = .001f;
 
     // Evaluate surface force for every particle
     for (Particle *pi : particles) {
@@ -22,6 +22,7 @@ void SurfaceForce::apply(System *s) {
         Vector3f n = s->colorField->dEval(pi->position);
         if (n.norm() > certainThreshold) {
             pi->force += -sigma * s->colorField->ddEval(pi->position) * n / n.norm();
+            pi->sForce = -sigma * s->colorField->ddEval(pi->position) * n / n.norm();
         }
     }
 }

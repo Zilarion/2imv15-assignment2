@@ -9,6 +9,8 @@
 #include "fields/ColorField.h"
 #include "MarchingCubes.h"
 #include "forces/DirectionalForce.h"
+#include <iostream>
+#include "parameters.h"
 
 
 const int RigidBody::STATE_SIZE;
@@ -218,13 +220,10 @@ void System::computeForces() {
     grid.insert(particles);
 
     // Compute all densities
-    float restDensity = 10000;
     for (Particle *p : particles) {
         if (p->rigid || p->cloth) continue;
         p->density = densityField->eval(p);
     }
-
-    float k = 5.f;
 
     // Compute all pressures at each particle
     for (Particle *p : particles) {
@@ -237,6 +236,22 @@ void System::computeForces() {
         f->apply(this);
     }
 
+    float vfmean, pfmean, sfmean;
+    for (Particle *p : particles) {
+        float sum = (p->vForce + p->pForce + p->sForce).norm();
+        float vf = (p->vForce).norm() / sum;
+        float pf = (p->pForce).norm() / sum;
+        float sf = (p->sForce).norm() / sum;
+
+        vfmean += vf;
+        pfmean += pf;
+        sfmean += sf;
+    }
+    vfmean /= particles.size();
+    pfmean /= particles.size();
+    sfmean /= particles.size();
+
+    std::cout << vfmean << std::endl << pfmean << std::endl << sfmean << std::endl << std::endl;
 }
 
 void System::clearForces() {
